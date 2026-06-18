@@ -1,0 +1,17 @@
+{
+  // Used only to emit .d.ts declarations for the published package.
+  // The base tsconfig.json keeps noEmit for editor/Bun usage.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "allowImportingTsExtensions": false,
+    "allowJs": false
+  },
+  "include": ["src"],
+  "exclude": ["dist", "node_modules", "src/**/*.test.ts"]
+}

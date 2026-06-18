@@ -1,0 +1,37 @@
+{
+  "name": "tsprov",
+  "version": "0.1.0",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "bun run clean && bun run build:js && bun run build:cjs && bun run build:types",
+    "build:js": "bun build ./src/index.ts --outdir ./dist --target node --format esm --sourcemap=linked",
+    "build:cjs": "bun build ./src/index.ts --outdir ./dist --target node --format cjs --sourcemap=linked --entry-naming '[name].cjs'",
+    "build:types": "tsc -p tsconfig.build.json",
+    "test": "bun test",
+    "prepublishOnly": "bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
