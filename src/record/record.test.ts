@@ -1,6 +1,8 @@
 import { test, expect, describe } from "bun:test";
 
 import { ProvRecord, type RecordBundle } from "./record";
+import { ProvElement } from "./element";
+import { ProvRelation } from "./relation";
 import { Namespace, QualifiedName } from "../identifier";
 import { Literal } from "../literal";
 import { ProvException, ProvExceptionInvalidQualifiedName } from "../error";
@@ -29,28 +31,22 @@ const bundle: RecordBundle = {
   },
 };
 
-class TestEntity extends ProvRecord {
+// Minimal concrete fixtures. They extend the real `ProvElement`/`ProvRelation`
+// bases (rather than overriding `isElement`/`isRelation` by hand) so they inherit
+// the genuine element/relation type-guard behavior under test.
+class TestEntity extends ProvElement {
   static override readonly prov_type = PROV_ENTITY;
-  override isElement(): boolean {
-    return true;
-  }
 }
-class TestActivity extends ProvRecord {
+class TestActivity extends ProvElement {
   static override readonly prov_type = PROV_ACTIVITY;
-  override isElement(): boolean {
-    return true;
-  }
 }
-class TestGeneration extends ProvRecord {
+class TestGeneration extends ProvRelation {
   static override readonly prov_type = PROV_GENERATION;
   static override readonly FORMAL_ATTRIBUTES = [
     PROV_ATTR_ENTITY,
     PROV_ATTR_ACTIVITY,
     PROV_ATTR_TIME,
   ] as const;
-  override isRelation(): boolean {
-    return true;
-  }
 }
 
 describe("type & attribute views", () => {

@@ -32,6 +32,11 @@ import {
   PROV_ATTRIBUTES,
   PROV_N_MAP,
 } from "../constants";
+// Type-only: lets `isElement`/`isRelation` narrow at the call site. Erased at
+// compile time (`import type`), so it adds no runtime edge to the element/relation
+// modules that import this one.
+import type { ProvElement } from "./element";
+import type { ProvRelation } from "./relation";
 
 /** A value that can be resolved to a {@link QualifiedName}: a QName, a prefixed string, or an Identifier. */
 export type QualifiedNameCandidate = QualifiedName | string | Identifier;
@@ -62,12 +67,12 @@ export type ProvAttributes =
  * The minimal bundle contract a {@link ProvRecord} needs: qualified-name
  * resolution. Implemented by `ProvBundle`'s `NamespaceManager` at M4.
  */
-export interface RecordBundle {
+export type RecordBundle = {
   /** Resolves a candidate to a {@link QualifiedName}, or `null` if it cannot be resolved. */
   validQualifiedName(name: QualifiedNameCandidate): QualifiedName | null;
   /** Resolves a candidate to a {@link QualifiedName}, throwing if it cannot be resolved. */
   mandatoryValidQname(name: QualifiedNameCandidate): QualifiedName;
-}
+};
 
 /** Set equality over canonical strings. */
 function setEqual(a: Set<string>, b: Set<string>): boolean {
@@ -169,13 +174,13 @@ export abstract class ProvRecord {
     return (this.constructor as typeof ProvRecord).FORMAL_ATTRIBUTES;
   }
 
-  /** True if this record is an element; overridden in `ProvElement`. */
-  isElement(): boolean {
+  /** Narrows to {@link ProvElement} (overridden there to return `true`). */
+  isElement(): this is ProvElement {
     return false;
   }
 
-  /** True if this record is a relation; overridden in `ProvRelation`. */
-  isRelation(): boolean {
+  /** Narrows to {@link ProvRelation} (overridden there to return `true`). */
+  isRelation(): this is ProvRelation {
     return false;
   }
 

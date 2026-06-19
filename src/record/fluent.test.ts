@@ -1,12 +1,15 @@
 import { test, expect, describe } from "bun:test";
 
 import { ProvBundle } from "../bundle";
-import { ProvEntity, ProvActivity, ProvAgent } from "./element";
+import { ProvDocument } from "../document";
+import type { ProvRecord } from "./record";
+import { ProvEntity, ProvActivity, ProvAgent, ProvElement } from "./element";
 import {
   ProvGeneration,
   ProvUsage,
   ProvAssociation,
   ProvDelegation,
+  ProvRelation,
 } from "./relation";
 
 function exBundle(): ProvBundle {
@@ -73,5 +76,40 @@ describe("fluent record methods", () => {
     expect(b.entity("ex:e")).toBeInstanceOf(ProvEntity);
     expect(b.activity("ex:a")).toBeInstanceOf(ProvActivity);
     expect(b.agent("ex:ag")).toBeInstanceOf(ProvAgent);
+  });
+});
+
+describe("is* type-guard narrowing", () => {
+  // Each branch body assigns the guarded value to the narrowed type. These
+  // compile *only* if the `is*` methods are type predicates — a plain `boolean`
+  // return would leave the wider type and fail `tsc`. So the build is the assertion.
+  test("isElement / isRelation narrow a ProvRecord", () => {
+    const b = exBundle();
+    const element: ProvRecord = b.entity("ex:e");
+    const relation: ProvRecord = b.wasGeneratedBy(b.entity("ex:e2"), b.activity("ex:a"));
+
+    if (element.isElement()) {
+      const narrowed: ProvElement = element;
+      expect(narrowed).toBe(element);
+    } else {
+      throw new Error("entity should narrow to ProvElement");
+    }
+
+    if (relation.isRelation()) {
+      const narrowed: ProvRelation = relation;
+      expect(narrowed).toBe(relation);
+    } else {
+      throw new Error("generation should narrow to ProvRelation");
+    }
+  });
+
+  test("isDocument narrows a ProvBundle to ProvDocument", () => {
+    const container: ProvBundle = new ProvDocument();
+    if (container.isDocument()) {
+      const doc: ProvDocument = container;
+      expect(doc.bundles).toEqual([]); // ProvDocument-only member, reachable via the guard
+    } else {
+      throw new Error("ProvDocument should narrow via isDocument()");
+    }
   });
 });

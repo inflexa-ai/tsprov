@@ -1,8 +1,8 @@
 import { test, expect, describe } from "bun:test";
 
 import { ProvBundle } from "./bundle";
-import { ProvEntity, ProvActivity } from "./record/element";
-import { ProvGeneration } from "./record/relation";
+import { ProvEntity, ProvActivity, ProvAgent, ProvElement } from "./record/element";
+import { ProvGeneration, ProvRelation } from "./record/relation";
 import {
   PROV_ENTITY,
   PROV_GENERATION,
@@ -135,5 +135,45 @@ describe("bundle equality", () => {
     b2.entity("ex:b");
     b2.entity("ex:a");
     expect(b1.equals(b2)).toBe(true);
+  });
+});
+
+describe("getRecords class filtering (model.py:1527)", () => {
+  function populated(): ProvBundle {
+    const b = exBundle();
+    b.entity("ex:e");
+    b.activity("ex:a");
+    b.agent("ex:ag");
+    b.wasGeneratedBy("ex:e", "ex:a");
+    return b;
+  }
+
+  test("no filter returns every record", () => {
+    expect(populated().getRecords()).toHaveLength(4);
+  });
+
+  test("a single class filters and narrows the result type", () => {
+    const entities = populated().getRecords(ProvEntity);
+    // Compile-time: `entities` is `ProvEntity[]` (no cast) — `.value` is entity-only.
+    expect(entities.every((e: ProvEntity) => e instanceof ProvEntity)).toBe(true);
+    expect(entities).toHaveLength(1);
+  });
+
+  test("an abstract base class matches all its subclasses", () => {
+    const b = populated();
+    expect(b.getRecords(ProvElement)).toHaveLength(3); // entity + activity + agent
+    expect(b.getRecords(ProvRelation)).toHaveLength(1); // the generation
+  });
+
+  test("an array of classes is a union filter", () => {
+    const some = populated().getRecords([ProvEntity, ProvAgent]);
+    expect(some).toHaveLength(2);
+    expect(some.some((r) => r instanceof ProvEntity)).toBe(true);
+    expect(some.some((r) => r instanceof ProvAgent)).toBe(true);
+  });
+
+  test("a class with no instances yields an empty array", () => {
+    expect(populated().getRecords(ProvGeneration)).toHaveLength(1);
+    expect(new ProvBundle().getRecords(ProvActivity)).toEqual([]);
   });
 });

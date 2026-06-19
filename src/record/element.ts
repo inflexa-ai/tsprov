@@ -51,7 +51,7 @@ export abstract class ProvElement extends ProvRecord {
     super(bundle, identifier, attributes);
   }
 
-  override isElement(): boolean {
+  override isElement(): this is ProvElement {
     return true;
   }
 }

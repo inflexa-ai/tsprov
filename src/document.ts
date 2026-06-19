@@ -16,6 +16,7 @@ import type { QualifiedName } from "./identifier";
 import type { NamespaceCollection } from "./namespace-manager";
 import { ProvException } from "./error";
 import { getSerializer } from "./serializers/serializer";
+import type { ProvFormat } from "./serializers/serializer";
 // Side-effect import: registers the core PROV-N serializer (JSON joins it at M5).
 import "./serializers/provn";
 
@@ -35,7 +36,7 @@ export class ProvDocument extends ProvBundle {
     super(records ?? null, null, namespaces ?? null, null);
   }
 
-  override isDocument(): boolean {
+  override isDocument(): this is ProvDocument {
     return true;
   }
 
@@ -49,11 +50,11 @@ export class ProvDocument extends ProvBundle {
   /**
    * Serializes the document in the given format (`model.py:2707`).
    *
-   * @param format Registered format name (default `"json"`).
+   * @param format Registered format name (default `"json"`); built-ins autocomplete.
    * @returns The serialized text.
    * @throws {DoNotExist} If the format has no registered serializer.
    */
-  serialize(format = "json"): string {
+  serialize(format: ProvFormat = "json"): string {
     const result = getSerializer(format).serialize(this);
     return typeof result === "string"
       ? result
@@ -64,14 +65,14 @@ export class ProvDocument extends ProvBundle {
    * Deserializes input in the given format into a new document (`model.py:2752`).
    *
    * @param input  The serialized input.
-   * @param format Registered format name (default `"json"`).
+   * @param format Registered format name (default `"json"`); built-ins autocomplete.
    * @returns The parsed document.
    * @throws {DoNotExist} If the format has no registered serializer.
    * @throws {UnsupportedOperationError} For serialize-only formats (e.g. PROV-N).
    */
   static deserialize(
     input: string | Uint8Array,
-    format = "json",
+    format: ProvFormat = "json",
   ): ProvDocument {
     return getSerializer(format).deserialize(input);
   }
@@ -183,8 +184,11 @@ export class ProvDocument extends ProvBundle {
     for (const record of other.getRecords()) {
       this.addRecord(record);
     }
-    if (other.hasBundles()) {
-      for (const bundle of (other as ProvDocument).bundles) {
+    // `isDocument()` narrows `other` to `ProvDocument` (so `.bundles` needs no
+    // cast); `hasBundles()` keeps Python's exact guard (`model.py:2620`). Any
+    // bundle-carrying container is necessarily a document, so this is equivalent.
+    if (other.isDocument() && other.hasBundles()) {
+      for (const bundle of other.bundles) {
         const bundleId = bundle.identifier;
         if (bundleId === null) {
           continue;

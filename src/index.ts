@@ -70,7 +70,13 @@ export { NamespaceManager } from "./namespace-manager";
 export type { NamespaceCollection } from "./namespace-manager";
 
 export { ProvBundle } from "./bundle";
-export type { EntityRef, ActivityRef, AgentRef } from "./bundle";
+export type {
+  EntityRef,
+  ActivityRef,
+  AgentRef,
+  RecordClass,
+  RecordInstance,
+} from "./bundle";
 export type { AttributeValue } from "./record/record";
 
 export { ProvDocument } from "./document";
@@ -87,6 +93,8 @@ export type {
   Serializer,
   SerializeOptions,
   DeserializeOptions,
+  ProvFormat,
+  BuiltinProvFormat,
 } from "./serializers/serializer";
 // Value-export the serializers so their modules (and their `registerSerializer`
 // calls) are included in the bundle despite `sideEffects: false`.

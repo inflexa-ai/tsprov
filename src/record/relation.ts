@@ -53,7 +53,7 @@ import {
 
 /** Base class for PROV relations (edges between elements) (`model.py:640`). */
 export abstract class ProvRelation extends ProvRecord {
-  override isRelation(): boolean {
+  override isRelation(): this is ProvRelation {
     return true;
   }
 }

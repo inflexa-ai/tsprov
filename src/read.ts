@@ -11,18 +11,19 @@
 
 import { ProvDocument } from "./document";
 import { registeredFormats } from "./serializers/serializer";
+import type { ProvFormat } from "./serializers/serializer";
 
 /**
  * Parses serialized PROV content into a {@link ProvDocument}.
  *
  * @param content The serialized document text (or bytes).
- * @param format  Optional format name; omit to auto-detect by probing serializers.
+ * @param format  Optional format name (built-ins autocomplete); omit to auto-detect by probing serializers.
  * @returns The parsed document.
  * @throws {TypeError} If `format` is omitted and no registered format can parse the content.
  */
 export function read(
   content: string | Uint8Array,
-  format?: string,
+  format?: ProvFormat,
 ): ProvDocument {
   if (format !== undefined) {
     return ProvDocument.deserialize(content, format);

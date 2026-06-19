@@ -43,6 +43,10 @@ import type {
   ProvMention,
   ProvMembership,
 } from "./record/relation";
+// Type-only: lets `isDocument` narrow `this`/a bundle ref to `ProvDocument` at the
+// call site. Erased at compile time, so it adds no runtime edge to `document.ts`
+// (which value-imports `ProvBundle` from here).
+import type { ProvDocument } from "./document";
 import { ProvException } from "./error";
 import { ensureDateTime, type DateLike } from "./datetime";
 import {
@@ -106,6 +110,23 @@ export type EntityRef = ProvRecord | QualifiedNameCandidate;
 export type ActivityRef = ProvRecord | QualifiedNameCandidate;
 /** A reference to an agent (see {@link EntityRef}). */
 export type AgentRef = ProvRecord | QualifiedNameCandidate;
+
+/**
+ * A {@link ProvRecord} subclass constructor — the filter accepted by
+ * {@link ProvBundle.getRecords}. May be abstract (e.g. {@link ProvElement}), since it
+ * is used only as the right operand of `instanceof`, never invoked.
+ */
+// `any[]` args: the constructor is never called here, only `instanceof`-tested, so
+// the parameter types are irrelevant and this accepts every record class.
+export type RecordClass<T extends ProvRecord = ProvRecord> = abstract new (
+  ...args: any[]
+) => T;
+
+/**
+ * The instance type a {@link RecordClass} constructs. Distributes over a union of
+ * classes, so an array of filters yields the union of their instance types.
+ */
+export type RecordInstance<C> = C extends RecordClass<infer T> ? T : never;
 
 /** A named set of PROV records plus the fluent authoring API (`model.py:1373`). */
 export class ProvBundle implements RecordBundle {
@@ -233,12 +254,15 @@ export class ProvBundle implements RecordBundle {
     return valid;
   }
 
-  /** True for a document; overridden in `ProvDocument`. */
-  isDocument(): boolean {
+  /** Narrows to {@link ProvDocument} (overridden there to return `true`). */
+  isDocument(): this is ProvDocument {
     return false;
   }
 
-  /** True for a (non-document) bundle. */
+  // Not a `this is ProvBundle` guard: `ProvDocument` *extends* `ProvBundle` yet
+  // returns `false` here (a document is not a *plain* bundle, `model.py:2549`), so a
+  // structural predicate would be unsound. This stays a semantic boolean.
+  /** True for a plain (non-document) bundle. */
   isBundle(): boolean {
     return true;
   }
@@ -248,9 +272,25 @@ export class ProvBundle implements RecordBundle {
     return false;
   }
 
-  /** All records (`model.py:1514`). (Type-filtered variant: a future addition.) */
-  getRecords(): ProvRecord[] {
-    return [...this._records];
+  /** All records (`model.py:1514`). */
+  getRecords(): ProvRecord[];
+  /**
+   * Records of a given subclass, narrowed to that type (`model.py:1527`).
+   *
+   * @param filter A record class, or an array of them, to keep (Python's
+   *   `isinstance(rec, class_or_type_or_tuple)`).
+   * @returns Only the records that are instances of `filter`, typed as such.
+   */
+  getRecords<C extends RecordClass>(filter: C | readonly C[]): RecordInstance<C>[];
+  getRecords(
+    filter?: RecordClass | readonly RecordClass[],
+  ): ProvRecord[] {
+    if (filter === undefined) {
+      return [...this._records];
+    }
+    // `instanceof` makes the narrowing sound — no asserted cast needed.
+    const classes = typeof filter === "function" ? [filter] : filter;
+    return this._records.filter((r) => classes.some((cls) => r instanceof cls));
   }
 
   /** The records matching an identifier (`model.py:1532`). */
@@ -379,14 +419,16 @@ export class ProvBundle implements RecordBundle {
   protected unifiedRecords(): ProvRecord[] {
     const mergedByKey = new Map<string, ProvRecord>();
     for (const records of this._idMap.values()) {
-      if (records.length > 1) {
-        const merged = records[0]!.copy();
-        for (let i = 1; i < records.length; i += 1) {
-          merged.addAttributes(records[i]!.attributes);
-        }
-        for (const record of records) {
-          mergedByKey.set(record.key, merged);
-        }
+      const [first, ...rest] = records;
+      if (first === undefined || rest.length === 0) {
+        continue; // 0 or 1 record for this id — nothing to merge
+      }
+      const merged = first.copy();
+      for (const record of rest) {
+        merged.addAttributes(record.attributes);
+      }
+      for (const record of records) {
+        mergedByKey.set(record.key, merged);
       }
     }
     if (mergedByKey.size === 0) {

@@ -1,13 +1,31 @@
-If the time is greater than 13:30 (using my computer's time), stop looping.
+If the time is greater than 15:00 (using my computer's time), stop looping.
 
 Read ./docs/migration/ fully. It contains documents about migrating a python codebase to typescript, and also progress reports done by other agents.
 
-Reason about the next migration item to pick up and use the reference python code at ./reference/prov/ to drive the typescript implementation.
+The migration should be mostly implemented in ./src/ .
 
-The migration item should be tested. The reference python impl has comprehensive tests.
+I want you to read the codebase and determine if it's typescript idiomatic. For example, there is a case in document:
 
-After the migration item is implemented, write a doc in ./docs/migration/ where you document the progress for the next agent to pick it up.
+```
+  /**
+   * Serializes the document in the given format (`model.py:2707`).
+   *
+   * @param format Registered format name (default `"json"`).
+   * @returns The serialized text.
+   * @throws {DoNotExist} If the format has no registered serializer.
+   */
+  serialize(format = "json"): string {
+    const result = getSerializer(format).serialize(this);
+    return typeof result === "string"
+      ? result
+      : new TextDecoder().decode(result);
+  }
+```
 
-You may not install anything on the system, besides npm packages that may be required by the implementation (however, even those should have appeared in the migration docs).
+where the format is a string, defaulting to "json". Why not have a union type that can allow the caller to have LSP niceties?
+
+Things like that I don't necessarily love, and I believe there can be many of them in the codebase.
+
+Your goal is to make it more typescript idiomatic, without changing features, or breaking tests, or giving up on the python3 impl (from ./reference/prov/) feature-parity and fidelity
 
 Do your best!

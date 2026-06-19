@@ -45,6 +45,248 @@ purely post-v1: PROV-N byte-differential, then M7 CLI / M8 graph+dot / M9 XML+RD
 
 ---
 
+## 2026-06-19 · entry 22 — idiomatic-TS pass (5): `interface` → `type` for the two contracts
+
+**Build:** `bun test` 629 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green. No behavior or
+API-shape change (only the declaration keyword).
+
+### What shipped
+
+- **`RecordBundle` (`record.ts`) and `Serializer` (`serializers/serializer.ts`) are now `type`
+  aliases**, not `interface`s — applying CLAUDE.md's "Prefer `type` over `interface`". Both are plain
+  contracts `implements`-ed by classes (`ProvBundle implements RecordBundle`; `ProvNSerializer` /
+  `ProvJsonSerializer implements Serializer`), and a class implements an object `type` exactly as it
+  does an interface, so nothing downstream changed. Neither needed interface-only features
+  (declaration merging / `extends`). They are **not** the "PROV record hierarchy" the convention
+  carves out — that exception is about the record *classes*, not these resolver/serializer contracts.
+  No `interface` declarations remain in non-test `src/`.
+
+### Status — idiomatic sweep is winding down
+
+Five passes this session (entries 18–22). The mechanical, clearly-correct idiomatic gaps are closed:
+finite string-set → union (`ProvFormat`), boolean checks → type guards, a deferred Python filter
+restored with sound generics (`getRecords`), non-null assertions removed, `interface` → `type`. What
+remains genuinely needs a **focused session** (see entry 21): the `newRecord` builder casts (a
+`constants.ts` QName→class branding refactor that changes exported constant types — wants sign-off)
+and the branded entity/activity/agent refs (a DX project). Not loop-tick work.
+
+### Verify before the next entry
+
+```sh
+bun test && bunx tsc --noEmit -p tsconfig.json && bun run build
+```
+
+---
+
+## 2026-06-19 · entry 21 — idiomatic-TS pass (4): drop the last non-null assertions + clean scan
+
+**Build:** `bun test` 629 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green. Pure
+refactor — no behavior change, no API change.
+
+### What shipped
+
+- **`ProvBundle.unifiedRecords` no longer uses `records[0]!` / `records[i]!`** — rewritten with
+  `const [first, ...rest] = records` + `for (const record of rest)`. `rest.length === 0` is the exact
+  equivalent of the old `records.length > 1` guard, so behavior is identical, and the indexed access
+  (which `noUncheckedIndexedAccess` was forcing the `!` on) is gone. **Zero non-null assertions remain
+  in non-test `src/`.**
+
+### Scan results (this pass was mostly verification that the surface is already clean)
+
+Swept `literal.ts`, `datetime.ts`, and the broader tree for the remaining smell classes:
+- **No raw-`string` known-sets** left to unionize — `Literal.langtag` (open BCP-47) and the
+  `xsd:dateTime` lexical strings are genuinely open sets; the datatype parser map is correctly
+  string-keyed by `.uri` (per the value-equality invariant). `ProvFormat` (entry 18) was the only
+  finite one.
+- **No `.forEach`** (already `for…of`), **no stray `let`** (all are real reassignments), **no
+  mutable-internal-array leaks** in the getters spot-checked.
+
+### Still open (needs an isolated session — do NOT cram into a 10-min loop tick)
+
+- **`newRecord` builder casts** (`as ProvEntity`/… across ~18 builders). Sound removal needs a
+  type-level QName→class link: brand the record-type constants in `constants.ts` as
+  `RecordTypeQName<ProvEntity>` (phantom field) and make `newRecord` generic over the brand, collapsing
+  ~18 call-site casts into one justified internal `as T`. Touches `constants.ts` + 18 `import type`s +
+  variance-sensitive inference — verify thoroughly in isolation. The lateral `newRecord<T>()` type-arg
+  alternative just moves the assertion; prefer the branded version because it makes the link *checked*.
+- **`EntityRef`/`ActivityRef`/`AgentRef`** are still bare aliases (`ProvRecord | QualifiedNameCandidate`)
+  — a branded-ref refinement to enforce entity-vs-activity distinctness is a separate DX project.
+
+> **Loop note:** `/loop @loop.md`, stop past **15:00**. Four passes this session (entries 18–21). The
+> cron re-fires every 10 min and self-stops after 15:00. The codebase is now substantially more
+> idiomatic; the two open items above are the only material ones left and both want a focused session.
+
+### Verify before the next entry
+
+```sh
+bun test && bunx tsc --noEmit -p tsconfig.json && bun run build
+```
+
+---
+
+## 2026-06-19 · entry 20 — idiomatic-TS pass (3): generic `getRecords(class)` filter (restores parity)
+
+**Build:** `bun test` 629 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green · the
+overloads verified in `dist/bundle.d.ts`. Additive (no behavior change for existing no-arg callers),
+and it **restores** a Python feature that was deferred — so it's parity-positive, not a deviation.
+
+### What shipped
+
+- **`getRecords()` now accepts an optional class filter** (`model.py:1514-1530`,
+  `isinstance(rec, class_or_type_or_tuple)`), which the TS port had stubbed as a no-arg method
+  ("Type-filtered variant: a future addition"). Two overloads:
+  ```ts
+  getRecords(): ProvRecord[];
+  getRecords<C extends RecordClass>(filter: C | readonly C[]): RecordInstance<C>[];
+  ```
+  `bundle.getRecords(ProvEntity)` → `ProvEntity[]`, `getRecords(ProvElement)` → all elements,
+  `getRecords([ProvEntity, ProvAgent])` → `(ProvEntity | ProvAgent)[]`. The narrowing is **sound**:
+  the implementation filters with `instanceof`, so the result genuinely *is* the narrowed type — no
+  asserted cast (unlike the `newRecord` builder casts, still open below).
+- **New exported types** `RecordClass<T>` (`abstract new (...args: any[]) => T` — abstract so
+  `ProvElement`/`ProvRelation` work as filters; the `any[]` is justified inline since the ctor is only
+  `instanceof`-tested, never invoked) and `RecordInstance<C>` (`C extends RecordClass<infer T> ? T :
+  never`). `RecordInstance` **distributes** over a union, which is what makes the heterogeneous-array
+  overload infer the *union* of instance types instead of collapsing to the first element's type
+  (the bug a naïve `RecordClass<T>[]` signature hit — fixed by inferring over the constructor `C`).
+- 5 tests in `bundle.test.ts`: no-filter count, single-class narrowing, abstract-base matches
+  subclasses, array union filter, empty result.
+
+### Punch-list for the next idiomatic pass
+
+- **`newRecord` builder casts** (`bundle.ts` element + 15 relation builders — `as ProvEntity`, …):
+  unlike `getRecords`, these can't be made sound without a type-level QName→class link. Options, both
+  more invasive than a quick pass: (a) brand the record-type QName constants in `constants.ts`
+  (`PROV_ENTITY: RecordTypeQName<ProvEntity>`) and make `newRecord` generic over the brand — moves the
+  casts to one site each; (b) a generic `newRecord<T>` type-arg — lateral (`as` → caller-asserted
+  `<T>`), not clearly better. Recommend (a), in isolation, since it makes the link *checked*.
+- **`bundle.ts` non-null assertions** (`records[0]!`, `records[i]!` in `unifiedRecords`) — guarded by
+  a length check; optional cleanup.
+- **Raw-`string` known-sets** in `literal.ts`/`datetime.ts` — re-scan for union/branded opportunities.
+- **Leave alone**: `equals(other: unknown)`, `isBundle()`/`hasBundles()` booleans,
+  `(this.constructor as typeof ProvRecord)` static polymorphism.
+
+> **Loop note:** `/loop @loop.md`, stop condition "clock past **15:00**". Three passes this session
+> (entries 18–20). The cron re-fires `@loop.md` every 10 min and self-stops (cancels its job) on the
+> first iteration past 15:00.
+
+### Verify before the next entry
+
+```sh
+bun test && bunx tsc --noEmit -p tsconfig.json && bun run build
+```
+
+---
+
+## 2026-06-19 · entry 19 — idiomatic-TS pass (2): `is*()` type-guard narrowing + a cast removed
+
+**Build:** `bun test` 624 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green · the
+predicate signatures verified in `dist/**/*.d.ts`. **No behavior change** (same booleans returned),
+so no `DEVIATIONS` entry.
+
+### What shipped
+
+- **`isElement()` / `isRelation()` / `isDocument()` are now TS type predicates** —
+  `isElement(): this is ProvElement`, `isRelation(): this is ProvRelation`,
+  `isDocument(): this is ProvDocument` (on the `ProvRecord` / `ProvBundle` bases, plus the
+  `ProvElement` / `ProvRelation` / `ProvDocument` overrides). Consumers (and our own internal call
+  sites) now get **call-site narrowing** instead of a bare `boolean`.
+- **`isBundle()` deliberately stays `boolean`** — `ProvDocument` *extends* `ProvBundle` yet
+  `is_bundle()` returns `false` (`model.py:2549`), so a structural `this is ProvBundle` predicate
+  would be unsound (an empty/any document *is* a `ProvBundle`). Same reasoning kept `hasBundles()` a
+  boolean. Both are flagged inline so a later pass doesn't "fix" them into broken guards.
+- **Cycle-free wiring:** `record.ts` type-imports `ProvElement`/`ProvRelation`; `bundle.ts`
+  type-imports `ProvDocument`. All `import type` (erased), so no runtime edge is added to the modules
+  that value-import these bases.
+- **`document.ts:update` cast removed** — `(other as ProvDocument).bundles` became
+  `if (other.isDocument() && other.hasBundles()) { … other.bundles … }`, the **same idiom already at
+  `bundle.ts:421`**. Keeps Python's exact `has_bundles()` guard while the `isDocument()` narrows away
+  the cast. Zero `as ProvDocument` casts remain in `src/`.
+- **Honest test fixtures:** `record.test.ts`'s `TestEntity`/`TestActivity`/`TestGeneration` used to
+  `extends ProvRecord` and hand-override `isElement`/`isRelation` to return `true` — a lie the old
+  `boolean` return hid. The predicate exposed it (`tsc` rejected the sibling override), so they now
+  `extends ProvElement` / `ProvRelation` for real and inherit the genuine guards. (`TestGeneration`
+  takes a `null` id in one test — fine, relations permit null ids; elements don't.)
+- **Compile-time narrowing tests** (`fluent.test.ts`, +2): each branch assigns the guarded value to
+  the narrowed type (`const el: ProvElement = rec`) and reaches a subclass-only member
+  (`doc.bundles`); these compile **only** while the guards narrow, so `tsc` is the regression assert.
+
+### Punch-list for the next idiomatic pass (scanned)
+
+- **`newRecord` builder casts** (`bundle.ts:450/468/481` — `as ProvEntity`/`ProvActivity`/`ProvAgent`):
+  `newRecord` returns `ProvRecord`, so the element builders cast. A typed `newRecord` overload set (or
+  a generic keyed by the type QName → concrete class) would drop these casts — medium effort, real DX
+  win; do it in isolation.
+- **`bundle.ts:390/392` non-null assertions** (`records[0]!`, `records[i]!`) under
+  `noUncheckedIndexedAccess` — guarded by a length check; a small refactor (iterate with a
+  `for…of` + first-seen accumulator) removes the `!`. Low value, optional.
+- **Raw-`string` known-sets**: re-scan `literal.ts` / `datetime.ts` for datatype/format strings that
+  could be unions or branded types. `QNameString` already exists; check for more.
+- **Leave alone** (not smells): `equals(other: unknown)` (CLAUDE.md blesses it), `isBundle()` /
+  `hasBundles()` booleans (sound-guard impossible), `(this.constructor as typeof ProvRecord)` static
+  polymorphism.
+
+> **Loop note:** running under `/loop @loop.md`; current stop condition is "clock past **15:00**".
+> Two passes done this session (entries 18–19). The cron re-fires `@loop.md` every 10 min and will
+> self-stop (cancel its job) on the first iteration that observes the clock past 15:00.
+
+### Verify before the next entry
+
+```sh
+bun test && bunx tsc --noEmit -p tsconfig.json && bun run build
+```
+
+---
+
+## 2026-06-19 · entry 18 — idiomatic-TS pass (1): `ProvFormat` union for serializer format names
+
+**Build:** `bun test` 622 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green ·
+`ProvFormat` verified present in the published `dist/*.d.ts`.
+
+> New track (post-v1): **make the surface more idiomatic TypeScript without changing behavior,
+> breaking tests, or losing Python feature-parity.** Each pass is one focused, fully-verified
+> refinement so the change stays reviewable and the corpus oracle keeps gating it.
+
+### What shipped
+
+- **`ProvFormat` / `BuiltinProvFormat` string-literal union** (`src/serializers/serializer.ts`).
+  Replaces the raw `format: string` on the format-dispatch surface so the two formats that ship
+  today autocomplete at the call site (`doc.serialize("…")` → `"json"` | `"provn"`), satisfying
+  CLAUDE.md's "never a raw `string` for a known value set". The serializer registry is genuinely
+  **open** (optional PROV-XML/PROV-RDF subpath modules and third-party code register their own
+  names), so the type is `BuiltinProvFormat | (string & {})` — the `string & {}` keeps the literal
+  members visible in completions while still accepting any string (a bare `string` in the union
+  collapses the whole type back to `string` and kills the hints). **No behavior change**: every
+  string the registry accepted before is still accepted; this is additive type-narrowing only, so
+  no `DEVIATIONS` entry.
+- Applied to `ProvDocument.serialize` / `.deserialize`, `read()`, `getSerializer`,
+  `registerSerializer`, `registeredFormats()`; `ProvFormat` + `BuiltinProvFormat` exported from
+  `index.ts`. `registeredFormats(): ProvFormat[]` flows cleanly back into `read()`'s probe loop.
+
+### Punch-list for the next idiomatic pass (scanned, not yet done)
+
+- **`isElement()`/`isRelation()`/`isDocument()`/`isBundle()` return `boolean`** — TS **type-predicate
+  guards** (`isElement(): this is ProvElement`) would give call-site narrowing. *Caution:* these are
+  `override`s across the `ProvRecord`/`ProvBundle` hierarchy under `noImplicitOverride`; a base
+  declaring `boolean` and a subclass narrowing to a predicate can conflict — verify the override
+  signatures line up (likely declare the predicate on the base) before committing. More invasive
+  than this pass; do it in isolation with the full suite.
+- **Leave the `equals(other: unknown)` signatures** — CLAUDE.md explicitly blesses them; not a smell.
+- `error.ts:27` `qname: unknown` holds an arbitrary invalid-qname candidate — justified; low priority.
+- Re-scan for other raw-`string` known-sets and unnecessary `as` casts each pass.
+
+> **Loop note:** this pass ran under `/loop @loop.md`, whose stop condition is "stop when the clock
+> passes 13:00". The clock crossed 13:00 during this iteration, so the session loop was stopped
+> (cron job cancelled) after this entry. Resume the punch-list above in a fresh run.
+
+### Verify before the next entry
+
+```sh
+bun test && bunx tsc --noEmit -p tsconfig.json && bun run build
+```
+
+---
+
 ## 2026-06-19 · entry 17 — M6 polish: `.d.ts` strip-internal + consumer typecheck
 
 **Build:** `bun test` 622 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green.
