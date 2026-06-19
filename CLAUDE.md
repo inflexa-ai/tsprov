@@ -29,9 +29,17 @@ to a **library** are kept (no TUI/db/CLI/module/event-bus rules).
   form the LSP surfaces on hover and completion, so a `//` above an export is invisible at the
   call site where you read it. Reserve `//` for inline implementation notes (the WHY) inside a
   body. Place the block on the line directly above what it documents.
-- Prefer `type` over `interface`, `const` over `let`, and named `function` declarations over
-  arrow functions — **except** the PROV record hierarchy, which is class-based *by design*
-  (`docs/migration/04-typescript-feasibility.md §3`). Use classes where the design mandates them.
+- Prefer `const` over `let` and named `function` declarations over arrow functions.
+- **`type` vs `interface`: default to `type`; reach for `interface` only when a class `implements`
+  the shape (a contract).** Use `type` for everything else — unions, intersections, mapped/conditional
+  types, tuples, function types, and plain object-shape aliases (a `type` keeps the surface uniform and
+  cannot be accidentally reopened via declaration merging). The exception is a **contract a class
+  implements**: there, `interface` is the idiomatic choice — it names the contract as implementable,
+  reads as intent at the `class X implements Y` site, and leaves the door open to extension/merging.
+  In this codebase that means `RecordBundle` (implemented by `ProvBundle`) and `Serializer`
+  (implemented by `ProvNSerializer`/`ProvJsonSerializer`) stay `interface`s; do **not** "simplify" them
+  to `type`. This is distinct from the PROV **record hierarchy**, which is class-based *by design*
+  (`docs/migration/04-typescript-feasibility.md §3`) — use classes where the design mandates them.
 - Always type function parameters and return values.
 - Comment every `any`/`unknown` usage with the WHY. The conventional `equals(other: unknown)`
   signature and `unknown` at deserialize boundaries are expected; explain any other use.

@@ -29,7 +29,7 @@ export type SerializeOptions = Record<string, unknown>;
 export type DeserializeOptions = Record<string, unknown>;
 
 /** A bidirectional PROV serializer for one format. */
-export type Serializer = {
+export interface Serializer {
   /** Encodes a document to text (or bytes, for binary formats). */
   serialize(doc: ProvDocument, options?: SerializeOptions): string | Uint8Array;
   /** Decodes input to a document; may throw {@link UnsupportedOperationError} for serialize-only formats. */
@@ -37,7 +37,7 @@ export type Serializer = {
     input: string | Uint8Array,
     options?: DeserializeOptions,
   ): ProvDocument;
-};
+}
 
 /** Thrown when no serializer is registered for a requested format (`serializers/__init__.py:49`). */
 export class DoNotExist extends ProvError {

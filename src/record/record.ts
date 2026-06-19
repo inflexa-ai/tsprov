@@ -67,12 +67,12 @@ export type ProvAttributes =
  * The minimal bundle contract a {@link ProvRecord} needs: qualified-name
  * resolution. Implemented by `ProvBundle`'s `NamespaceManager` at M4.
  */
-export type RecordBundle = {
+export interface RecordBundle {
   /** Resolves a candidate to a {@link QualifiedName}, or `null` if it cannot be resolved. */
   validQualifiedName(name: QualifiedNameCandidate): QualifiedName | null;
   /** Resolves a candidate to a {@link QualifiedName}, throwing if it cannot be resolved. */
   mandatoryValidQname(name: QualifiedNameCandidate): QualifiedName;
-};
+}
 
 /** Set equality over canonical strings. */
 function setEqual(a: Set<string>, b: Set<string>): boolean {
