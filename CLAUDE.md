@@ -9,6 +9,63 @@ Default to using Bun instead of Node.js.
 - Use `bunx <package> <command>` instead of `npx <package> <command>`
 - Bun automatically loads .env, so don't use dotenv.
 
+## Project: tsprov
+
+This repo ports the Python [`prov`](https://github.com/trungdong/prov) library (W3C PROV-DM,
+vendored at `reference/prov/`) to idiomatic TypeScript. The plan and progress live in
+`docs/migration/` — **read `docs/migration/00-overview.md` and the newest entry in
+`docs/migration/05-progress-log.md` (the running progress log) before starting work.** The
+reference Python is the spec:
+drive every port from it and its test corpus, and anchor non-obvious decisions to the source
+as `file.py:NN`.
+
+## TypeScript
+
+Adapted from the team conventions in `../inflexa/inflexa/CLAUDE.md` — only the rules that apply
+to a **library** are kept (no TUI/db/CLI/module/event-bus rules).
+
+- **Document every exported declaration — types, their properties, classes, methods, and
+  functions — with a JSDoc (`/** … */`) block, never a `//` line comment.** JSDoc is the only
+  form the LSP surfaces on hover and completion, so a `//` above an export is invisible at the
+  call site where you read it. Reserve `//` for inline implementation notes (the WHY) inside a
+  body. Place the block on the line directly above what it documents.
+- Prefer `type` over `interface`, `const` over `let`, and named `function` declarations over
+  arrow functions — **except** the PROV record hierarchy, which is class-based *by design*
+  (`docs/migration/04-typescript-feasibility.md §3`). Use classes where the design mandates them.
+- Always type function parameters and return values.
+- Comment every `any`/`unknown` usage with the WHY. The conventional `equals(other: unknown)`
+  signature and `unknown` at deserialize boundaries are expected; explain any other use.
+- **Use domain/branded types, never a raw `string` for a known value set** (e.g. `QNameString`
+  for a `prefix:localpart` display form). A raw `string` where a QName/URI is meant is a smell.
+- Keep the existing strict flags (`strict`, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`,
+  `noImplicitOverride`, `noFallthroughCasesInSwitch`). Never loosen tsconfig to land a change.
+
+## Conventions
+
+- **Value equality is the load-bearing invariant.** Every PROV value type exposes `equals(other)`
+  plus a canonical `key` getter — a `\u0000`-separated string that reproduces the exact Python
+  `__hash__` inputs. **Never** use an object-keyed `Map`/`Set` for value semantics (JS keys by
+  reference); key by `.key` instead. See `docs/migration/04-typescript-feasibility.md §6`.
+- **Named exports only; no default exports.** The single exception is `src/index.ts` — the
+  package's public barrel (the entry point `package.json` resolves to). Internal modules import
+  each other directly; never add other barrels or re-export files.
+- **Extensionless relative imports** (`from "./identifier"`, not `"./identifier.ts"`). The
+  declaration build (`tsconfig.build.json`) sets `allowImportingTsExtensions: false`, so a
+  `.ts`-suffixed import breaks `bun run build:types`.
+- **Filenames:** lowercase, kebab-case for multi-word names (`namespace-manager.ts`), matching
+  the canonical layout in `docs/migration/04-typescript-feasibility.md §2`.
+- Explain **WHY** in comments, not HOW.
+- **No new dependencies without explicit approval.** The core ships with **luxon only**;
+  XML/RDF/graph/dot deps are optional peers behind subpath exports
+  (`docs/migration/03-dependency-analysis.md`). A package the migration docs did not already
+  call out needs sign-off first.
+- **TODO format:** `// TODO(<tag>): <reason>` — never a bare `// TODO`. Tags: `extend` (revisit
+  when capabilities grow), `perf` (fine now, optimize at scale), `slop` (works but should be
+  cleaned up), `robustness` (missing hardening).
+- Log every intentional divergence from Python behavior in `DEVIATIONS.md` with the source
+  anchor and the reason.
+- When moving code, update all importers; never leave a shim or re-export behind.
+
 ## APIs
 
 - `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.

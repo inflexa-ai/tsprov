@@ -10,7 +10,8 @@
     "outDir": "dist",
     "rootDir": "src",
     "allowImportingTsExtensions": false,
-    "allowJs": false
+    "allowJs": false,
+    "stripInternal": true
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules", "src/**/*.test.ts"]

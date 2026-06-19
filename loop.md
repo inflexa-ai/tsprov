@@ -1,4 +1,4 @@
-If the time is 6 AM UTC, stop looping.
+If the time is greater than 13:30 (using my computer's time), stop looping.
 
 Read ./docs/migration/ fully. It contains documents about migrating a python codebase to typescript, and also progress reports done by other agents.
 

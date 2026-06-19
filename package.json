@@ -1,6 +1,26 @@
 {
   "name": "tsprov",
   "version": "0.1.0",
+  "description": "An idiomatic TypeScript implementation of the W3C PROV Data Model (a port of Python prov): author provenance documents and round-trip them through PROV-JSON and PROV-N.",
+  "keywords": [
+    "prov",
+    "provenance",
+    "w3c",
+    "prov-dm",
+    "prov-json",
+    "prov-n",
+    "lineage",
+    "metadata"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inflexa-ai/tsprov.git"
+  },
+  "homepage": "https://github.com/inflexa-ai/tsprov#readme",
+  "bugs": {
+    "url": "https://github.com/inflexa-ai/tsprov/issues"
+  },
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.cjs",
@@ -29,9 +49,13 @@
     "prepublishOnly": "bun run build"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/luxon": "^3.7.1"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "luxon": "^3.7.2"
   }
 }

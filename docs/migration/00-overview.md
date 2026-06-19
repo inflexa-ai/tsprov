@@ -1,12 +1,20 @@
 # prov → tsprov — Migration Document Set
 
-This directory is the **initial analysis & planning effort** for porting the Python
+> **STATUS (2026-06-19): the v1 migration (M0–M6) is COMPLETE.** The full PROV-DM model, the fluent
+> authoring API, PROV-JSON (round-trip — the 398-file corpus oracle is green), PROV-N (serialize),
+> `read()`, value-equality, and all container transformations are implemented under `src/`, tested
+> (620+ tests), and building to dual ESM+CJS. **For where things stand and what's next, read the
+> running progress log: [`05-progress-log.md`](05-progress-log.md)** (newest entry first). Intentional
+> divergences from Python live in [`../../DEVIATIONS.md`](../../DEVIATIONS.md). Documents 01–04 below
+> are the original planning analysis (still accurate as the design rationale); the prose in this file
+> describing the pre-implementation state is kept for historical context.
+
+This directory began as the **initial analysis & planning effort** for porting the Python
 [`prov`](https://github.com/trungdong/prov) library (W3C PROV Data Model, v2.1.1, vendored at
 `reference/prov/`) to **first-class, idiomatic TypeScript** in this repo (`tsprov`).
 
-No library code has been written yet. These four documents are the foundation the migration
-builds on: what the code *is*, how to *sequence* the port, what the *dependencies* require, and
-how to make it *idiomatic TS with great DX*.
+These four documents are the foundation the migration was built on: what the code *is*, how to
+*sequence* the port, what the *dependencies* require, and how to make it *idiomatic TS with great DX*.
 
 > **Scope at a glance.** Source = ~5,800 LOC of core Python across 13 modules; the heart is
 > `model.py` (2,838 LOC). Target = a strict-mode, ESM-first, dual-published (ESM+CJS) Bun/TypeScript
