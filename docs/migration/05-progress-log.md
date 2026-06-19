@@ -45,6 +45,107 @@ purely post-v1: PROV-N byte-differential, then M7 CLI / M8 graph+dot / M9 XML+RD
 
 ---
 
+## 2026-06-19 · entry 24 — fix: nodenext-compatible `.d.ts` (resolves entry 23's open item)
+
+**Build:** `bun test` 630 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green. Consumer
+typecheck against the built `dist` now **clean under both `bundler` and `nodenext`/`node16`** (proven
+with two genuine `@ts-expect-error`s — a number→`ProvEntity` diagnostic confirms types truly resolve,
+and the agent-where-`AgentRef`-expected line confirms the distinct refs still bite under nodenext).
+
+### The bug (from entry 23)
+
+`bun build` bundles the runtime JS to a single `dist/index.js`/`.cjs`, but `tsc` emits **21 multi-file
+`.d.ts`** whose relative re-exports were **extensionless** (`from "./identifier"`). Under
+`moduleResolution: nodenext`/`node16`, ESM-mode declaration resolution rejects that with **TS2834** on
+every line, so nodenext consumers couldn't load the package's types at all. (This also retroactively
+corrects entry 17's "nodenext clean" claim — that check never actually resolved the package types.)
+
+### The fix
+
+- **`scripts/fix-dts-extensions.ts`** — a tiny Bun post-build step (no new dependency) that appends
+  `.js` to the relative `… from "x"` / `import("x")` specifiers in `dist/**/*.d.ts`. Wired into
+  `build:types` (`tsc … && bun run scripts/fix-dts-extensions.ts`), so `prepublishOnly` covers it.
+  Last run rewrote **98 specifiers across 18 files**; zero extensionless relative specifiers remain.
+- **Why it's correct + safe:** source stays extensionless (CLAUDE.md; `allowImportingTsExtensions:
+  false`); in a `.d.ts`, a `.js` specifier resolves to its sibling `.d.ts` under nodenext — exactly
+  what `tsc` emitted next to it; and the runtime JS is bundled (no relative imports), so this touches
+  the type-resolution graph only. Every relative specifier targets a file (no barrels but `index.ts`),
+  so appending `.js` is unambiguous.
+
+### Possible follow-up (not done)
+
+A build-time guard (assert no extensionless relative specifier survives in `dist/**/*.d.ts`) would stop
+a regression if the build pipeline changes. Cheap to add to CI; left out for now to avoid scope creep.
+
+### Verify before the next entry
+
+```sh
+bun test && bunx tsc --noEmit -p tsconfig.json && bun run build
+# consumer: typecheck dist/index.d.ts under both bundler and nodenext (see entry 24)
+```
+
+---
+
+## 2026-06-19 · entry 23 — idiomatic-TS pass (6): branded record-type QNames + distinct refs (signed off)
+
+**Build:** `bun test` 630 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green · branded
+constants + generic `newRecord` + distinct refs verified in `dist/*.d.ts` and via a **bundler**
+consumer typecheck. The two items below were the ones entry 21 flagged as "needs sign-off" — the owner
+approved both.
+
+### Correction to entry 22 — `interface` vs `type`
+
+Entry 22 converted `RecordBundle` and `Serializer` from `interface` → `type` as a literal reading of
+CLAUDE.md's "prefer `type`". **Reverted both back to `interface`** (owner call): for a contract a class
+`implements`, `interface` is the idiomatic choice (names it as implementable, reads at the `implements`
+site, allows extension/merging). CLAUDE.md's rule has been **enriched** to say exactly this — default
+`type`, but `interface` for class-implemented contracts (naming `RecordBundle`/`Serializer`) — so this
+doesn't recur. Pass-5's net effect is now nil; the `interface`s stand.
+
+### #1 — `newRecord` builder casts removed via branded record-type QNames
+
+- **`RecordTypeQName<T extends ProvRecord>`** added to `record/registry.ts`: `QualifiedName & {
+  readonly __record?: T }` — a phantom tag (never set at runtime) linking a type QName to the class it
+  builds. The 18 record-type constants in `constants.ts` are branded
+  (`PROV_ENTITY as RecordTypeQName<ProvEntity>`, … `PROV_MEMBERSHIP`); `PROV_BUNDLE` and the subtype
+  QNames stay unbranded (no record class). Type-only `import type`s into `constants.ts` — **no runtime
+  cycle** (the record modules import constants, never the reverse).
+- **`newRecord<T extends ProvRecord = ProvRecord>(recordType: RecordTypeQName<T>, …): T`** — `T` infers
+  from the brand, so all **18 builder casts** (`as ProvEntity`/… across `entity`/`activity`/`agent` +
+  15 relations) are gone. One justified internal `record as T` remains (the URI-keyed registry can't
+  statically prove `ctor` builds `T`). `addRecord(record.getType(), …)` still works (plain
+  `QualifiedName` → `T` defaults to `ProvRecord`). `RecordTypeQName` exported from `index.ts`.
+- **Verified the link actually constrains:** the de-risk removed one cast first and `tsc` confirmed `T`
+  infers as `ProvEntity` before doing all 18.
+
+### #2 — distinct `EntityRef` / `ActivityRef` / `AgentRef`
+
+- Narrowed from the shared `ProvRecord | QualifiedNameCandidate` to
+  `ProvEntity | …` / `ProvActivity | …` / `ProvAgent | …`. The three element classes have disjoint
+  fluent-method sets, so they're structurally non-interchangeable — passing a `ProvAgent` where an
+  `ActivityRef` is expected is now a compile error. A string/QName id still passes (deliberate escape
+  hatch). **Zero blast radius** (`tsc` clean — every existing call site already passed correct kinds).
+- Locked in with a `@ts-expect-error` negative test in `fluent.test.ts` (+1 test = 630): if the
+  rejection ever regresses to a no-op, the unused directive fails the build.
+
+### ⚠️ New open item (discovered, pre-existing — NOT caused by #1/#2)
+
+- **`dist/*.d.ts` breaks under `moduleResolution: nodenext`/`node16`** with **TS2834** ("relative
+  import paths need explicit file extensions"): the published declarations re-export with extensionless
+  paths (`from "./identifier"`), which ESM-mode node resolution rejects. A **bundler**-resolution
+  consumer is clean; nodenext is not. This contradicts entry 17's "nodenext clean" claim (that test
+  didn't actually resolve the package types). **Fix options** (separate, focused task): emit `.js`
+  extensions in the declaration build (e.g. a `.d.ts` rewrite step, or `tsc` with rewriting), or
+  publish a dual `.d.ts`/`.d.mts`, or document nodenext as unsupported. Needs its own session.
+
+### Verify before the next entry
+
+```sh
+bun test && bunx tsc --noEmit -p tsconfig.json && bun run build
+```
+
+---
+
 ## 2026-06-19 · entry 22 — idiomatic-TS pass (5): `interface` → `type` for the two contracts
 
 **Build:** `bun test` 629 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green. No behavior or
