@@ -4,6 +4,9 @@ An idiomatic TypeScript implementation of the [W3C PROV Data Model](https://www.
 a port of the Python [`prov`](https://github.com/trungdong/prov) library. Author provenance documents
 with a fully-typed fluent API, and round-trip them through PROV-JSON and PROV-N.
 
+> 📖 **New to PROV or want the full tour?** See the [**tsprov guide**](docs/guide.md) — provenance
+> concepts, a worked example, the data model in depth, and design notes.
+
 - **Value-equality that works.** `doc.equals(other)` is content-based — validated against the full
   398-file Python PROV-JSON conformance corpus (every fixture round-trips: `deserialize → serialize →
   deserialize` is `.equals()`-stable).
