@@ -19,7 +19,7 @@ import {
   type QualifiedNameCandidate,
   normalizeAttributes,
 } from "./record/record";
-import { getRecordClass } from "./record/registry";
+import { getRecordClass, type RecordTypeQName } from "./record/registry";
 // Side-effect imports: loading these modules runs their `registerRecordClass`
 // calls, which `newRecord` depends on. Bare imports are never elided, unlike the
 // type-only imports of the same classes below.
@@ -382,12 +382,12 @@ export class ProvBundle implements RecordBundle {
    * @param attributes      The formal attributes.
    * @param otherAttributes Extra attributes.
    */
-  newRecord(
-    recordType: QualifiedName,
+  newRecord<T extends ProvRecord = ProvRecord>(
+    recordType: RecordTypeQName<T>,
     identifier?: QualifiedNameCandidate | null,
     attributes?: ProvAttributes,
     otherAttributes?: ProvAttributes,
-  ): ProvRecord {
+  ): T {
     const attrList = [
       ...(attributes ? normalizeAttributes(attributes) : []),
       ...(otherAttributes ? normalizeAttributes(otherAttributes) : []),
@@ -402,7 +402,9 @@ export class ProvBundle implements RecordBundle {
     }
     const record = new ctor(this, recordId, attrList);
     this.addRecordInternal(record);
-    return record;
+    // The single justified cast: the URI-keyed registry can't statically prove
+    // `ctor` builds `T`; the branded `recordType` is the source of truth for the link.
+    return record as T;
   }
 
   /** Re-creates `record` inside this bundle (used when seeding records) (`model.py:1760`). */
@@ -477,12 +479,7 @@ export class ProvBundle implements RecordBundle {
     identifier: QualifiedNameCandidate,
     otherAttributes?: ProvAttributes,
   ): ProvEntity {
-    return this.newRecord(
-      PROV_ENTITY,
-      identifier,
-      undefined,
-      otherAttributes,
-    ) as ProvEntity;
+    return this.newRecord(PROV_ENTITY, identifier, undefined, otherAttributes);
   }
 
   /** Creates a new activity, optionally with start/end times (`model.py:1787`). */
@@ -500,7 +497,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_ENDTIME, ensureDateTime(endTime)],
       ],
       otherAttributes,
-    ) as ProvActivity;
+    );
   }
 
   /** Creates a new agent (`model.py:2018`). */
@@ -513,7 +510,7 @@ export class ProvBundle implements RecordBundle {
       identifier,
       undefined,
       otherAttributes,
-    ) as ProvAgent;
+    );
   }
 
   /** Creates a new collection entity (`model.py:2369`). */
@@ -545,7 +542,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_TIME, ensureDateTime(time)],
       ],
       otherAttributes,
-    ) as ProvGeneration;
+    );
   }
 
   /** `used` — an activity used an entity (`model.py:1851`). */
@@ -565,7 +562,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_TIME, ensureDateTime(time)],
       ],
       otherAttributes,
-    ) as ProvUsage;
+    );
   }
 
   /** `wasInformedBy` — an activity was informed by another (`model.py:1991`). */
@@ -583,7 +580,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_INFORMANT, informant],
       ],
       otherAttributes,
-    ) as ProvCommunication;
+    );
   }
 
   /** `wasStartedBy` — an activity was started by a trigger (`model.py:1884`). */
@@ -605,7 +602,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_TIME, ensureDateTime(time)],
       ],
       otherAttributes,
-    ) as ProvStart;
+    );
   }
 
   /** `wasEndedBy` — an activity was ended by a trigger (`model.py:1921`). */
@@ -627,7 +624,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_TIME, ensureDateTime(time)],
       ],
       otherAttributes,
-    ) as ProvEnd;
+    );
   }
 
   /** `wasInvalidatedBy` — an entity was invalidated by an activity (`model.py:1958`). */
@@ -647,7 +644,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_TIME, ensureDateTime(time)],
       ],
       otherAttributes,
-    ) as ProvInvalidation;
+    );
   }
 
   /** `wasAttributedTo` — an entity was attributed to an agent (`model.py:2032`). */
@@ -665,7 +662,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_AGENT, agent],
       ],
       otherAttributes,
-    ) as ProvAttribution;
+    );
   }
 
   /** `wasAssociatedWith` — an activity was associated with an agent (`model.py:2061`). */
@@ -685,7 +682,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_PLAN, plan],
       ],
       otherAttributes,
-    ) as ProvAssociation;
+    );
   }
 
   /** `actedOnBehalfOf` — an agent delegated to another (`model.py:2093`). */
@@ -705,7 +702,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_ACTIVITY, activity],
       ],
       otherAttributes,
-    ) as ProvDelegation;
+    );
   }
 
   /** `wasInfluencedBy` — generic influence between two things (`model.py:2125`). */
@@ -723,7 +720,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_INFLUENCER, influencer],
       ],
       otherAttributes,
-    ) as ProvInfluence;
+    );
   }
 
   /** `wasDerivedFrom` — one entity derived from another (`model.py:2154`). */
@@ -747,7 +744,7 @@ export class ProvBundle implements RecordBundle {
         [PROV_ATTR_USAGE, usage],
       ],
       otherAttributes,
-    ) as ProvDerivation;
+    );
   }
 
   /** `wasRevisionOf` — a derivation asserting `prov:Revision` (`model.py:2191`). */
@@ -827,7 +824,7 @@ export class ProvBundle implements RecordBundle {
     return this.newRecord(PROV_SPECIALIZATION, null, [
       [PROV_ATTR_SPECIFIC_ENTITY, specificEntity],
       [PROV_ATTR_GENERAL_ENTITY, generalEntity],
-    ]) as ProvSpecialization;
+    ]);
   }
 
   /** `alternateOf` — two entities are alternates (`model.py:2327`). */
@@ -835,7 +832,7 @@ export class ProvBundle implements RecordBundle {
     return this.newRecord(PROV_ALTERNATE, null, [
       [PROV_ATTR_ALTERNATE1, alternate1],
       [PROV_ATTR_ALTERNATE2, alternate2],
-    ]) as ProvAlternate;
+    ]);
   }
 
   /** `mentionOf` — a specialization within a bundle (`model.py:2346`). */
@@ -848,7 +845,7 @@ export class ProvBundle implements RecordBundle {
       [PROV_ATTR_SPECIFIC_ENTITY, specificEntity],
       [PROV_ATTR_GENERAL_ENTITY, generalEntity],
       [PROV_ATTR_BUNDLE, bundle],
-    ]) as ProvMention;
+    ]);
   }
 
   /** `hadMember` — an entity is a member of a collection (`model.py:2385`). */
@@ -856,7 +853,7 @@ export class ProvBundle implements RecordBundle {
     return this.newRecord(PROV_MEMBERSHIP, null, [
       [PROV_ATTR_COLLECTION, collection],
       [PROV_ATTR_ENTITY, entity],
-    ]) as ProvMembership;
+    ]);
   }
 
   // ── Descriptive aliases (Python's primary names) ──────────────────────────

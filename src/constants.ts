@@ -15,6 +15,28 @@
 
 import { ns } from "./intern";
 import type { QualifiedName } from "./identifier";
+// Type-only (erased): brands the record-type QNames with the class each builds, so
+// `ProvBundle.newRecord` returns the concrete type with no cast. No runtime cycle —
+// the record modules import this one at runtime, never the reverse.
+import type { RecordTypeQName } from "./record/registry";
+import type { ProvEntity, ProvActivity, ProvAgent } from "./record/element";
+import type {
+  ProvGeneration,
+  ProvUsage,
+  ProvCommunication,
+  ProvStart,
+  ProvEnd,
+  ProvInvalidation,
+  ProvDerivation,
+  ProvAttribution,
+  ProvAssociation,
+  ProvDelegation,
+  ProvInfluence,
+  ProvAlternate,
+  ProvSpecialization,
+  ProvMention,
+  ProvMembership,
+} from "./record/relation";
 
 // ── Namespaces ──────────────────────────────────────────────────────────────
 
@@ -28,43 +50,43 @@ export const XSI = ns("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 // ── Record type QNames (constants.py:11-37) ─────────────────────────────────
 
 /** `prov:Entity` — PROV-DM Entity element type. */
-export const PROV_ENTITY = PROV.qn("Entity");
+export const PROV_ENTITY = PROV.qn("Entity") as RecordTypeQName<ProvEntity>;
 /** `prov:Activity` — PROV-DM Activity element type. */
-export const PROV_ACTIVITY = PROV.qn("Activity");
+export const PROV_ACTIVITY = PROV.qn("Activity") as RecordTypeQName<ProvActivity>;
 /** `prov:Generation` — `wasGeneratedBy` relation type. */
-export const PROV_GENERATION = PROV.qn("Generation");
+export const PROV_GENERATION = PROV.qn("Generation") as RecordTypeQName<ProvGeneration>;
 /** `prov:Usage` — `used` relation type. */
-export const PROV_USAGE = PROV.qn("Usage");
+export const PROV_USAGE = PROV.qn("Usage") as RecordTypeQName<ProvUsage>;
 /** `prov:Communication` — `wasInformedBy` relation type. */
-export const PROV_COMMUNICATION = PROV.qn("Communication");
+export const PROV_COMMUNICATION = PROV.qn("Communication") as RecordTypeQName<ProvCommunication>;
 /** `prov:Start` — `wasStartedBy` relation type. */
-export const PROV_START = PROV.qn("Start");
+export const PROV_START = PROV.qn("Start") as RecordTypeQName<ProvStart>;
 /** `prov:End` — `wasEndedBy` relation type. */
-export const PROV_END = PROV.qn("End");
+export const PROV_END = PROV.qn("End") as RecordTypeQName<ProvEnd>;
 /** `prov:Invalidation` — `wasInvalidatedBy` relation type. */
-export const PROV_INVALIDATION = PROV.qn("Invalidation");
+export const PROV_INVALIDATION = PROV.qn("Invalidation") as RecordTypeQName<ProvInvalidation>;
 /** `prov:Derivation` — `wasDerivedFrom` relation type. */
-export const PROV_DERIVATION = PROV.qn("Derivation");
+export const PROV_DERIVATION = PROV.qn("Derivation") as RecordTypeQName<ProvDerivation>;
 /** `prov:Agent` — PROV-DM Agent element type. */
-export const PROV_AGENT = PROV.qn("Agent");
+export const PROV_AGENT = PROV.qn("Agent") as RecordTypeQName<ProvAgent>;
 /** `prov:Attribution` — `wasAttributedTo` relation type. */
-export const PROV_ATTRIBUTION = PROV.qn("Attribution");
+export const PROV_ATTRIBUTION = PROV.qn("Attribution") as RecordTypeQName<ProvAttribution>;
 /** `prov:Association` — `wasAssociatedWith` relation type. */
-export const PROV_ASSOCIATION = PROV.qn("Association");
+export const PROV_ASSOCIATION = PROV.qn("Association") as RecordTypeQName<ProvAssociation>;
 /** `prov:Delegation` — `actedOnBehalfOf` relation type. */
-export const PROV_DELEGATION = PROV.qn("Delegation");
+export const PROV_DELEGATION = PROV.qn("Delegation") as RecordTypeQName<ProvDelegation>;
 /** `prov:Influence` — `wasInfluencedBy` relation type. */
-export const PROV_INFLUENCE = PROV.qn("Influence");
-/** `prov:Bundle` — bundle type. */
+export const PROV_INFLUENCE = PROV.qn("Influence") as RecordTypeQName<ProvInfluence>;
+/** `prov:Bundle` — bundle type. (Unbranded: a bundle is a container, not a `ProvRecord`.) */
 export const PROV_BUNDLE = PROV.qn("Bundle");
 /** `prov:Alternate` — `alternateOf` relation type. */
-export const PROV_ALTERNATE = PROV.qn("Alternate");
+export const PROV_ALTERNATE = PROV.qn("Alternate") as RecordTypeQName<ProvAlternate>;
 /** `prov:Specialization` — `specializationOf` relation type. */
-export const PROV_SPECIALIZATION = PROV.qn("Specialization");
+export const PROV_SPECIALIZATION = PROV.qn("Specialization") as RecordTypeQName<ProvSpecialization>;
 /** `prov:Mention` — `mentionOf` relation type (a specialization subtype). */
-export const PROV_MENTION = PROV.qn("Mention");
+export const PROV_MENTION = PROV.qn("Mention") as RecordTypeQName<ProvMention>;
 /** `prov:Membership` — `hadMember` relation type. */
-export const PROV_MEMBERSHIP = PROV.qn("Membership");
+export const PROV_MEMBERSHIP = PROV.qn("Membership") as RecordTypeQName<ProvMembership>;
 
 // ── Subtype QNames (PROV-N subtypes / asserted types, constants.py:64-72) ────
 

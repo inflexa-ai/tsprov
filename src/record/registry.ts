@@ -19,6 +19,16 @@ export type RecordCtor = new (
   attributes?: ProvAttributes,
 ) => ProvRecord;
 
+/**
+ * A {@link QualifiedName} tagged — at the type level only — with the concrete
+ * record class it constructs. The fluent builders pass these so `newRecord` can
+ * return the right type without a cast; `__record` is phantom (never set at
+ * runtime), so a branded QName is still an ordinary `QualifiedName` everywhere else.
+ */
+export type RecordTypeQName<T extends ProvRecord> = QualifiedName & {
+  readonly __record?: T;
+};
+
 /** `type.uri` → constructor. Mirrors `PROV_REC_CLS` (`model.py:1101`). */
 const PROV_REC_CLS = new Map<string, RecordCtor>();
 

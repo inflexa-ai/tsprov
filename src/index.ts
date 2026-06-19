@@ -64,7 +64,7 @@ export {
   registerRecordClass,
   getRecordClass,
 } from "./record/registry";
-export type { RecordCtor } from "./record/registry";
+export type { RecordCtor, RecordTypeQName } from "./record/registry";
 
 export { NamespaceManager } from "./namespace-manager";
 export type { NamespaceCollection } from "./namespace-manager";
