@@ -4,11 +4,11 @@ import {
   formatFloatG,
   quoteMaybeMultiline,
   encodingProvnValue,
-} from "./format";
-import { Namespace, Identifier } from "./identifier";
-import { Literal } from "./literal";
-import { parseXsdDateTime } from "./datetime";
-import { XSD_STRING } from "./constants";
+} from "./format.js";
+import { Namespace, Identifier } from "./identifier.js";
+import { Literal } from "./literal.js";
+import { parseXsdDateTime } from "./datetime.js";
+import { XSD_STRING } from "./constants.js";
 
 const EX = new Namespace("ex", "http://example.org/");
 

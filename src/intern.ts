@@ -10,7 +10,7 @@
 // 04-typescript-feasibility §6). It stays `sideEffects: false`-safe because the
 // tables are mutated only lazily, when these functions are actually called.
 
-import { Namespace, QualifiedName } from "./identifier";
+import { Namespace, QualifiedName } from "./identifier.js";
 
 /** Canonical `Namespace.key` (`prefix\u0000uri`) → the one interned instance. */
 const namespaces = new Map<string, Namespace>();

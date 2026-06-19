@@ -8,8 +8,8 @@
 
 import { DateTime } from "luxon";
 
-import type { AttrValue } from "./value";
-import { toXsdDateTime } from "./datetime";
+import type { AttrValue } from "./value.js";
+import { toXsdDateTime } from "./datetime.js";
 
 /**
  * Wraps a value as a double-quoted PROV-N string, triple-quoting it when it spans

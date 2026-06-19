@@ -5,15 +5,15 @@
 // re-exports" rule: internal modules import each other directly. Keep this file
 // limited to the *public, dependency-free core* surface.
 
-export { Identifier, QualifiedName, Namespace } from "./identifier";
-export type { QNameString } from "./identifier";
+export { Identifier, QualifiedName, Namespace } from "./identifier.js";
+export type { QNameString } from "./identifier.js";
 
-export { ns, internNamespace, internQName } from "./intern";
+export { ns, internNamespace, internQName } from "./intern.js";
 
-export { Literal } from "./literal";
+export { Literal } from "./literal.js";
 
-export { ensureDateTime, parseXsdDateTime, toXsdDateTime } from "./datetime";
-export type { DateLike } from "./datetime";
+export { ensureDateTime, parseXsdDateTime, toXsdDateTime } from "./datetime.js";
+export type { DateLike } from "./datetime.js";
 
 export {
   ProvError,
@@ -21,27 +21,27 @@ export {
   ProvExceptionInvalidQualifiedName,
   ProvElementIdentifierRequired,
   setWarningHandler,
-} from "./error";
-export type { WarningHandler } from "./error";
+} from "./error.js";
+export type { WarningHandler } from "./error.js";
 
-export { valueKey } from "./value";
-export type { AttrValue } from "./value";
+export { valueKey } from "./value.js";
+export type { AttrValue } from "./value.js";
 
 // The record layer: the abstract base, the 3 elements, the 15 relations, and
 // the type registry.
-export { ProvRecord } from "./record/record";
+export { ProvRecord } from "./record/record.js";
 export type {
   RecordBundle,
   ProvAttributes,
   AttrKey,
   QualifiedNameCandidate,
-} from "./record/record";
+} from "./record/record.js";
 export {
   ProvElement,
   ProvEntity,
   ProvActivity,
   ProvAgent,
-} from "./record/element";
+} from "./record/element.js";
 export {
   ProvRelation,
   ProvGeneration,
@@ -59,27 +59,27 @@ export {
   ProvAlternate,
   ProvMention,
   ProvMembership,
-} from "./record/relation";
+} from "./record/relation.js";
 export {
   registerRecordClass,
   getRecordClass,
-} from "./record/registry";
-export type { RecordCtor, RecordTypeQName } from "./record/registry";
+} from "./record/registry.js";
+export type { RecordCtor, RecordTypeQName } from "./record/registry.js";
 
-export { NamespaceManager } from "./namespace-manager";
-export type { NamespaceCollection } from "./namespace-manager";
+export { NamespaceManager } from "./namespace-manager.js";
+export type { NamespaceCollection } from "./namespace-manager.js";
 
-export { ProvBundle } from "./bundle";
+export { ProvBundle } from "./bundle.js";
 export type {
   EntityRef,
   ActivityRef,
   AgentRef,
   RecordClass,
   RecordInstance,
-} from "./bundle";
-export type { AttributeValue } from "./record/record";
+} from "./bundle.js";
+export type { AttributeValue } from "./record/record.js";
 
-export { ProvDocument } from "./document";
+export { ProvDocument } from "./document.js";
 
 // Serializer registry + the core PROV-N serializer (JSON joins at M5).
 export {
@@ -88,20 +88,20 @@ export {
   registeredFormats,
   DoNotExist,
   UnsupportedOperationError,
-} from "./serializers/serializer";
+} from "./serializers/serializer.js";
 export type {
   Serializer,
   SerializeOptions,
   DeserializeOptions,
   ProvFormat,
   BuiltinProvFormat,
-} from "./serializers/serializer";
+} from "./serializers/serializer.js";
 // Value-export the serializers so their modules (and their `registerSerializer`
 // calls) are included in the bundle despite `sideEffects: false`.
-export { ProvNSerializer } from "./serializers/provn";
-export { ProvJsonSerializer, ProvJSONException } from "./serializers/json";
+export { ProvNSerializer } from "./serializers/provn.js";
+export { ProvJsonSerializer, ProvJSONException } from "./serializers/json.js";
 
-export { read } from "./read";
+export { read } from "./read.js";
 
 // Public PROV/XSD constants: namespaces, type & attribute QNames, XSD datatypes.
 // The internal wiring maps (PROV_N_MAP, PROV_BASE_CLS, the id maps, …) are
@@ -200,4 +200,4 @@ export {
   XSD_FLOAT,
   XSD_DOUBLE,
   XSD_DECIMAL,
-} from "./constants";
+} from "./constants.js";

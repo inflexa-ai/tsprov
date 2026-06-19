@@ -6,8 +6,8 @@ import {
   parseBoolean,
   parseXsdTypes,
   XSD_DATATYPE_PARSERS,
-} from "./literal";
-import { Identifier } from "./identifier";
+} from "./literal.js";
+import { Identifier } from "./identifier.js";
 import {
   PROV_INTERNATIONALIZEDSTRING,
   XSD_STRING,
@@ -17,7 +17,7 @@ import {
   XSD_BOOLEAN,
   XSD_DATETIME,
   XSD_ANYURI,
-} from "./constants";
+} from "./constants.js";
 
 describe("Literal construction", () => {
   test("coerces the value to a string and keeps the datatype", () => {

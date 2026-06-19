@@ -14,14 +14,14 @@
 
 import { DateTime } from "luxon";
 
-import { Identifier, QualifiedName } from "../identifier";
-import { type AttrValue, valueKey } from "../value";
-import { Literal, parseXsdTypes } from "../literal";
-import { parseXsdDateTime, ensureDateTime, toXsdDateTime } from "../datetime";
-import { encodingProvnValue } from "../format";
-import { ProvException } from "../error";
-import { AttributeStore } from "./attributes";
-import { getRecordClass } from "./registry";
+import { Identifier, QualifiedName } from "../identifier.js";
+import { type AttrValue, valueKey } from "../value.js";
+import { Literal, parseXsdTypes } from "../literal.js";
+import { parseXsdDateTime, ensureDateTime, toXsdDateTime } from "../datetime.js";
+import { encodingProvnValue } from "../format.js";
+import { ProvException } from "../error.js";
+import { AttributeStore } from "./attributes.js";
+import { getRecordClass } from "./registry.js";
 import {
   PROV_TYPE,
   PROV_LABEL,
@@ -31,12 +31,12 @@ import {
   PROV_ATTRIBUTE_LITERALS,
   PROV_ATTRIBUTES,
   PROV_N_MAP,
-} from "../constants";
+} from "../constants.js";
 // Type-only: lets `isElement`/`isRelation` narrow at the call site. Erased at
 // compile time (`import type`), so it adds no runtime edge to the element/relation
 // modules that import this one.
-import type { ProvElement } from "./element";
-import type { ProvRelation } from "./relation";
+import type { ProvElement } from "./element.js";
+import type { ProvRelation } from "./relation.js";
 
 /** A value that can be resolved to a {@link QualifiedName}: a QName, a prefixed string, or an Identifier. */
 export type QualifiedNameCandidate = QualifiedName | string | Identifier;

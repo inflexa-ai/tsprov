@@ -4,12 +4,12 @@
 // document's `getProvN()`; deserialization is unsupported (Python raises
 // `NotImplementedError`, `provn.py:31` — we raise our `UnsupportedOperationError`).
 
-import type { ProvDocument } from "../document";
+import type { ProvDocument } from "../document.js";
 import {
   type Serializer,
   UnsupportedOperationError,
   registerSerializer,
-} from "./serializer";
+} from "./serializer.js";
 
 /** Serialize-only PROV-N serializer (`provn.py`). */
 export class ProvNSerializer implements Serializer {

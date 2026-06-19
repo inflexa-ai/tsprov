@@ -1,11 +1,11 @@
 import { test, expect, describe } from "bun:test";
 
-import { ProvRecord, type RecordBundle } from "./record";
-import { ProvElement } from "./element";
-import { ProvRelation } from "./relation";
-import { Namespace, QualifiedName } from "../identifier";
-import { Literal } from "../literal";
-import { ProvException, ProvExceptionInvalidQualifiedName } from "../error";
+import { ProvRecord, type RecordBundle } from "./record.js";
+import { ProvElement } from "./element.js";
+import { ProvRelation } from "./relation.js";
+import { Namespace, QualifiedName } from "../identifier.js";
+import { Literal } from "../literal.js";
+import { ProvException, ProvExceptionInvalidQualifiedName } from "../error.js";
 import {
   PROV_ENTITY,
   PROV_ACTIVITY,
@@ -16,7 +16,7 @@ import {
   XSD_INT,
   XSD_STRING,
   XSD_FLOAT,
-} from "../constants";
+} from "../constants.js";
 
 const EX = new Namespace("ex", "http://example.org/");
 

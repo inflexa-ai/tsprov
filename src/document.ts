@@ -10,15 +10,15 @@
 // immutable bundle design does not expose), and `serialize`/`deserialize`
 // (needs the M5 serializers).
 
-import { ProvBundle } from "./bundle";
-import type { ProvRecord, QualifiedNameCandidate } from "./record/record";
-import type { QualifiedName } from "./identifier";
-import type { NamespaceCollection } from "./namespace-manager";
-import { ProvException } from "./error";
-import { getSerializer } from "./serializers/serializer";
-import type { ProvFormat } from "./serializers/serializer";
+import { ProvBundle } from "./bundle.js";
+import type { ProvRecord, QualifiedNameCandidate } from "./record/record.js";
+import type { QualifiedName } from "./identifier.js";
+import type { NamespaceCollection } from "./namespace-manager.js";
+import { ProvException } from "./error.js";
+import { getSerializer } from "./serializers/serializer.js";
+import type { ProvFormat } from "./serializers/serializer.js";
 // Side-effect import: registers the core PROV-N serializer (JSON joins it at M5).
-import "./serializers/provn";
+import "./serializers/provn.js";
 
 /** A PROV document: document-level records plus named sub-bundles (`model.py:2500`). */
 export class ProvDocument extends ProvBundle {

@@ -6,9 +6,9 @@
 // `ProvMention` IS-A `ProvSpecialization` (model.py:1079). The fluent builder
 // helpers are the bundle's job (M4) and are deferred.
 
-import { ProvRecord } from "./record";
-import { registerRecordClass } from "./registry";
-import type { QualifiedName } from "../identifier";
+import { ProvRecord } from "./record.js";
+import { registerRecordClass } from "./registry.js";
+import type { QualifiedName } from "../identifier.js";
 import {
   PROV_GENERATION,
   PROV_USAGE,
@@ -49,7 +49,7 @@ import {
   PROV_ATTR_ALTERNATE2,
   PROV_ATTR_BUNDLE,
   PROV_ATTR_COLLECTION,
-} from "../constants";
+} from "../constants.js";
 
 /** Base class for PROV relations (edges between elements) (`model.py:640`). */
 export abstract class ProvRelation extends ProvRecord {

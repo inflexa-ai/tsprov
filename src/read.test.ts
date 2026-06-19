@@ -1,9 +1,9 @@
 import { test, expect, describe } from "bun:test";
 
-import { read } from "./read";
-import { ProvDocument } from "./document";
+import { read } from "./read.js";
+import { ProvDocument } from "./document.js";
 // Ensure the JSON serializer is registered (the auto-detect probe needs it).
-import "./serializers/json";
+import "./serializers/json.js";
 
 function sampleJson(): { doc: ProvDocument; json: string } {
   const doc = new ProvDocument();

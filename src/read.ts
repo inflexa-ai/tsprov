@@ -9,9 +9,9 @@
 // File/URL loading is the caller's job (the async I/O edge): pass the text, e.g.
 // `read(await Bun.file(path).text())`.
 
-import { ProvDocument } from "./document";
-import { registeredFormats } from "./serializers/serializer";
-import type { ProvFormat } from "./serializers/serializer";
+import { ProvDocument } from "./document.js";
+import { registeredFormats } from "./serializers/serializer.js";
+import type { ProvFormat } from "./serializers/serializer.js";
 
 /**
  * Parses serialized PROV content into a {@link ProvDocument}.

@@ -17,15 +17,15 @@
 
 import { DateTime } from "luxon";
 
-import { Identifier, Namespace, QualifiedName } from "../identifier";
-import { Literal } from "../literal";
-import { toXsdDateTime, parseXsdDateTime } from "../datetime";
-import { ProvDocument } from "../document";
-import type { ProvBundle } from "../bundle";
-import type { ProvRecord } from "../record/record";
-import type { AttrValue } from "../value";
-import { ProvError } from "../error";
-import { type Serializer, registerSerializer } from "./serializer";
+import { Identifier, Namespace, QualifiedName } from "../identifier.js";
+import { Literal } from "../literal.js";
+import { toXsdDateTime, parseXsdDateTime } from "../datetime.js";
+import { ProvDocument } from "../document.js";
+import type { ProvBundle } from "../bundle.js";
+import type { ProvRecord } from "../record/record.js";
+import type { AttrValue } from "../value.js";
+import { ProvError } from "../error.js";
+import { type Serializer, registerSerializer } from "./serializer.js";
 import {
   PROV_N_MAP,
   PROV_RECORD_IDS_MAP,
@@ -38,7 +38,7 @@ import {
   PROV_MEMBERSHIP,
   PROV_ATTR_ENTITY,
   PROV_ATTR_COLLECTION,
-} from "../constants";
+} from "../constants.js";
 
 // A parsed-JSON object/value. `any` is unavoidable at the JSON boundary.
 // ANY-BUDGET: PROV-JSON containers are dynamically shaped, narrowed locally.

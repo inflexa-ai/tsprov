@@ -57,9 +57,14 @@ to a **library** are kept (no TUI/db/CLI/module/event-bus rules).
 - **Named exports only; no default exports.** The single exception is `src/index.ts` — the
   package's public barrel (the entry point `package.json` resolves to). Internal modules import
   each other directly; never add other barrels or re-export files.
-- **Extensionless relative imports** (`from "./identifier"`, not `"./identifier.ts"`). The
-  declaration build (`tsconfig.build.json`) sets `allowImportingTsExtensions: false`, so a
-  `.ts`-suffixed import breaks `bun run build:types`.
+- **Relative imports carry a `.js` extension** (`from "./identifier.js"`, never `"./identifier"`
+  or `"./identifier.ts"`) — even though the file on disk is `identifier.ts`. Bun and `tsc`
+  (`moduleResolution: bundler`) both resolve the `.js` specifier to the `.ts` source, and `tsc`
+  emits the specifier verbatim, so the published `dist/*.d.ts` is consumable under
+  `moduleResolution: nodenext`/`node16` (which rejects extensionless relative imports, TS2834)
+  with **no post-build rewrite step**. A `.ts`-suffixed import breaks `bun run build:types`
+  (`tsconfig.build.json` sets `allowImportingTsExtensions: false`); an extensionless one breaks
+  nodenext consumers. Package/bare imports (`luxon`, `bun:test`) take no extension.
 - **Filenames:** lowercase, kebab-case for multi-word names (`namespace-manager.ts`), matching
   the canonical layout in `docs/migration/04-typescript-feasibility.md §2`.
 - Explain **WHY** in comments, not HOW.

@@ -13,10 +13,10 @@
 
 import { DateTime } from "luxon";
 
-import { Identifier, type QualifiedName } from "./identifier";
-import { parseXsdDateTime } from "./datetime";
-import { warn } from "./error";
-import { quoteMaybeMultiline } from "./format";
+import { Identifier, type QualifiedName } from "./identifier.js";
+import { parseXsdDateTime } from "./datetime.js";
+import { warn } from "./error.js";
+import { quoteMaybeMultiline } from "./format.js";
 import {
   PROV_INTERNATIONALIZEDSTRING,
   XSD_STRING,
@@ -26,7 +26,7 @@ import {
   XSD_BOOLEAN,
   XSD_DATETIME,
   XSD_ANYURI,
-} from "./constants";
+} from "./constants.js";
 
 /**
  * Tri-state `xsd:boolean` parser, mirroring `parse_boolean` (`model.py:80`):

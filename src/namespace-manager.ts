@@ -11,9 +11,9 @@
 // register). `valid_qualified_name` is the precedence resolver the whole
 // authoring API depends on.
 
-import { Namespace, QualifiedName, Identifier } from "./identifier";
-import type { QualifiedNameCandidate } from "./record/record";
-import { PROV, XSD, XSI } from "./constants";
+import { Namespace, QualifiedName, Identifier } from "./identifier.js";
+import type { QualifiedNameCandidate } from "./record/record.js";
+import { PROV, XSD, XSI } from "./constants.js";
 
 /** The namespaces every manager starts with (`DEFAULT_NAMESPACES`, `model.py:1121`). */
 const DEFAULT_NAMESPACES: ReadonlyArray<readonly [string, Namespace]> = [

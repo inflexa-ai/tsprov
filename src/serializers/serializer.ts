@@ -5,8 +5,8 @@
 // Formats register themselves on import (the core ones from `document.ts`; the
 // optional XML/RDF from their subpath modules).
 
-import { ProvError } from "../error";
-import type { ProvDocument } from "../document";
+import { ProvError } from "../error.js";
+import type { ProvDocument } from "../document.js";
 
 /** The serialization formats that ship with the dependency-free core. */
 export type BuiltinProvFormat = "json" | "provn";

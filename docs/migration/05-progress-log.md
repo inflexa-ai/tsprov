@@ -45,6 +45,46 @@ purely post-v1: PROV-N byte-differential, then M7 CLI / M8 graph+dot / M9 XML+RD
 
 ---
 
+## 2026-06-19 · entry 25 — `.js`-extension imports (supersedes entry 24's post-build fixup)
+
+**Build:** `bun test` 630 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green (now just
+`tsc` for types — no post-process). Consumer typecheck against `dist` clean under **both** `bundler`
+and `nodenext`/`node16`, with the `.d.ts` **natively** carrying extensions.
+
+### What changed and why
+
+Entry 24 fixed the nodenext `.d.ts` problem with a post-build rewrite script. This replaces that with
+the ESM-canonical approach: **source relative imports now carry a `.js` extension**
+(`from "./identifier.js"`), even though the files on disk stay `.ts`. Bun and `tsc`
+(`moduleResolution: bundler`) both resolve the `.js` specifier to the `.ts` source (verified), and
+`tsc` emits specifiers verbatim — so the published declarations are nodenext-correct **with no
+post-processing**. This is how most published TS ESM libraries are set up; it removes a build step and
+a custom script rather than maintaining them.
+
+- **182 relative specifiers across 38 `src` files** rewritten to `.js` (one-off script, not committed;
+  handled `from "…"`, bare `import "…"`, and `import("…")`; idempotent; package imports like `luxon` /
+  `bun:test` left bare).
+- **Deleted `scripts/fix-dts-extensions.ts`** and reverted `build:types` to plain
+  `tsc -p tsconfig.build.json`.
+- **CLAUDE.md** rule flipped: relative imports now **must** carry `.js` (was: extensionless). The
+  rationale (extensionless breaks nodenext consumers; `.ts` breaks `build:types`) is recorded inline.
+
+### Verified
+
+- `bun test` 630 pass (Bun resolves `.js`→`.ts`); `tsc --noEmit` clean (bundler mode resolves it);
+  editor go-to-def unaffected.
+- `dist/**/*.d.ts`: zero extensionless relative specifiers; built by `tsc` alone.
+- nodenext consumer: clean, with two genuine `@ts-expect-error`s confirming types resolve *and* the
+  #1 (branded `newRecord`) / #2 (distinct refs) guarantees still hold under nodenext.
+
+### Verify before the next entry
+
+```sh
+bun test && bunx tsc --noEmit -p tsconfig.json && bun run build
+```
+
+---
+
 ## 2026-06-19 · entry 24 — fix: nodenext-compatible `.d.ts` (resolves entry 23's open item)
 
 **Build:** `bun test` 630 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green. Consumer

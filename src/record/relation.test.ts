@@ -17,10 +17,10 @@ import {
   ProvAlternate,
   ProvMention,
   ProvMembership,
-} from "./relation";
-import { type RecordBundle } from "./record";
-import { Namespace, QualifiedName } from "../identifier";
-import { ProvExceptionInvalidQualifiedName } from "../error";
+} from "./relation.js";
+import { type RecordBundle } from "./record.js";
+import { Namespace, QualifiedName } from "../identifier.js";
+import { ProvExceptionInvalidQualifiedName } from "../error.js";
 import {
   PROV_GENERATION,
   PROV_USAGE,
@@ -61,7 +61,7 @@ import {
   PROV_ATTR_ALTERNATE2,
   PROV_ATTR_BUNDLE,
   PROV_ATTR_COLLECTION,
-} from "../constants";
+} from "../constants.js";
 
 const EX = new Namespace("ex", "http://example.org/");
 const bundle: RecordBundle = {

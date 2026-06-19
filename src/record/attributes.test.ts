@@ -1,9 +1,9 @@
 import { test, expect, describe } from "bun:test";
 
-import { AttributeStore } from "./attributes";
-import { Namespace } from "../identifier";
-import { Literal } from "../literal";
-import { XSD_STRING } from "../constants";
+import { AttributeStore } from "./attributes.js";
+import { Namespace } from "../identifier.js";
+import { Literal } from "../literal.js";
+import { XSD_STRING } from "../constants.js";
 
 const EX = new Namespace("ex", "http://example.org/");
 const EX_OTHER = new Namespace("other", "http://example.org/");

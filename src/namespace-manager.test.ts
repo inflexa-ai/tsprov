@@ -1,8 +1,8 @@
 import { test, expect, describe } from "bun:test";
 
-import { NamespaceManager } from "./namespace-manager";
-import { Namespace, Identifier } from "./identifier";
-import { PROV } from "./constants";
+import { NamespaceManager } from "./namespace-manager.js";
+import { Namespace, Identifier } from "./identifier.js";
+import { PROV } from "./constants.js";
 
 describe("NamespaceManager defaults & registration", () => {
   test("starts with the prov/xsd/xsi namespaces", () => {

@@ -10,22 +10,22 @@
 // (`generation`, `derivation`, …) are kept as aliases. (Python is the reverse,
 // model.py:2479.)
 
-import { NamespaceManager, type NamespaceCollection } from "./namespace-manager";
-import { Namespace, type QualifiedName } from "./identifier";
+import { NamespaceManager, type NamespaceCollection } from "./namespace-manager.js";
+import { Namespace, type QualifiedName } from "./identifier.js";
 import {
   ProvRecord,
   type RecordBundle,
   type ProvAttributes,
   type QualifiedNameCandidate,
   normalizeAttributes,
-} from "./record/record";
-import { getRecordClass, type RecordTypeQName } from "./record/registry";
+} from "./record/record.js";
+import { getRecordClass, type RecordTypeQName } from "./record/registry.js";
 // Side-effect imports: loading these modules runs their `registerRecordClass`
 // calls, which `newRecord` depends on. Bare imports are never elided, unlike the
 // type-only imports of the same classes below.
-import "./record/element";
-import "./record/relation";
-import type { ProvEntity, ProvActivity, ProvAgent } from "./record/element";
+import "./record/element.js";
+import "./record/relation.js";
+import type { ProvEntity, ProvActivity, ProvAgent } from "./record/element.js";
 import type {
   ProvGeneration,
   ProvUsage,
@@ -42,13 +42,13 @@ import type {
   ProvAlternate,
   ProvMention,
   ProvMembership,
-} from "./record/relation";
+} from "./record/relation.js";
 // Type-only: lets `isDocument` narrow `this`/a bundle ref to `ProvDocument` at the
 // call site. Erased at compile time, so it adds no runtime edge to `document.ts`
 // (which value-imports `ProvBundle` from here).
-import type { ProvDocument } from "./document";
-import { ProvException } from "./error";
-import { ensureDateTime, type DateLike } from "./datetime";
+import type { ProvDocument } from "./document.js";
+import { ProvException } from "./error.js";
+import { ensureDateTime, type DateLike } from "./datetime.js";
 import {
   PROV_ENTITY,
   PROV_ACTIVITY,
@@ -98,7 +98,7 @@ import {
   PROV_ATTR_ALTERNATE2,
   PROV_ATTR_BUNDLE,
   PROV_ATTR_COLLECTION,
-} from "./constants";
+} from "./constants.js";
 
 /**
  * A reference to an entity: the concrete {@link ProvEntity} record, or a name

@@ -1,6 +1,6 @@
 import { test, expect, describe } from "bun:test";
 
-import { ns } from "./intern";
+import { ns } from "./intern.js";
 import {
   XSD,
   PROV,
@@ -26,7 +26,7 @@ import {
   PROV_ATTRIBUTES_ID_MAP,
   XSD_INT,
   XSD_DOUBLE,
-} from "./constants";
+} from "./constants.js";
 
 describe("namespaces", () => {
   test("are interned singletons with the right URIs", () => {

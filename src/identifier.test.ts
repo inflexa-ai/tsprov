@@ -1,7 +1,7 @@
 import { test, expect, describe } from "bun:test";
 
-import { Identifier, Namespace } from "./identifier";
-import { internNamespace, internQName, ns } from "./intern";
+import { Identifier, Namespace } from "./identifier.js";
+import { internNamespace, internQName, ns } from "./intern.js";
 
 // The two-prefix-same-URI fixture from `reference/prov/src/prov/tests/attributes.py:4-5`.
 // It exists precisely to pin down that QName identity ignores the prefix.

@@ -12,8 +12,8 @@
 // output is deterministic where Python's was not (a documented, harmless
 // divergence — PROV equality is order-independent).
 
-import type { QualifiedName } from "../identifier";
-import { type AttrValue, valueKey } from "../value";
+import type { QualifiedName } from "../identifier.js";
+import { type AttrValue, valueKey } from "../value.js";
 
 /** One attribute's name plus its ordered, value-deduped values. */
 type AttrEntry = {

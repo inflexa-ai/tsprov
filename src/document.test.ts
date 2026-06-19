@@ -1,7 +1,7 @@
 import { test, expect, describe } from "bun:test";
 
-import { ProvDocument } from "./document";
-import { ProvBundle } from "./bundle";
+import { ProvDocument } from "./document.js";
+import { ProvBundle } from "./bundle.js";
 
 function exDoc(): ProvDocument {
   const d = new ProvDocument();

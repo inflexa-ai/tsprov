@@ -2,9 +2,9 @@ import { test, expect, describe } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { ProvDocument } from "../document";
-import { ProvJsonSerializer } from "./json";
-import { getSerializer } from "./serializer";
+import { ProvDocument } from "../document.js";
+import { ProvJsonSerializer } from "./json.js";
+import { getSerializer } from "./serializer.js";
 
 describe("PROV-JSON serializer basics", () => {
   test("is registered", () => {

@@ -11,9 +11,9 @@
 
 import { DateTime } from "luxon";
 
-import { Identifier, QualifiedName } from "./identifier";
-import { Literal } from "./literal";
-import { toXsdDateTime } from "./datetime";
+import { Identifier, QualifiedName } from "./identifier.js";
+import { Literal } from "./literal.js";
+import { toXsdDateTime } from "./datetime.js";
 
 /**
  * A value that may appear as a PROV attribute. Typed numerics (to distinguish

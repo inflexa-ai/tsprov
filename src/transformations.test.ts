@@ -1,7 +1,7 @@
 import { test, expect, describe } from "bun:test";
 
-import { ProvBundle } from "./bundle";
-import { ProvDocument } from "./document";
+import { ProvBundle } from "./bundle.js";
+import { ProvDocument } from "./document.js";
 
 const EX = "http://example.org/";
 

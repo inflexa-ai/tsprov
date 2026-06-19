@@ -44,7 +44,7 @@
     "build": "bun run clean && bun run build:js && bun run build:cjs && bun run build:types",
     "build:js": "bun build ./src/index.ts --outdir ./dist --target node --format esm --sourcemap=linked",
     "build:cjs": "bun build ./src/index.ts --outdir ./dist --target node --format cjs --sourcemap=linked --entry-naming '[name].cjs'",
-    "build:types": "tsc -p tsconfig.build.json && bun run scripts/fix-dts-extensions.ts",
+    "build:types": "tsc -p tsconfig.build.json",
     "test": "bun test",
     "prepublishOnly": "bun run build"
   },

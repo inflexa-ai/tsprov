@@ -7,7 +7,7 @@ import {
   ProvElementIdentifierRequired,
   setWarningHandler,
   warn,
-} from "./error";
+} from "./error.js";
 
 describe("exception hierarchy", () => {
   test("ProvError is a native Error with the right name", () => {

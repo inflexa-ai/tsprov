@@ -1,7 +1,7 @@
 import { test, expect, describe } from "bun:test";
 import { DateTime } from "luxon";
 
-import { ensureDateTime, parseXsdDateTime, toXsdDateTime } from "./datetime";
+import { ensureDateTime, parseXsdDateTime, toXsdDateTime } from "./datetime.js";
 
 describe("ensureDateTime", () => {
   test("passes through null/undefined as null", () => {

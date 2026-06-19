@@ -1,13 +1,13 @@
 import { test, expect, describe } from "bun:test";
 
-import { ProvDocument } from "../document";
-import { ProvNSerializer } from "./provn";
+import { ProvDocument } from "../document.js";
+import { ProvNSerializer } from "./provn.js";
 import {
   getSerializer,
   registeredFormats,
   DoNotExist,
   UnsupportedOperationError,
-} from "./serializer";
+} from "./serializer.js";
 
 function sampleDoc(): ProvDocument {
   const d = new ProvDocument();

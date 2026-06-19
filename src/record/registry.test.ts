@@ -3,13 +3,13 @@ import { test, expect, describe } from "bun:test";
 import {
   getRecordClass,
   registeredRecordCount,
-} from "./registry";
+} from "./registry.js";
 // Importing the concrete classes loads their modules and triggers registration.
-import { ProvEntity, ProvActivity, ProvAgent } from "./element";
-import { ProvGeneration, ProvMembership } from "./relation";
-import { type RecordBundle } from "./record";
-import { Namespace, QualifiedName } from "../identifier";
-import { ProvExceptionInvalidQualifiedName } from "../error";
+import { ProvEntity, ProvActivity, ProvAgent } from "./element.js";
+import { ProvGeneration, ProvMembership } from "./relation.js";
+import { type RecordBundle } from "./record.js";
+import { Namespace, QualifiedName } from "../identifier.js";
+import { ProvExceptionInvalidQualifiedName } from "../error.js";
 import {
   PROV_ENTITY,
   PROV_ACTIVITY,
@@ -17,7 +17,7 @@ import {
   PROV_GENERATION,
   PROV_MEMBERSHIP,
   PROV_ATTR_ENTITY,
-} from "../constants";
+} from "../constants.js";
 
 const EX = new Namespace("ex", "http://example.org/");
 const bundle: RecordBundle = {

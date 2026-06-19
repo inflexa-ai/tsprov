@@ -1,16 +1,16 @@
 import { test, expect, describe } from "bun:test";
 
-import { ProvBundle } from "../bundle";
-import { ProvDocument } from "../document";
-import type { ProvRecord } from "./record";
-import { ProvEntity, ProvActivity, ProvAgent, ProvElement } from "./element";
+import { ProvBundle } from "../bundle.js";
+import { ProvDocument } from "../document.js";
+import type { ProvRecord } from "./record.js";
+import { ProvEntity, ProvActivity, ProvAgent, ProvElement } from "./element.js";
 import {
   ProvGeneration,
   ProvUsage,
   ProvAssociation,
   ProvDelegation,
   ProvRelation,
-} from "./relation";
+} from "./relation.js";
 
 function exBundle(): ProvBundle {
   const b = new ProvBundle();

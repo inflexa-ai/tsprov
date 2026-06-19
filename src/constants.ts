@@ -13,13 +13,13 @@
 // `PROV_N_MAP`, the attribute id maps from `PROV_RECORD_ATTRIBUTES`), we derive
 // from a single source-of-truth pair array so the two directions cannot drift.
 
-import { ns } from "./intern";
-import type { QualifiedName } from "./identifier";
+import { ns } from "./intern.js";
+import type { QualifiedName } from "./identifier.js";
 // Type-only (erased): brands the record-type QNames with the class each builds, so
 // `ProvBundle.newRecord` returns the concrete type with no cast. No runtime cycle —
 // the record modules import this one at runtime, never the reverse.
-import type { RecordTypeQName } from "./record/registry";
-import type { ProvEntity, ProvActivity, ProvAgent } from "./record/element";
+import type { RecordTypeQName } from "./record/registry.js";
+import type { ProvEntity, ProvActivity, ProvAgent } from "./record/element.js";
 import type {
   ProvGeneration,
   ProvUsage,
@@ -36,7 +36,7 @@ import type {
   ProvSpecialization,
   ProvMention,
   ProvMembership,
-} from "./record/relation";
+} from "./record/relation.js";
 
 // ── Namespaces ──────────────────────────────────────────────────────────────
 

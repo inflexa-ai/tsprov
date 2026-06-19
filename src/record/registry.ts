@@ -9,8 +9,8 @@
 // themselves at module load (`element.ts`/`relation.ts` call
 // `registerRecordClass`); `record.ts` calls `getRecordClass` from `copy()`.
 
-import type { QualifiedName } from "../identifier";
-import type { ProvRecord, RecordBundle, ProvAttributes } from "./record";
+import type { QualifiedName } from "../identifier.js";
+import type { ProvRecord, RecordBundle, ProvAttributes } from "./record.js";
 
 /** Constructor signature shared by every concrete record class. */
 export type RecordCtor = new (

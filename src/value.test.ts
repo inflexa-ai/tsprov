@@ -1,10 +1,10 @@
 import { test, expect, describe } from "bun:test";
 
-import { valueKey } from "./value";
-import { Identifier, Namespace } from "./identifier";
-import { Literal } from "./literal";
-import { parseXsdDateTime } from "./datetime";
-import { XSD_STRING, XSD_INT } from "./constants";
+import { valueKey } from "./value.js";
+import { Identifier, Namespace } from "./identifier.js";
+import { Literal } from "./literal.js";
+import { parseXsdDateTime } from "./datetime.js";
+import { XSD_STRING, XSD_INT } from "./constants.js";
 
 const EX = new Namespace("ex", "http://example.org/");
 const EX_OTHER = new Namespace("other", "http://example.org/");

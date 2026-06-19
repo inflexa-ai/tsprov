@@ -12,25 +12,25 @@ import {
   ProvRecord,
   type RecordBundle,
   type ProvAttributes,
-} from "./record";
+} from "./record.js";
 import type {
   ProvBundle,
   EntityRef,
   ActivityRef,
   AgentRef,
-} from "../bundle";
-import type { QualifiedName } from "../identifier";
-import { type AttrValue } from "../value";
-import type { DateLike } from "../datetime";
-import { ProvElementIdentifierRequired } from "../error";
-import { registerRecordClass } from "./registry";
+} from "../bundle.js";
+import type { QualifiedName } from "../identifier.js";
+import { type AttrValue } from "../value.js";
+import type { DateLike } from "../datetime.js";
+import { ProvElementIdentifierRequired } from "../error.js";
+import { registerRecordClass } from "./registry.js";
 import {
   PROV_ENTITY,
   PROV_ACTIVITY,
   PROV_AGENT,
   PROV_ATTR_STARTTIME,
   PROV_ATTR_ENDTIME,
-} from "../constants";
+} from "../constants.js";
 
 /** Base class for PROV elements (nodes). Every element requires an identifier (`model.py:613`). */
 export abstract class ProvElement extends ProvRecord {
