@@ -113,3 +113,27 @@ describe("is* type-guard narrowing", () => {
     }
   });
 });
+
+describe("ref types reject mismatched record kinds", () => {
+  // The `@ts-expect-error` lines below are the assertion: each must be a genuine
+  // compile error, or `tsc` flags the directive as unused and the build fails. They
+  // run at runtime too (harmless records in a throwaway bundle) — proof the distinct
+  // ref types catch a wrong-kind argument the old shared `ProvRecord` alias allowed.
+  test("a wrong-kind record is a compile error; a string id still works", () => {
+    const b = exBundle();
+    const e = b.entity("ex:e");
+    const a = b.activity("ex:a");
+    const ag = b.agent("ex:ag");
+
+    // Correct kinds compile and chain:
+    expect(e.wasGeneratedBy(a)).toBe(e);
+    expect(a.wasAssociatedWith(ag)).toBe(a);
+    // String/QName ids remain the deliberate escape hatch:
+    expect(e.wasGeneratedBy("ex:other")).toBe(e);
+
+    // @ts-expect-error — an agent is not an ActivityRef
+    e.wasGeneratedBy(ag);
+    // @ts-expect-error — an entity is not an AgentRef
+    a.wasAssociatedWith(e);
+  });
+});

@@ -101,15 +101,18 @@ import {
 } from "./constants";
 
 /**
- * A reference to an entity: an entity record or a name candidate. (Aliased
- * per-role for documentation; distinctness is not yet enforced at the type
- * level — a future branded-ref refinement.)
+ * A reference to an entity: the concrete {@link ProvEntity} record, or a name
+ * candidate (a `QualifiedName`, a `prefix:local` string, or an `Identifier`).
+ *
+ * The role types are now **distinct**: passing a {@link ProvActivity} where an
+ * {@link EntityRef} is expected is a compile error. A string/QName id still passes
+ * (you can reference any record by id) — that is the deliberate escape hatch.
  */
-export type EntityRef = ProvRecord | QualifiedNameCandidate;
-/** A reference to an activity (see {@link EntityRef}). */
-export type ActivityRef = ProvRecord | QualifiedNameCandidate;
-/** A reference to an agent (see {@link EntityRef}). */
-export type AgentRef = ProvRecord | QualifiedNameCandidate;
+export type EntityRef = ProvEntity | QualifiedNameCandidate;
+/** A reference to an activity: a {@link ProvActivity} record or a name candidate (see {@link EntityRef}). */
+export type ActivityRef = ProvActivity | QualifiedNameCandidate;
+/** A reference to an agent: a {@link ProvAgent} record or a name candidate (see {@link EntityRef}). */
+export type AgentRef = ProvAgent | QualifiedNameCandidate;
 
 /**
  * A {@link ProvRecord} subclass constructor — the filter accepted by
