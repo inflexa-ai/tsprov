@@ -81,18 +81,28 @@ while preserving PROV-DM semantics exactly:
 
 ## 3. Installation
 
+tsprov publishes to [GitHub Packages](https://docs.github.com/en/packages) under the
+`@inflexa-ai` scope, so first map that scope to the GitHub registry in an `.npmrc` (authenticated
+with a token that has `read:packages`):
+
+```ini
+# .npmrc
+@inflexa-ai:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
 ```bash
-npm install tsprov      # or: pnpm add tsprov / yarn add tsprov / bun add tsprov
+npm install @inflexa-ai/tsprov      # or: pnpm add @inflexa-ai/tsprov / yarn add @inflexa-ai/tsprov / bun add @inflexa-ai/tsprov
 ```
 
 This pulls in **luxon** (the only runtime dependency). tsprov ships **dual ESM + CJS** with `.d.ts`
 declarations, so it works in Node, Bun, browsers/bundlers, and both `import` and `require`:
 
 ```ts
-import { ProvDocument } from "tsprov";        // ESM
+import { ProvDocument } from "@inflexa-ai/tsprov";        // ESM
 ```
 ```js
-const { ProvDocument } = require("tsprov");   // CommonJS
+const { ProvDocument } = require("@inflexa-ai/tsprov");   // CommonJS
 ```
 
 No build step or peer dependencies are required to consume it.
@@ -120,7 +130,7 @@ flowchart RL
 Build it with the **container API**:
 
 ```ts
-import { ProvDocument } from "tsprov";
+import { ProvDocument } from "@inflexa-ai/tsprov";
 
 const doc = new ProvDocument();
 doc.addNamespace("ex", "https://example.org/");
@@ -194,7 +204,7 @@ endDocument
 ### Round-trip
 
 ```ts
-import { read } from "tsprov";
+import { read } from "@inflexa-ai/tsprov";
 
 const json = doc.serialize("json");
 const parsed = read(json);          // format auto-detected
@@ -267,7 +277,7 @@ Attribute values can be strings, booleans, numbers, datetimes, qualified names, 
 datatype:
 
 ```ts
-import { Literal, XSD_INT } from "tsprov";
+import { Literal, XSD_INT } from "@inflexa-ai/tsprov";
 
 doc.entity("ex:dataset", {
   "ex:rows": new Literal(10_000, XSD_INT),   // xsd:int

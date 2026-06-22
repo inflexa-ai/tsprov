@@ -18,14 +18,24 @@ with a fully-typed fluent API, and round-trip them through PROV-JSON and PROV-N.
 
 ## Install
 
+tsprov is published to [GitHub Packages](https://docs.github.com/en/packages). Map the
+`@inflexa-ai` scope to the GitHub registry in an `.npmrc` (and authenticate with a token that
+has `read:packages`):
+
+```ini
+# .npmrc
+@inflexa-ai:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
 ```bash
-npm install tsprov     # or: bun add tsprov
+npm install @inflexa-ai/tsprov     # or: bun add @inflexa-ai/tsprov
 ```
 
 ## Quick start
 
 ```ts
-import { ProvDocument } from "tsprov";
+import { ProvDocument } from "@inflexa-ai/tsprov";
 
 const doc = new ProvDocument();
 doc.addNamespace("ex", "http://example.org/");
@@ -59,7 +69,7 @@ const parsed = ProvDocument.deserialize(json, "json");
 doc.equals(parsed); // true
 
 // read() auto-detects the format
-import { read } from "tsprov";
+import { read } from "@inflexa-ai/tsprov";
 const back = read(json);
 ```
 
@@ -85,7 +95,7 @@ JavaScript has a single `number` type, so to preserve the XSD datatype distincti
 in a `Literal`:
 
 ```ts
-import { Literal, XSD_INT } from "tsprov";
+import { Literal, XSD_INT } from "@inflexa-ai/tsprov";
 
 doc.entity("ex:dataset", { "ex:rows": new Literal(10_000, XSD_INT) });
 ```
