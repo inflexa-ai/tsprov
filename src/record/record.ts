@@ -9,8 +9,9 @@
 //     including the asymmetric blank-id rule (compare ids only when *this* has one).
 //
 // Bundle seam: Python resolves attribute-name strings via the bundle's
-// `NamespaceManager`. That layer is M4, so `ProvRecord` depends only on the
-// minimal `RecordBundle` resolver interface below; M4's `ProvBundle` implements it.
+// `NamespaceManager`. `ProvRecord` depends only on the minimal `RecordBundle`
+// resolver interface below — decoupling the record layer from the full bundle —
+// which `ProvBundle` implements.
 
 import { DateTime } from "luxon";
 
@@ -65,7 +66,7 @@ export type ProvAttributes =
 
 /**
  * The minimal bundle contract a {@link ProvRecord} needs: qualified-name
- * resolution. Implemented by `ProvBundle`'s `NamespaceManager` at M4.
+ * resolution. Implemented by `ProvBundle`'s `NamespaceManager`.
  */
 export interface RecordBundle {
   /** Resolves a candidate to a {@link QualifiedName}, or `null` if it cannot be resolved. */

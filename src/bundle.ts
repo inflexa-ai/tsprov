@@ -2,8 +2,9 @@
 //
 // Port of `ProvBundle` (model.py:1373). Holds a `NamespaceManager`, an ordered
 // record list, and an id→records map. **Implements `RecordBundle`** (the resolver
-// seam the record layer deferred through M3): `validQualifiedName` /
-// `mandatoryValidQname` delegate to the NamespaceManager.
+// seam through which records resolve qualified names without depending on the
+// concrete bundle type): `validQualifiedName` / `mandatoryValidQname` delegate to
+// the NamespaceManager.
 //
 // Naming inversion (DEVIATIONS): the camelCase PROV vocabulary (`wasGeneratedBy`,
 // `wasDerivedFrom`, …) is the **primary** API; Python's descriptive names
@@ -104,7 +105,7 @@ import {
  * A reference to an entity: the concrete {@link ProvEntity} record, or a name
  * candidate (a `QualifiedName`, a `prefix:local` string, or an `Identifier`).
  *
- * The role types are now **distinct**: passing a {@link ProvActivity} where an
+ * The role types are **distinct**: passing a {@link ProvActivity} where an
  * {@link EntityRef} is expected is a compile error. A string/QName id still passes
  * (you can reference any record by id) — that is the deliberate escape hatch.
  */

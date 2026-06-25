@@ -2,9 +2,7 @@
 //
 // Port of `ProvElement` + the element classes (model.py:613, :663, :778, :999).
 // The fluent builder helpers (`e.wasGeneratedBy(...)`, `a.used(...)`, etc.)
-// delegate to the bundle's authoring API, which is M4 — they are deferred. What
-// lands here is the class shape: `static prov_type` / `FORMAL_ATTRIBUTES`, the
-// element identifier requirement, and `ProvActivity`'s time accessors.
+// delegate to the bundle's authoring API.
 
 import { DateTime } from "luxon";
 
@@ -66,6 +64,10 @@ export class ProvEntity extends ProvElement {
     time?: DateLike,
     attributes?: ProvAttributes,
   ): this {
+    // `_bundle` is typed as the minimal `RecordBundle` seam, but the only
+    // implementor is `ProvBundle`, so the owning bundle is always a `ProvBundle`
+    // at runtime — this widening cast (repeated across the fluent helpers below)
+    // is sound and reaches the full authoring API.
     (this._bundle as ProvBundle).wasGeneratedBy(
       this,
       activity,

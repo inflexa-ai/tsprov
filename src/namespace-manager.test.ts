@@ -39,7 +39,7 @@ describe("addNamespace dedup & rename", () => {
     const nm = new NamespaceManager();
     nm.addNamespace(new Namespace("ex", "http://example.org/"));
     const ex2 = nm.addNamespace(new Namespace("ex", "http://elsewhere.org/"));
-    expect(ex2.prefix).toBe("ex_1"); // renamed
+    expect(ex2.prefix).toBe("ex_1");
     expect(ex2.uri).toBe("http://elsewhere.org/");
   });
 });

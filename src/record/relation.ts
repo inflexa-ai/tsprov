@@ -4,7 +4,7 @@
 // (model.py:640-1097). Each declares its `static prov_type` and ordered
 // `FORMAL_ATTRIBUTES`, copied verbatim from the Python class definitions.
 // `ProvMention` IS-A `ProvSpecialization` (model.py:1079). The fluent builder
-// helpers are the bundle's job (M4) and are deferred.
+// helpers live on the bundle, not on these relation classes.
 
 import { ProvRecord } from "./record.js";
 import { registerRecordClass } from "./registry.js";

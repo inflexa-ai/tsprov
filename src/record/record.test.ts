@@ -20,7 +20,7 @@ import {
 
 const EX = new Namespace("ex", "http://example.org/");
 
-// M3 seam: a trivial resolver that only accepts already-resolved QNames.
+// Minimal RecordBundle seam: a trivial resolver that only accepts already-resolved QNames.
 const bundle: RecordBundle = {
   validQualifiedName: (n) => (n instanceof QualifiedName ? n : null),
   mandatoryValidQname: (n) => {
@@ -117,8 +117,8 @@ describe("asserted types & auto literal conversion", () => {
       [EX.qn("rows"), new Literal("5", XSD_INT)],
       [EX.qn("name"), new Literal("Bob", XSD_STRING)],
     ]);
-    expect(e.getAttribute(EX.qn("rows"))).toEqual([5]); // number
-    expect(e.getAttribute(EX.qn("name"))).toEqual(["Bob"]); // string
+    expect(e.getAttribute(EX.qn("rows"))).toEqual([5]);
+    expect(e.getAttribute(EX.qn("name"))).toEqual(["Bob"]);
   });
 
   test("a Literal with an unparseable datatype is kept as a Literal", () => {

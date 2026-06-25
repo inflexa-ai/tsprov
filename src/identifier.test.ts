@@ -146,7 +146,7 @@ describe("intern", () => {
   test("interned namespaces make their QNames === (constants are singletons)", () => {
     const PROV = ns("prov", "http://www.w3.org/ns/prov#");
     const PROV_ENTITY = PROV.qn("Entity");
-    expect(PROV_ENTITY).toBe(PROV.qn("Entity")); // singleton, like PROV_ENTITY === PROV.qn('Entity')
+    expect(PROV_ENTITY).toBe(PROV.qn("Entity"));
   });
 
   test("internQName() unifies equal-URI QNames from different namespace instances", () => {

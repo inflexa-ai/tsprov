@@ -92,7 +92,6 @@ describe("document equality", () => {
 
   test("a differing bundle breaks equality", () => {
     const d = build();
-    // Add an extra record into the existing bundle.
     d.bundles[0]!.entity("ex:extra");
     expect(build().equals(d)).toBe(false);
   });

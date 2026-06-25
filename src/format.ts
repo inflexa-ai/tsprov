@@ -69,6 +69,7 @@ export function formatFloatG(value: number, precision = 6): string {
   const sig = precision === 0 ? 1 : precision;
   // The decimal exponent as it appears in `%e` form (after rounding to `sig`
   // significant digits), which is what C uses to choose between %e and %f.
+  // `[1]!`: `toExponential` always emits exactly one `e`, so index 1 is present.
   const exponent = Number.parseInt(
     value.toExponential(sig - 1).split("e")[1]!,
     10,

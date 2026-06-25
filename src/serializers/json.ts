@@ -180,8 +180,9 @@ function decodeJsonDocument(content: Json, document: ProvDocument): void {
   decodeJsonContainer(containerContent, document);
   if (bundles) {
     for (const bundleId of Object.keys(bundles)) {
-      // `document.bundle()` creates + registers the child with the document as
-      // parent — sidestepping the (deferred) `add_bundle` mutation path.
+      // `document.bundle()` creates + registers a fresh child under this
+      // document as parent — the decode builds records into it directly, rather
+      // than grafting a standalone bundle via `addBundle`.
       const child = document.bundle(bundleId);
       decodeJsonContainer(bundles[bundleId], child);
     }

@@ -4,11 +4,6 @@
 // support: a document holds document-level records plus named child bundles, and
 // child bundles inherit the document's namespaces (their `NamespaceManager`'s
 // parent is the document's).
-//
-// Deferred to later iterations: `add_bundle`/`update`/`unified` (they mutate a
-// bundle's identifier / namespace-manager parent / document, which the current
-// immutable bundle design does not expose), and `serialize`/`deserialize`
-// (needs the M5 serializers).
 
 import { ProvBundle } from "./bundle.js";
 import type { ProvRecord, QualifiedNameCandidate } from "./record/record.js";
@@ -17,7 +12,7 @@ import type { NamespaceCollection } from "./namespace-manager.js";
 import { ProvException } from "./error.js";
 import { getSerializer } from "./serializers/serializer.js";
 import type { ProvFormat } from "./serializers/serializer.js";
-// Side-effect import: registers the core PROV-N serializer (JSON joins it at M5).
+// Side-effect import: registers the core PROV-N serializer.
 import "./serializers/provn.js";
 
 /** A PROV document: document-level records plus named sub-bundles (`model.py:2500`). */

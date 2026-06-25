@@ -48,7 +48,7 @@ describe("ProvRecord.copy", () => {
   test("copies an element to an equal, independent instance", () => {
     const e = new ProvEntity(bundle, EX.qn("e"), [[EX.qn("role"), "author"]]);
     const c = e.copy();
-    expect(c).not.toBe(e); // distinct object
+    expect(c).not.toBe(e);
     expect(c).toBeInstanceOf(ProvEntity); // dispatched through the registry
     expect(c.equals(e)).toBe(true);
     expect(e.equals(c)).toBe(true);

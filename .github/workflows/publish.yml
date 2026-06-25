@@ -20,7 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Bun runs install + build (the build scripts shell out to `bun build`).
+      # Bun runs the install and build steps below (`bun install`, `bun run build`).
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -39,6 +39,13 @@ jobs:
 
       - name: Build
         run: bun run build
+
+      # Gate the publish on the artifacts actually executing: a type-correct build
+      # can still be runtime-empty (a tree-shake can drop the implementation), so
+      # this loads both the ESM and CJS entry points and round-trips a document,
+      # failing CI before a broken publish.
+      - name: Smoke-test built artifacts
+        run: bun run smoke
 
       - name: Check if version already published
         id: check

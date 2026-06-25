@@ -81,7 +81,7 @@ export type { AttributeValue } from "./record/record.js";
 
 export { ProvDocument } from "./document.js";
 
-// Serializer registry + the core PROV-N serializer (JSON joins at M5).
+// Serializer registry + the built-in PROV-N and PROV-JSON serializers.
 export {
   getSerializer,
   registerSerializer,

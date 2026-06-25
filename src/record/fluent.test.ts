@@ -118,7 +118,7 @@ describe("ref types reject mismatched record kinds", () => {
   // The `@ts-expect-error` lines below are the assertion: each must be a genuine
   // compile error, or `tsc` flags the directive as unused and the build fails. They
   // run at runtime too (harmless records in a throwaway bundle) — proof the distinct
-  // ref types catch a wrong-kind argument the old shared `ProvRecord` alias allowed.
+  // ref types catch a wrong-kind argument a single shared `ProvRecord` ref type would accept.
   test("a wrong-kind record is a compile error; a string id still works", () => {
     const b = exBundle();
     const e = b.entity("ex:e");

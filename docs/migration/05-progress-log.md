@@ -45,6 +45,74 @@ purely post-v1: PROV-N byte-differential, then M7 CLI / M8 graph+dot / M9 XML+RD
 
 ---
 
+## 2026-06-25 · entry 26 — fix: published runtime was tree-shaken empty; `tsc` per-module emit + smoke gate (→ 0.1.1)
+
+**Build:** `bun test` 630 pass / 0 fail · `tsc --noEmit -p tsconfig.json` clean · `bun run build`
+green (now two `tsc` passes — ESM + CJS, no bundler) · `bun run smoke` green (both entry points load
+and round-trip under node). Consumer import-by-name verified at runtime (node + bun, ESM + CJS) and
+under `nodenext` type resolution for **both** the `import` and `require` conditions.
+
+### The bug (reported by the consumer, `inflexa/prov.improvements.md`)
+
+`import { ProvDocument } from "@inflexa-ai/tsprov"` threw at load in **0.1.0**:
+`"NamespaceManager" is not declared in this file`. The `.d.ts` were complete (types looked fine) but
+the **runtime was empty** — `dist/index.js` was a dangling `export { … }` manifest with no
+definitions, and `dist/index.cjs` referenced bindings it never defined.
+
+**Root cause — bundler non-determinism, not a source bug.** `build:js`/`build:cjs` ran
+`bun build ./src/index.ts --format esm|cjs` over the pure re-export barrel with `"sideEffects": false`
+set. That flag is *factually wrong*: `serializers/{json,provn}.ts` call `registerSerializer(...)` at
+import time — a real side effect — so declaring "no side effects" authorizes a bundler to tree-shake
+the implementation (and, more insidiously, the JSON registration that `serialize("json")`, the
+**default** format, depends on) out of the barrel. The CI publish built with `bun-version: latest`; a
+bun version whose tree-shake was aggressive enough shipped the empty bundle. (Repro is
+version-dependent: bun 1.3.8 locally does *not* strip it — which is exactly why "works on my bun" is
+not a fix. The fix must be immune to bundler behavior.)
+
+### The fix
+
+Stop bundling the runtime. Let `tsc` emit **per-module** `dist/*.js`, the deterministic mirror of the
+per-module `.d.ts` we already ship, exploiting the entry-25 `.js`-extension imports so the output is
+directly nodenext-runnable with no post-process and no tree-shake step.
+
+- **`tsconfig.build.json`** — dropped `emitDeclarationOnly`; now emits ESM `.js` + `.d.ts` + source
+  maps (`module: "Preserve"` keeps the `.js` specifiers verbatim).
+- **`tsconfig.cjs.json`** (new) — second pass: `module: commonjs`, `moduleResolution: node`,
+  `verbatimModuleSyntax: false` → per-module CJS into `dist/cjs/`; `build:cjs` then writes
+  `dist/cjs/package.json` = `{"type":"commonjs"}` so Node loads it as CJS under the `"type":"module"`
+  package root.
+- **`package.json`** — **removed the false `"sideEffects": false"`** (conservative + correct: the
+  serializers self-register); `main` → `./dist/cjs/index.js`; `exports` rewired to per-condition types
+  (`import`→`dist/index.{js,d.ts}`, `require`→`dist/cjs/index.{js,d.ts}`); `build:js`/`build:cjs`/
+  `build:types` replaced by `build:esm`/`build:cjs`; **version 0.1.0 → 0.1.1** (0.1.0 is published
+  broken and the workflow skips same-version, so the fix needs a bump).
+- **`scripts/smoke.mjs`** (new) + **`prepublishOnly: build && smoke`** + a CI smoke step — loads the
+  exact files `exports` points at (ESM `import`, CJS `require`) and runs serialize→deserialize→equals.
+  Non-zero exit blocks publish. This is the guard that would have caught 0.1.0; **types passing is not
+  proof a package runs.**
+
+Source under `src/**` was untouched — the report confirmed (and round-trips prove) the source and our
+API are correct; only the published bundle was broken.
+
+### Verified
+
+- `bun run build && bun run smoke` green; ESM `dist/index.js` is a 3.9 KB per-module barrel (was a
+  ~200 KB bundle), `record/` + `serializers/` emitted in both trees.
+- Consumer installs the package (`dist` + `src` + `package.json`, mirroring `files`) and imports by
+  **name**: ESM ✓ (node + bun), CJS ✓ (node) — `exports` map resolves both conditions and round-trips.
+- `nodenext` consumer typecheck clean for both `import` (`.ts`) and `require` (`.cts`) conditions
+  (remaining strict-mode noise was unrelated `@types/node`/`@types/bun` in the scratch sandbox).
+- **Production tree-shake** of a consumer importing only `ProvDocument` still serializes the default
+  JSON format — the registration survives now that `sideEffects` no longer lies.
+
+### Verify before the next entry
+
+```sh
+bun test && bunx tsc --noEmit -p tsconfig.json && bun run build && bun run smoke
+```
+
+---
+
 ## 2026-06-19 · entry 25 — `.js`-extension imports (supersedes entry 24's post-build fixup)
 
 **Build:** `bun test` 630 pass / 0 fail · `tsc --noEmit` clean · `bun run build` green (now just

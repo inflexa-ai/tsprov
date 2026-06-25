@@ -21,7 +21,7 @@ describe("AttributeStore", () => {
   test("dedups values by value-equality (valueKey)", () => {
     const s = new AttributeStore();
     s.add(TYPE, EX.qn("Doc"));
-    s.add(TYPE, EX.qn("Doc")); // same QName
+    s.add(TYPE, EX.qn("Doc"));
     s.add(TYPE, EX_OTHER.qn("Doc")); // equal QName, different prefix → still dup
     expect(s.get(TYPE)).toHaveLength(1);
 

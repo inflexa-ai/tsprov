@@ -6,8 +6,8 @@
 // (preserves the source UTC offset) and a custom formatter that reproduces
 // Python's `isoformat()` byte-for-byte for timezone-aware values.
 //
-// Known limitations vs Python (to revisit when the JSON corpus differential runs
-// at M5 — see 03-dependency-analysis §2 / 00-overview open questions):
+// Known limitations vs Python (see 03-dependency-analysis §2 / 00-overview open
+// questions):
 //   - luxon has millisecond resolution, so sub-millisecond microseconds are lost
 //     on parse (`...123456` round-trips as `...123000`).
 //   - luxon is ISO-8601-only, stricter than `dateutil` (which parses many

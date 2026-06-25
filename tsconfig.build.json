@@ -1,12 +1,19 @@
 {
-  // Used only to emit .d.ts declarations for the published package.
-  // The base tsconfig.json keeps noEmit for editor/Bun usage.
+  // The ESM build: emits per-module runtime `.js` (+ source maps) AND the `.d.ts`
+  // declarations for the published package. The base tsconfig.json keeps noEmit for
+  // editor/Bun usage; this config drives `tsc` to emit real code.
+  //
+  // Per-module emit via `tsc` (not a bundler) is deliberate: `module: "Preserve"`
+  // (from the base config) leaves the `.js`-extension import specifiers verbatim, so
+  // `dist/*.js` is a faithful, deterministic mirror of `src/*.ts` runnable under
+  // nodenext — with no tree-shaking pass that could drop the implementation or the
+  // serializers' import-time `registerSerializer(...)` side effects.
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
-    "emitDeclarationOnly": true,
     "declaration": true,
     "declarationMap": true,
+    "sourceMap": true,
     "outDir": "dist",
     "rootDir": "src",
     "allowImportingTsExtensions": false,

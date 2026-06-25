@@ -40,7 +40,7 @@ describe("namespaces", () => {
 describe("type QNames", () => {
   test("have the expected URIs and are interned singletons", () => {
     expect(PROV_ENTITY.uri).toBe("http://www.w3.org/ns/prov#Entity");
-    expect(PROV_ENTITY).toBe(PROV.qn("Entity")); // PROV_ENTITY === PROV.qn("Entity")
+    expect(PROV_ENTITY).toBe(PROV.qn("Entity"));
     expect(String(PROV_ENTITY)).toBe("prov:Entity");
     expect(XSD_INT.uri).toBe("http://www.w3.org/2001/XMLSchema#int");
     expect(XSD_DOUBLE.uri).toBe("http://www.w3.org/2001/XMLSchema#double");
