@@ -1,6 +1,6 @@
 {
   "name": "@inflexa-ai/tsprov",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "An idiomatic TypeScript implementation of the W3C PROV Data Model (a port of Python prov): author provenance documents and round-trip them through PROV-JSON and PROV-N.",
   "keywords": [
     "prov",
@@ -57,10 +57,8 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/luxon": "^3.7.1"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
+    "@types/luxon": "^3.7.1",
+    "typescript": "^5 || ^6"
   },
   "dependencies": {
     "luxon": "^3.7.2"
