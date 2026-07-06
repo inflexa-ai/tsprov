@@ -302,12 +302,16 @@ export abstract class ProvRecord {
    *   single-valued formal attribute (see {@link FormalAttributeConflictPolicy}).
    *   Defaults to `"throw"`, which reproduces the Python reference exactly; the
    *   merge policies are opt-in for callers that unify replayed observations.
+   * @param singleValued   URIs of NON-formal attributes to additionally treat as
+   *   single-valued (resolved by `conflictPolicy`, exactly like a formal attr).
+   *   Defaults to none, so every non-formal attribute stays multi-valued.
    * @throws {ProvException} On an invalid value, or a conflicting formal value
    *   under the `"throw"` policy.
    */
   addAttributes(
     attributes: ProvAttributes,
     conflictPolicy: FormalAttributeConflictPolicy = "throw",
+    singleValued?: ReadonlySet<string>,
   ): void {
     const pairs = normalizeAttributes(attributes);
     if (pairs.length === 0) {
@@ -370,7 +374,7 @@ export abstract class ProvRecord {
 
       if (
         !isCollection &&
-        PROV_ATTRIBUTES.has(attr.uri) &&
+        (PROV_ATTRIBUTES.has(attr.uri) || (singleValued?.has(attr.uri) ?? false)) &&
         this.attrs.has(attr)
       ) {
         const existing = this.attrs.first(attr)!;

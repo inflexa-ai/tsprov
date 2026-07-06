@@ -196,6 +196,71 @@ describe("ProvBundle.unified — formalAttributeConflict policy", () => {
   });
 });
 
+describe("ProvBundle.unified — singleValued (non-formal) attributes", () => {
+  // A run activity re-declared with a genuinely different status — the shape a
+  // budget-cancel that later resumes to completion produces on merge.
+  function conflictingStatus(): ProvBundle {
+    const b = new ProvBundle();
+    b.addNamespace("ex", EX);
+    b.activity("ex:run", undefined, undefined, { "ex:status": "canceled" });
+    b.activity("ex:run", undefined, undefined, { "ex:status": "completed" });
+    return b;
+  }
+
+  test("default merge unions a non-formal attribute to multiple values", () => {
+    const merged = conflictingStatus().unified().getRecord("ex:run");
+    expect(merged).toHaveLength(1);
+    const provn = merged[0]!.getProvN();
+    expect(provn).toContain("canceled");
+    expect(provn).toContain("completed"); // both survive — the multi-value problem
+  });
+
+  test('singleValued + "last" keeps only the latest value', () => {
+    const merged = conflictingStatus()
+      .unified({ formalAttributeConflict: "last", singleValued: ["ex:status"] })
+      .getRecord("ex:run");
+    expect(merged).toHaveLength(1);
+    const provn = merged[0]!.getProvN();
+    expect(provn).toContain("completed");
+    expect(provn).not.toContain("canceled");
+  });
+
+  test('singleValued + "first" keeps only the earliest value', () => {
+    const merged = conflictingStatus()
+      .unified({ formalAttributeConflict: "first", singleValued: ["ex:status"] })
+      .getRecord("ex:run");
+    expect(merged).toHaveLength(1);
+    const provn = merged[0]!.getProvN();
+    expect(provn).toContain("canceled");
+    expect(provn).not.toContain("completed");
+  });
+
+  test("identical re-emits of a single-valued non-formal attribute dedupe to one", () => {
+    const b = new ProvBundle();
+    b.addNamespace("ex", EX);
+    b.activity("ex:run", undefined, undefined, { "ex:status": "completed" });
+    b.activity("ex:run", undefined, undefined, { "ex:status": "completed" });
+    const merged = b
+      .unified({ formalAttributeConflict: "last", singleValued: ["ex:status"] })
+      .getRecord("ex:run");
+    expect(merged).toHaveLength(1);
+    expect(merged[0]!.getProvN().match(/completed/g) ?? []).toHaveLength(1);
+  });
+
+  test("a non-formal attribute NOT named stays multi-valued under the policy", () => {
+    const b = new ProvBundle();
+    b.addNamespace("ex", EX);
+    b.activity("ex:run", undefined, undefined, { "ex:note": "a" });
+    b.activity("ex:run", undefined, undefined, { "ex:note": "b" });
+    const provn = b
+      .unified({ formalAttributeConflict: "last", singleValued: ["ex:status"] })
+      .getRecord("ex:run")[0]!
+      .getProvN();
+    expect(provn).toContain('ex:note="a"');
+    expect(provn).toContain('ex:note="b"'); // not named → still unions
+  });
+});
+
 describe("ProvDocument.unified — formalAttributeConflict policy", () => {
   function docWithConflictInBundle(): ProvDocument {
     const d = new ProvDocument();

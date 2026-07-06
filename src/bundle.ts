@@ -143,6 +143,16 @@ export type RecordInstance<C> = C extends RecordClass<infer T> ? T : never;
  */
 export type UnifiedOptions = {
   formalAttributeConflict?: FormalAttributeConflictPolicy;
+  /**
+   * Non-formal attribute names to treat as SINGLE-VALUED during the merge, resolved by the same
+   * {@link formalAttributeConflict} policy. By default every non-formal attribute is multi-valued
+   * (a re-declared record's values UNION with the existing ones). Naming an attribute here makes a
+   * later record's value supersede (`"last"`) or be discarded (`"first"`) instead — e.g. a status
+   * attribute whose latest write is the truth, re-declared across an idempotent re-emit that may
+   * carry a genuinely newer value. Names resolve against the bundle's namespaces like any QName
+   * candidate; an unresolvable candidate is ignored (that attribute stays multi-valued).
+   */
+  singleValued?: Iterable<QualifiedNameCandidate>;
 };
 
 /** A named set of PROV records plus the fluent authoring API (`model.py:1373`). */
@@ -443,6 +453,16 @@ export class ProvBundle implements RecordBundle {
    */
   protected unifiedRecords(options?: UnifiedOptions): ProvRecord[] {
     const conflictPolicy = options?.formalAttributeConflict ?? "throw";
+    // Resolve the caller's single-valued non-formal attribute names to URIs once (against this
+    // bundle's namespaces). An unresolvable candidate contributes nothing, so that attribute keeps
+    // the default multi-valued (union) merge.
+    const singleValued = new Set<string>();
+    if (options?.singleValued) {
+      for (const candidate of options.singleValued) {
+        const qn = this.validQualifiedName(candidate);
+        if (qn !== null) singleValued.add(qn.uri);
+      }
+    }
     const mergedByKey = new Map<string, ProvRecord>();
     for (const records of this._idMap.values()) {
       const [first, ...rest] = records;
@@ -453,7 +473,7 @@ export class ProvBundle implements RecordBundle {
       // policy keeps its formal values and `"last"` lets later records override.
       const merged = first.copy();
       for (const record of rest) {
-        merged.addAttributes(record.attributes, conflictPolicy);
+        merged.addAttributes(record.attributes, conflictPolicy, singleValued);
       }
       for (const record of records) {
         mergedByKey.set(record.key, merged);
