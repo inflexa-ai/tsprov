@@ -18,6 +18,7 @@ import {
   type RecordBundle,
   type ProvAttributes,
   type QualifiedNameCandidate,
+  type FormalAttributeConflictPolicy,
   normalizeAttributes,
 } from "./record/record.js";
 import { getRecordClass, type RecordTypeQName } from "./record/registry.js";
@@ -131,6 +132,18 @@ export type RecordClass<T extends ProvRecord = ProvRecord> = abstract new (
  * classes, so an array of filters yields the union of their instance types.
  */
 export type RecordInstance<C> = C extends RecordClass<infer T> ? T : never;
+
+/**
+ * Options for {@link ProvBundle.unified} / {@link ProvDocument.unified}.
+ *
+ * @property formalAttributeConflict How merging same-identifier records resolves
+ *   a clash on a single-valued formal attribute (see
+ *   {@link FormalAttributeConflictPolicy}). Omitted ⇒ `"throw"`, so the default
+ *   unify is identical to the Python reference (`model.py:1681`).
+ */
+export type UnifiedOptions = {
+  formalAttributeConflict?: FormalAttributeConflictPolicy;
+};
 
 /** A named set of PROV records plus the fluent authoring API (`model.py:1373`). */
 export class ProvBundle implements RecordBundle {
@@ -421,17 +434,26 @@ export class ProvBundle implements RecordBundle {
     );
   }
 
-  /** Merges records that share an identifier into one, preserving order (`model.py:1649`). */
-  protected unifiedRecords(): ProvRecord[] {
+  /**
+   * Merges records that share an identifier into one, preserving order
+   * (`model.py:1649`).
+   *
+   * @param options Controls how a clash on a single-valued formal attribute is
+   *   resolved during the merge; defaults to `"throw"` (see {@link UnifiedOptions}).
+   */
+  protected unifiedRecords(options?: UnifiedOptions): ProvRecord[] {
+    const conflictPolicy = options?.formalAttributeConflict ?? "throw";
     const mergedByKey = new Map<string, ProvRecord>();
     for (const records of this._idMap.values()) {
       const [first, ...rest] = records;
       if (first === undefined || rest.length === 0) {
         continue; // 0 or 1 record for this id — nothing to merge
       }
+      // `first` is the earliest-recorded record for this id, so a `"first"`
+      // policy keeps its formal values and `"last"` lets later records override.
       const merged = first.copy();
       for (const record of rest) {
-        merged.addAttributes(record.attributes);
+        merged.addAttributes(record.attributes, conflictPolicy);
       }
       for (const record of records) {
         mergedByKey.set(record.key, merged);
@@ -454,9 +476,14 @@ export class ProvBundle implements RecordBundle {
     return unified;
   }
 
-  /** Returns a new bundle with same-identifier records unified (`model.py:1681`). */
-  unified(): ProvBundle {
-    return new ProvBundle(this.unifiedRecords(), this._identifier);
+  /**
+   * Returns a new bundle with same-identifier records unified (`model.py:1681`).
+   *
+   * @param options Merge behavior for single-valued formal-attribute clashes;
+   *   defaults to `"throw"` — the exact Python behavior (see {@link UnifiedOptions}).
+   */
+  unified(options?: UnifiedOptions): ProvBundle {
+    return new ProvBundle(this.unifiedRecords(options), this._identifier);
   }
 
   /**

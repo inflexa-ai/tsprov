@@ -5,11 +5,22 @@ All notable changes to `tsprov` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- **Opt-in merge policy for `unified()` formal-attribute conflicts.** `ProvBundle.unified` and
+  `ProvDocument.unified` now accept `{ formalAttributeConflict?: "throw" | "first" | "last" }`
+  (default `"throw"`). Previously, unifying two same-identifier records that carried different
+  values for a single-valued formal attribute (e.g. two `prov:startTime`s on one activity) always
+  raised `"Cannot have more than one value for attribute …"`. Consumers whose records can
+  legitimately be observed more than once — an event source that replays on crash recovery — can now
+  pass `"first"` (keep the earliest-recorded value) or `"last"` (last-write-wins), both ordered by
+  record insertion order. The default is unchanged and byte-identical to the Python reference; see
+  `DEVIATIONS.md` D12. New public types: `FormalAttributeConflictPolicy` and `UnifiedOptions`.
+
 ### Not yet included
 
-PROV-XML, PROV-RDF, graph/DOT visualisation, the CLI, and `ProvBundle.update`/`unified` /
-`ProvDocument.add_bundle`. See `docs/migration/` for the roadmap and `DEVIATIONS.md` for intentional
-divergences from the Python reference.
+PROV-XML, PROV-RDF, graph/DOT visualisation, and the CLI. See `docs/migration/` for the roadmap
+and `DEVIATIONS.md` for intentional divergences from the Python reference.
 
 ## [0.1.1] — 2026-06-25
 

@@ -50,8 +50,10 @@ export class AttributeStore {
   }
 
   /**
-   * Replaces all values under `attr` with the single `value`. Used by
-   * `ProvActivity.setTime`'s raw-store quirk (`model.py:802`).
+   * Replaces all values under `attr` with the single `value` — the escape hatch
+   * for callers that own the single-valued invariant themselves:
+   * `ProvActivity.setTime`'s raw-store quirk (`model.py:802`) and the `"last"`
+   * formal-attribute conflict policy in `ProvRecord.addAttributes`.
    *
    * @param attr  The attribute name.
    * @param value The sole value to store.

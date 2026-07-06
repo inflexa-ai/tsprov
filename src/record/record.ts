@@ -65,6 +65,24 @@ export type ProvAttributes =
   | Record<string, AttributeInput | readonly AttributeValue[]>;
 
 /**
+ * How {@link ProvRecord.addAttributes} resolves a second, *different* value for a
+ * single-valued formal attribute (e.g. two `prov:startTime`s on one activity id).
+ *
+ * - `"throw"` — reject the conflict (`ProvException`). This is the default and
+ *   mirrors Python's unconditional behavior (`model.py:505-524`): in a world
+ *   where each record is observed exactly once, two different start times for the
+ *   same activity is a genuine data error, not something to paper over.
+ * - `"first"` — keep the value that was recorded first; drop the later one.
+ * - `"last"` — keep the value that was recorded last (last-write-wins).
+ *
+ * "First"/"last" are ordered by **record insertion order**, not by comparing the
+ * values themselves — they exist for consumers whose records can legitimately be
+ * observed more than once (e.g. an event source that replays on crash recovery),
+ * where a deterministic merge is wanted instead of a serialization-time throw.
+ */
+export type FormalAttributeConflictPolicy = "throw" | "first" | "last";
+
+/**
  * The minimal bundle contract a {@link ProvRecord} needs: qualified-name
  * resolution. Implemented by `ProvBundle`'s `NamespaceManager`.
  */
@@ -276,12 +294,21 @@ export abstract class ProvRecord {
    * Adds attributes, enforcing PROV's rules (`model.py:443`): QName-valued
    * formal attrs resolve to qualified names; literal-valued formal attrs must be
    * datetimes; a second value for a single-valued formal attribute is ignored if
-   * equal and rejected if different (unless this is a collection).
+   * *equal*, and — when *different* — handled per `conflictPolicy` (unless this is
+   * a collection, which lifts the single-value rule entirely).
    *
-   * @param attributes The attributes to add (any {@link ProvAttributes} shape).
-   * @throws {ProvException} On an invalid value or a conflicting formal value.
+   * @param attributes     The attributes to add (any {@link ProvAttributes} shape).
+   * @param conflictPolicy How to resolve a different second value for a
+   *   single-valued formal attribute (see {@link FormalAttributeConflictPolicy}).
+   *   Defaults to `"throw"`, which reproduces the Python reference exactly; the
+   *   merge policies are opt-in for callers that unify replayed observations.
+   * @throws {ProvException} On an invalid value, or a conflicting formal value
+   *   under the `"throw"` policy.
    */
-  addAttributes(attributes: ProvAttributes): void {
+  addAttributes(
+    attributes: ProvAttributes,
+    conflictPolicy: FormalAttributeConflictPolicy = "throw",
+  ): void {
     const pairs = normalizeAttributes(attributes);
     if (pairs.length === 0) {
       return;
@@ -350,11 +377,31 @@ export abstract class ProvRecord {
         // A non-comparable second value counts as different (model.py:514-516);
         // valueKey is total, so a key mismatch covers both "different" cases.
         if (valueKey(value) !== valueKey(existing)) {
-          throw new ProvException(
-            `Cannot have more than one value for attribute ${attr}`,
-          );
+          switch (conflictPolicy) {
+            case "throw":
+              // Python throws here unconditionally (model.py:517-521); this is
+              // the default so the strict path stays byte-identical to the spec.
+              throw new ProvException(
+                `Cannot have more than one value for attribute ${attr}`,
+              );
+            case "first":
+              break; // keep the earliest-recorded value; discard this one
+            case "last":
+              // Last-write-wins by record insertion order: replace all values
+              // under this attr with the newer one.
+              this.attrs.set(attr, value);
+              break;
+            default: {
+              // Exhaustiveness: a future policy variant must handle its own case
+              // rather than silently falling through to "keep existing".
+              const unhandled: never = conflictPolicy;
+              throw new Error(
+                `Unhandled formal-attribute conflict policy: ${String(unhandled)}`,
+              );
+            }
+          }
         }
-        continue; // same value → ignore
+        continue; // conflict resolved (or values equal) → never store a second value
       }
 
       this.attrs.add(attr, value);
