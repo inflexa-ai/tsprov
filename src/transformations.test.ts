@@ -98,3 +98,135 @@ describe("ProvDocument.unified", () => {
     expect(u.getRecord("ex:e")).toHaveLength(1);
   });
 });
+
+// Two ISO-8601 instants an hour apart. Rendered PROV-N carries the wall-clock
+// time (`…T10:00:00+00:00`), so the surviving value is asserted via a substring.
+const T10 = "2026-01-01T10:00:00.000Z";
+const T11 = "2026-01-01T11:00:00.000Z";
+
+describe("ProvBundle.unified — formalAttributeConflict policy", () => {
+  function conflictingStartTimes(): ProvBundle {
+    const b = new ProvBundle();
+    b.addNamespace("ex", EX);
+    b.activity("ex:a", T10); // startTime is the 2nd arg
+    b.activity("ex:a", T11); // same id, later start observed
+    return b;
+  }
+
+  test("default (no options) throws on a conflicting single-valued formal attribute", () => {
+    expect(() => conflictingStartTimes().unified()).toThrow(
+      "Cannot have more than one value for attribute prov:startTime",
+    );
+  });
+
+  test('explicit "throw" also throws', () => {
+    expect(() =>
+      conflictingStartTimes().unified({ formalAttributeConflict: "throw" }),
+    ).toThrow("Cannot have more than one value for attribute prov:startTime");
+  });
+
+  test('"first" keeps the earliest-recorded value', () => {
+    const u = conflictingStartTimes().unified({
+      formalAttributeConflict: "first",
+    });
+    const merged = u.getRecord("ex:a");
+    expect(merged).toHaveLength(1);
+    const provn = merged[0]!.getProvN();
+    expect(provn).toContain("10:00:00");
+    expect(provn).not.toContain("11:00:00");
+  });
+
+  test('"last" keeps the latest-recorded value', () => {
+    const u = conflictingStartTimes().unified({
+      formalAttributeConflict: "last",
+    });
+    const merged = u.getRecord("ex:a");
+    expect(merged).toHaveLength(1);
+    const provn = merged[0]!.getProvN();
+    expect(provn).toContain("11:00:00");
+    expect(provn).not.toContain("10:00:00");
+  });
+
+  test("replayed observations (disjoint start/end) merge cleanly with no options", () => {
+    const b = new ProvBundle();
+    b.addNamespace("ex", EX);
+    b.activity("ex:a", T10, undefined); // start observed
+    b.activity("ex:a", undefined, T11); // end observed on a later replay
+    const merged = b.unified().getRecord("ex:a");
+    expect(merged).toHaveLength(1);
+    const provn = merged[0]!.getProvN();
+    expect(provn).toContain("10:00:00"); // startTime survives
+    expect(provn).toContain("11:00:00"); // endTime survives — no conflict
+  });
+
+  test("equal values for a single-valued formal attribute dedupe under every policy", () => {
+    for (const policy of ["throw", "first", "last"] as const) {
+      const b = new ProvBundle();
+      b.addNamespace("ex", EX);
+      b.activity("ex:a", T10);
+      b.activity("ex:a", T10); // identical startTime — dedupes, never a conflict
+      const u = b.unified({ formalAttributeConflict: policy });
+      expect(u.getRecord("ex:a")).toHaveLength(1);
+    }
+  });
+
+  test("resolves a conflicting QName-valued formal attribute under first/last", () => {
+    function twoGenerations(): ProvBundle {
+      const b = new ProvBundle();
+      b.addNamespace("ex", EX);
+      // Same relation identifier, different prov:activity → a formal-attribute
+      // clash on a QName value (not a time literal).
+      b.wasGeneratedBy("ex:e", "ex:a1", undefined, "ex:gen");
+      b.wasGeneratedBy("ex:e", "ex:a2", undefined, "ex:gen");
+      return b;
+    }
+    expect(() => twoGenerations().unified()).toThrow(
+      "Cannot have more than one value for attribute prov:activity",
+    );
+    const first = twoGenerations()
+      .unified({ formalAttributeConflict: "first" })
+      .getRecord("ex:gen");
+    expect(first[0]!.getProvN()).toContain("ex:a1");
+    expect(first[0]!.getProvN()).not.toContain("ex:a2");
+    const last = twoGenerations()
+      .unified({ formalAttributeConflict: "last" })
+      .getRecord("ex:gen");
+    expect(last[0]!.getProvN()).toContain("ex:a2");
+    expect(last[0]!.getProvN()).not.toContain("ex:a1");
+  });
+});
+
+describe("ProvDocument.unified — formalAttributeConflict policy", () => {
+  function docWithConflictInBundle(): ProvDocument {
+    const d = new ProvDocument();
+    d.addNamespace("ex", EX);
+    const bnd = d.bundle("ex:bnd");
+    bnd.activity("ex:a", T10);
+    bnd.activity("ex:a", T11);
+    return d;
+  }
+
+  test("propagates the policy into sub-bundles (default throws)", () => {
+    expect(() => docWithConflictInBundle().unified()).toThrow(
+      "Cannot have more than one value for attribute prov:startTime",
+    );
+  });
+
+  test('"first" resolves conflicts inside a sub-bundle', () => {
+    const u = docWithConflictInBundle().unified({
+      formalAttributeConflict: "first",
+    });
+    const merged = u.bundles[0]!.getRecord("ex:a");
+    expect(merged).toHaveLength(1);
+    expect(merged[0]!.getProvN()).toContain("10:00:00");
+  });
+
+  test('"last" resolves conflicts inside a sub-bundle', () => {
+    const u = docWithConflictInBundle().unified({
+      formalAttributeConflict: "last",
+    });
+    const merged = u.bundles[0]!.getRecord("ex:a");
+    expect(merged).toHaveLength(1);
+    expect(merged[0]!.getProvN()).toContain("11:00:00");
+  });
+});

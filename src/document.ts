@@ -5,7 +5,7 @@
 // child bundles inherit the document's namespaces (their `NamespaceManager`'s
 // parent is the document's).
 
-import { ProvBundle } from "./bundle.js";
+import { ProvBundle, type UnifiedOptions } from "./bundle.js";
 import type { ProvRecord, QualifiedNameCandidate } from "./record/record.js";
 import type { QualifiedName } from "./identifier.js";
 import type { NamespaceCollection } from "./namespace-manager.js";
@@ -202,12 +202,16 @@ export class ProvDocument extends ProvBundle {
    * Returns a new document with same-identifier records unified, including those
    * inside bundles (`model.py:2595`). The new document **shares** this one's
    * namespace manager (a deliberate Python quirk — DEVIATIONS).
+   *
+   * @param options Merge behavior for single-valued formal-attribute clashes,
+   *   applied to both the document-level records and every sub-bundle; defaults
+   *   to `"throw"` (see {@link UnifiedOptions}).
    */
-  override unified(): ProvDocument {
-    const doc = new ProvDocument(this.unifiedRecords());
+  override unified(options?: UnifiedOptions): ProvDocument {
+    const doc = new ProvDocument(this.unifiedRecords(options));
     doc._namespaces = this._namespaces; // shared by reference (model.py:2603)
     for (const bundle of this.bundles) {
-      doc.addBundle(bundle.unified());
+      doc.addBundle(bundle.unified(options));
     }
     return doc;
   }

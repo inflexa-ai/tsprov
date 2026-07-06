@@ -45,6 +45,58 @@ purely post-v1: PROV-N byte-differential, then M7 CLI / M8 graph+dot / M9 XML+RD
 
 ---
 
+## 2026-07-06 · entry 27 — feat: opt-in `unified()` formal-attribute conflict policy (issue #3)
+
+**Build:** `bun test` 640 pass / 0 fail (20 files) · `tsc --noEmit -p tsconfig.json` clean ·
+`bun run build` green (ESM + CJS). +10 new tests in `src/transformations.test.ts`.
+
+### The change
+
+`unified()` used to throw `"Cannot have more than one value for attribute prov:startTime"` (and the
+like) whenever two same-QName records carried different values for the *same* single-valued formal
+attribute — Python does this unconditionally (`model.py:505-524`, reached through `_unified_records`
+at `model.py:1681`). That is correct when every record is observed once, but consumers whose records
+can legitimately be re-observed (an event source that replays on crash recovery) got a hard throw at
+serialization time instead of a merged document.
+
+`unified()` (on both `ProvBundle` and `ProvDocument`) and the underlying `ProvRecord.addAttributes`
+now take an **opt-in** conflict policy:
+
+- `"throw"` — **default**, byte-identical to Python (still raises `ProvException`).
+- `"first"` — keep the earliest-**recorded** value (by record insertion order, not min of the values).
+- `"last"` — last-write-wins, again by record insertion order.
+
+The policy applies to **all** single-valued formal attributes (everything in `PROV_ATTRIBUTES`), not
+just time literals — verified with a QName-valued clash (two `wasGeneratedBy` sharing an id but with
+different `prov:activity`). The switch on the policy carries a `never`-typed default so a future
+variant breaks the build.
+
+### API surface added
+
+- `FormalAttributeConflictPolicy = "throw" | "first" | "last"` (`src/record/record.ts`, exported via
+  `src/index.ts`).
+- `UnifiedOptions = { formalAttributeConflict?: FormalAttributeConflictPolicy }` (`src/bundle.ts`,
+  exported via `src/index.ts`).
+- `ProvRecord.addAttributes(attributes, conflictPolicy = "throw")` — additive optional 2nd param, so
+  the constructor path and every existing caller are untouched and non-breaking.
+- `ProvBundle.unified(options?)`, `ProvBundle.unifiedRecords(options?)` (protected),
+  `ProvDocument.unified(options?)` — the document override forwards `options` to both its
+  document-level `unifiedRecords` and each sub-bundle's `unified`.
+
+### Deviation
+
+Logged as **D12** in `DEVIATIONS.md` (anchors `model.py:505-524` throw, `model.py:1681` unified).
+Default path stays byte-identical to Python; the merge policies are strictly opt-in. Also recorded
+under `## [Unreleased] → Added` in `CHANGELOG.md`.
+
+### Verify before the next entry
+
+```sh
+bun test && bunx tsc --noEmit -p tsconfig.json && bun run build
+```
+
+---
+
 ## 2026-06-25 · entry 26 — fix: published runtime was tree-shaken empty; `tsc` per-module emit + smoke gate (→ 0.1.1)
 
 **Build:** `bun test` 630 pass / 0 fail · `tsc --noEmit -p tsconfig.json` clean · `bun run build`

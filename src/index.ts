@@ -35,6 +35,7 @@ export type {
   ProvAttributes,
   AttrKey,
   QualifiedNameCandidate,
+  FormalAttributeConflictPolicy,
 } from "./record/record.js";
 export {
   ProvElement,
@@ -76,6 +77,7 @@ export type {
   AgentRef,
   RecordClass,
   RecordInstance,
+  UnifiedOptions,
 } from "./bundle.js";
 export type { AttributeValue } from "./record/record.js";
 
