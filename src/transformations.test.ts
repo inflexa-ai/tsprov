@@ -159,7 +159,7 @@ describe("ProvBundle.unified — formalAttributeConflict policy", () => {
     expect(provn).toContain("11:00:00"); // endTime survives — no conflict
   });
 
-  test("equal conflicting values merge without throwing under every policy", () => {
+  test("equal values for a single-valued formal attribute dedupe under every policy", () => {
     for (const policy of ["throw", "first", "last"] as const) {
       const b = new ProvBundle();
       b.addNamespace("ex", EX);

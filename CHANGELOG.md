@@ -5,6 +5,13 @@ All notable changes to `tsprov` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Not yet included
+
+PROV-XML, PROV-RDF, graph/DOT visualisation, and the CLI. See `docs/migration/` for the roadmap
+and `DEVIATIONS.md` for intentional divergences from the Python reference.
+
+## [0.3.0] — 2026-07-06
+
 ### Added
 
 - **Opt-in merge policy for `unified()` formal-attribute conflicts.** `ProvBundle.unified` and
@@ -16,11 +23,6 @@ All notable changes to `tsprov` are documented here. The format is based on
   pass `"first"` (keep the earliest-recorded value) or `"last"` (last-write-wins), both ordered by
   record insertion order. The default is unchanged and byte-identical to the Python reference; see
   `DEVIATIONS.md` D12. New public types: `FormalAttributeConflictPolicy` and `UnifiedOptions`.
-
-### Not yet included
-
-PROV-XML, PROV-RDF, graph/DOT visualisation, and the CLI. See `docs/migration/` for the roadmap
-and `DEVIATIONS.md` for intentional divergences from the Python reference.
 
 ## [0.1.1] — 2026-06-25
 

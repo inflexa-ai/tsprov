@@ -393,7 +393,11 @@ export abstract class ProvRecord {
               break;
             default: {
               // Exhaustiveness: a future policy variant must handle its own case
-              // rather than silently falling through to "keep existing".
+              // rather than silently falling through to "keep existing". Unlike
+              // the "throw" arm's ProvException — a catchable domain error for a
+              // genuine runtime conflict — this branch is unreachable, so a plain
+              // Error is deliberate: reaching it is a programmer bug, not a
+              // user-facing condition callers should ever catch.
               const unhandled: never = conflictPolicy;
               throw new Error(
                 `Unhandled formal-attribute conflict policy: ${String(unhandled)}`,
