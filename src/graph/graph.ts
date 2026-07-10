@@ -248,6 +248,15 @@ export class ProvGraph {
    * endpoint through an unmapped attribute, are skipped and recorded in
    * {@link skipped}.
    *
+   * Same-identifier hazard: `flattened()` hoists every bundle's records into one
+   * identifier-keyed `unified()` scope, so a cross-bundle same-identifier
+   * collision merges bug-for-bug as Python's document-level `unified()` does
+   * (`model.py:1649-1668`) — records sharing an identifier merge into the first.
+   * A relation that shares an identifier with an element therefore union-merges
+   * INTO that element and never reaches edge extraction, so it is absent from both
+   * {@link edges} and {@link skipped} (which only sees relations that survived the
+   * merge). Give elements and relations distinct identifiers to avoid this.
+   *
    * @param document The source document (never mutated).
    * @param options  Pass-through to {@link ProvDocument.unified}. Defaults to the
    *   parity `"throw"` policy, so a same-id formal-attribute clash throws exactly

@@ -437,6 +437,20 @@ export const DEFAULT_PATH_LIMIT = 100;
 type PathStep = { readonly edge: GraphEdge; readonly next: string };
 
 /**
+ * One frame of {@link lineagePaths}' explicit-stack DFS: the node being visited
+ * and a cursor into its onward {@link PathStep}s. The explicit stack replaces
+ * recursion because a linear result chain can be tens of thousands of hops deep
+ * — past the JS engine's call-stack limit, so a recursive walk would overflow on
+ * real (not pathological) input. The cursor advances a node's steps in their
+ * array order, which is what reproduces the recursive enumeration order exactly.
+ */
+type PathFrame = {
+  readonly uri: string;
+  readonly steps: readonly PathStep[];
+  cursor: number;
+};
+
+/**
  * Resolves path endpoints the way the walk's root normalization does
  * (lineage.ts `normalizeRoots`, design D5): a string resolves against the
  * graph document's namespaces; a `QualifiedName` contributes its URI; a
@@ -514,6 +528,10 @@ function resolveEndpointUris(
  * @param target  The target endpoint (the walk's root forms).
  * @param options Starting endpoint(s) and the cap (see
  *   {@link LineagePathsOptions}).
+ * @throws {TypeError} If `options.limit` is `NaN` — a `NaN` cap is a programmer
+ *   error (a leaked `parseInt`/arithmetic failure), not a query outcome, and
+ *   silently reinterpreting it would mask the caller's bug. `Infinity` is legal
+ *   (explicit "no cap"); only `NaN` throws.
  */
 export function lineagePaths(
   graph: ProvGraph,
@@ -522,6 +540,12 @@ export function lineagePaths(
   options?: LineagePathsOptions,
 ): LineagePathsResult {
   const limit = options?.limit ?? DEFAULT_PATH_LIMIT;
+  // `??` only defaults null/undefined, so an explicit `NaN` limit survives to
+  // here. `paths.length >= NaN` is always false, which would silently disable the
+  // cap; reject it as a programmer error rather than mask it (see @throws).
+  if (Number.isNaN(limit)) {
+    throw new TypeError("lineagePaths: limit must not be NaN");
+  }
   const targetUris = resolveEndpointUris(graph, target);
   const fromUris =
     options?.from === undefined
@@ -554,54 +578,86 @@ export function lineagePaths(
 
   // Simple-path DFS, one shared cap across every pair and both orientations.
   // Once `truncated` flips, every in-flight search unwinds immediately.
+  //
+  // Written with an EXPLICIT stack (not recursion): a linear result chain can run
+  // tens of thousands of hops deep, past the JS call-stack limit, so a recursive
+  // walk would overflow on real input. The index-cursor {@link PathFrame}
+  // reproduces the old recursion's enumeration ORDER exactly — each node's steps
+  // are advanced in array order, and a child frame is opened only after its
+  // connecting node is recorded, so the goal is reached along the same paths in
+  // the same sequence (pinned by the ordering-sensitive path tests + a
+  // determinism probe).
   function enumerate(
     start: string,
     goal: string,
     orientation: PathOrientation,
   ): void {
+    // nodePath/edgePath/visited are mutated in lockstep with `stack`: they
+    // describe the current partial path from `start`, and `visited` enforces
+    // simple paths (a node appears once per path, deleted on backtrack so it can
+    // reappear in a different path). The root `start` frame is the last popped
+    // and owns no incoming edge, so it never contributes to edgePath.
     const nodePath: string[] = [start];
     const edgePath: GraphEdge[] = [];
     const visited = new Set<string>([start]);
+    const stack: PathFrame[] = [
+      { uri: start, steps: steps.get(start) ?? [], cursor: 0 },
+    ];
 
-    function walk(uri: string): void {
-      if (truncated) {
-        return;
-      }
-      if (uri === goal) {
-        // The pre-push guard makes a degenerate `limit <= 0` yield zero paths
-        // instead of one; the post-push check halts the search the moment the
-        // cap is filled (design D6: stop AT the cap — see
-        // `LineagePathsResult.truncated` for why exactly-limit reads as
-        // truncated). A simple path ends at the goal: continuing through it
-        // could never reach it again (it is now visited).
-        if (paths.length >= limit) {
-          truncated = true;
-          return;
-        }
-        paths.push({ orientation, nodes: [...nodePath], edges: [...edgePath] });
-        if (paths.length >= limit) {
-          truncated = true;
-        }
-        return;
-      }
-      for (const step of steps.get(uri) ?? []) {
-        if (truncated) {
-          return;
-        }
-        if (visited.has(step.next)) {
-          continue; // simple paths only — never revisit within one path
-        }
-        visited.add(step.next);
-        nodePath.push(step.next);
-        edgePath.push(step.edge);
-        walk(step.next);
-        edgePath.pop();
+    // Returning from a frame's visit: drop it and undo its node from the path —
+    // except the root frame (stack now empty), seeded before the loop with no
+    // incoming edge.
+    function unwind(): void {
+      const done = stack.pop()!; // called only with a non-empty stack
+      if (stack.length > 0) {
+        visited.delete(done.uri);
         nodePath.pop();
-        visited.delete(step.next);
+        edgePath.pop();
       }
     }
 
-    walk(start);
+    while (stack.length > 0) {
+      if (truncated) {
+        break; // cap filled — abandon every in-flight frame at once
+      }
+      const frame = stack[stack.length - 1]!; // length > 0, so never undefined
+
+      // Goal handling runs once, at frame entry (cursor still 0): a simple path
+      // ends at the goal, so the frame records and unwinds WITHOUT iterating its
+      // steps (continuing could never reach the now-visited goal again).
+      if (frame.cursor === 0 && frame.uri === goal) {
+        // Pre-push guard: a degenerate `limit <= 0` yields zero paths. Post-push
+        // check: stop AT the cap (design D6 — see `LineagePathsResult.truncated`
+        // for why exactly-limit reads as truncated).
+        if (paths.length < limit) {
+          paths.push({ orientation, nodes: [...nodePath], edges: [...edgePath] });
+          if (paths.length >= limit) {
+            truncated = true;
+          }
+        } else {
+          truncated = true;
+        }
+        unwind();
+        continue;
+      }
+
+      if (frame.cursor >= frame.steps.length) {
+        unwind(); // steps exhausted — this frame's visit returns
+        continue;
+      }
+
+      const step = frame.steps[frame.cursor]!; // cursor < length, so defined
+      frame.cursor += 1;
+      if (visited.has(step.next)) {
+        continue; // simple paths only — never revisit within one path
+      }
+      // Descend one hop and open the child frame; its own goal-record or step
+      // exhaustion unwinds it later, restoring the path.
+      visited.add(step.next);
+      nodePath.push(step.next);
+      edgePath.push(step.edge);
+      stack.push({ uri: step.next, steps: steps.get(step.next) ?? [], cursor: 0 });
+    }
   }
 
   for (const fromUri of fromUris) {

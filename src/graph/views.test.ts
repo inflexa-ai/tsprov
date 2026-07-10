@@ -374,6 +374,48 @@ describe("lineagePaths (spec: result-scoped, oriented, explicitly bounded)", () 
     expect(paths.length).toBe(1);
     expect(truncated).toBe(true);
   });
+
+  // Scenario: A path far deeper than the JS call stack does not overflow.
+  // The enumeration is an EXPLICIT-stack DFS precisely so a linear chain past the
+  // call-stack limit (a recursive walk would `RangeError`) still enumerates.
+  test("a 30k-hop linear chain enumerates its single path without a stack overflow", () => {
+    // One straight derivation chain e0 -> e1 -> ... -> eN, N hops deep — well
+    // beyond the ~10-15k-frame default JS call stack. No diamonds: exactly one
+    // simple path exists, so the whole test stays O(N) and fast.
+    const n = 30_000;
+    const doc = exDoc();
+    doc.entity("ex:e0");
+    for (let i = 0; i < n; i += 1) {
+      doc.entity(`ex:e${i + 1}`);
+      doc.wasDerivedFrom(`ex:e${i}`, `ex:e${i + 1}`); // edge e_i -> e_{i+1}
+    }
+
+    const g = provToGraph(doc);
+    // Explicit depth past the chain length so the walk reaches the far terminal;
+    // the default MAX_WALK_DEPTH ceiling (1000) would otherwise truncate it.
+    const result = lineage(g, "ex:e0", { depth: n });
+    expect(result.frontier.length).toBe(0); // fully traversed, nothing cut
+
+    const { paths, truncated } = lineagePaths(g, result, `ex:e${n}`);
+
+    expect(truncated).toBe(false);
+    expect(paths.length).toBe(1);
+    expect(paths[0]?.orientation).toBe("asserted");
+    expect(paths[0]?.nodes.length).toBe(n + 1); // e0 … eN inclusive
+    expect(paths[0]?.nodes[0]).toBe(uriOf(doc, "ex:e0"));
+    expect(paths[0]?.nodes[n]).toBe(uriOf(doc, `ex:e${n}`));
+  });
+
+  // Scenario: A NaN cap is a programmer error, not "unlimited".
+  test("a NaN limit throws TypeError instead of silently disabling the cap", () => {
+    const doc = diamondDoc();
+    const g = provToGraph(doc);
+    const result = lineage(g, "ex:e4");
+
+    expect(() => lineagePaths(g, result, "ex:e1", { limit: NaN })).toThrow(
+      TypeError,
+    );
+  });
 });
 
 describe("views — non-mutation of every input (task 2.2)", () => {

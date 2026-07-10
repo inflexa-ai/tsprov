@@ -109,8 +109,12 @@ A bare `number` defaults to `xsd:double` on encode; a bare `string` is an `xsd:s
 - The complete fluent authoring API (camelCase PROV vocabulary primary; descriptive aliases).
 - **PROV-JSON** (serialize + deserialize) and **PROV-N** (serialize), with `read()` auto-detection.
 - Content-based `equals()`, plus `flattened()` and sub-bundles.
+- **Graph & lineage** under the optional `@inflexa-ai/tsprov/graph` subpath: a multi-digraph view
+  (`ProvGraph`, `provToGraph` / `graphToProv`), composable record `resolve()`, and a directional,
+  bounded `lineage()` walk with standalone-document / flat-graph / paths views — zero extra
+  dependencies (core stays luxon-only).
 
-PROV-XML, PROV-RDF, graph/DOT visualisation, and the CLI are out of scope for now.
+PROV-XML, PROV-RDF, DOT (graph-visualisation) rendering, and the CLI are out of scope for now.
 
 ## Develop
 

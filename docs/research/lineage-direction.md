@@ -30,11 +30,13 @@
 - **D4 — The walk never widens; the document view closes over references by default.**
   Depth bounds are exact in the walk and its result object (the ground truth: nodes,
   relations, roots, truncation frontier). Materializing the result as a PROV document
-  defaults to a **one-pass reference closure** (`closure: "referenced"`): every record
-  referenced by an included relation (n-ary legs — derivation's activity/generation/usage,
-  association's plan, start/end's starter/ender, mention's bundle — and frontier endpoints)
-  is included as its full declaration; the closure chases *references*, never adjacency, so
-  it terminates in one bounded pass. `closure: "none"` opts out (exact slice; dangling
+  defaults to a **reference closure repeated to a fixpoint** (`closure: "referenced"`): every
+  identifier referenced by an included record's formal-attribute values that is declared in the
+  document (n-ary legs — derivation's activity/generation/usage, association's plan,
+  start/end's starter/ender, mention's bundle — and frontier endpoints) is pulled in as its full
+  declaration; the closure chases *references* of pulled records too, never adjacency (pulling an
+  element never pulls other relations touching it), so it is bounded by the document size.
+  `closure: "none"` opts out (exact slice; dangling
   identifier references are legal PROV). Closure-added records are distinguishable from
   walked records in the result. Optionally (opt-in, default off), frontier entities are
   annotated with an attribute in a dedicated query namespace so even the serialized document
@@ -105,17 +107,21 @@ fold/algebra API, ProvRank-style relevance truncation, `tsprov/dot`, any reachab
 ## API shape (non-binding sketch — specs refine, direction holds)
 
 ```ts
-import { GraphView, resolve, lineage } from "@inflexa-ai/tsprov/graph";
+import {
+  ProvGraph, resolve, lineage, toProvDocument, toFlatGraph, lineagePaths,
+} from "@inflexa-ai/tsprov/graph";
 
-const view = GraphView.of(doc);              // flattened().unified() inside, build-once
-const matches = resolve(view, { attribute: { name: "ex:path", contains: "results" } });
-const result = lineage(view, matches.records, {
+const graph = ProvGraph.of(doc);              // flattened().unified() inside, build-once (alias: provToGraph)
+const matches = resolve(graph, { attribute: { name: "ex:path", contains: "results" } });
+const roots = matches.kind === "matched" ? matches.records : []; // Resolution is a tagged union
+const result = lineage(graph, roots, {
   direction: "backward",
   depth: { back: 3 },
   relations: "dataflow",
 });
-result.document();                            // valid standalone ProvDocument (D4)
-result.graph();                               // flat { roots, nodes, edges }
+toProvDocument(graph, result);                // { document, closureAdded } — standalone ProvDocument (D4)
+toFlatGraph(result);                          // JSON-safe { roots, unknownRoots, nodes, edges, frontier }
+lineagePaths(graph, result, "ex:report");     // bounded, orientation-labeled simple paths
 ```
 
 ## Spec-time micro-decisions (each spec settles its own; record the choice in the design doc)

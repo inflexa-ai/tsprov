@@ -410,6 +410,45 @@ describe("lineage — unbounded ceiling (spec: MAX_WALK_DEPTH truncates as reaso
     // The chain's far terminal is beyond the ceiling — never reached.
     expect(nodeUris(result).has(uriOf(doc, "ex:e0"))).toBe(false);
   });
+
+  // Scenario: Infinity is a legal "no bound" — the ceiling is opt-out, not opt-in.
+  test("depth: Infinity walks a chain past the ceiling to exhaustion with an empty frontier", () => {
+    // Explicit unbounded intent (Infinity is NOT NaN — the visited set still
+    // terminates the walk). A chain longer than MAX_WALK_DEPTH is fully traversed
+    // and, because no node ever reaches a finite bound, nothing is truncated.
+    const m = MAX_WALK_DEPTH / 2 + 10; // 2*m = MAX_WALK_DEPTH + 20 hops
+    const doc = longBackwardChain(m);
+    const g = provToGraph(doc);
+
+    const result = lineage(g, `ex:e${m}`, { depth: Infinity });
+
+    expect(result.frontier.length).toBe(0);
+    // The far terminal that the ceiling run stopped short of IS reached here.
+    expect(nodeUris(result).has(uriOf(doc, "ex:e0"))).toBe(true);
+  });
+});
+
+describe("lineage — NaN depth is a programmer error (spec: reject, don't reinterpret, F2)", () => {
+  /** A single-node graph — enough to reach `boundFor`, which throws before the walk. */
+  function oneNodeGraph(): ReturnType<typeof provToGraph> {
+    const doc = exDoc();
+    doc.entity("ex:e1");
+    return provToGraph(doc);
+  }
+
+  // Scenario: A bare NaN depth would make `current.depth >= NaN` always false,
+  // silently defeating the ceiling — reject it instead.
+  test("a bare NaN depth throws TypeError", () => {
+    const g = oneNodeGraph();
+    expect(() => lineage(g, "ex:e1", { depth: NaN })).toThrow(TypeError);
+  });
+
+  // Scenario: The object form is checked on the direction that actually runs
+  // (default backward reads `back`).
+  test("a NaN in { back } throws TypeError", () => {
+    const g = oneNodeGraph();
+    expect(() => lineage(g, "ex:e1", { depth: { back: NaN } })).toThrow(TypeError);
+  });
 });
 
 describe("lineage — flat, deduplicated, reference-based result (spec: D6)", () => {

@@ -26,6 +26,7 @@ export type {
 export { lineage, MAX_WALK_DEPTH } from "./lineage.js";
 export type {
   LineageDirection,
+  WalkDirection,
   RelationProfile,
   LineageRoot,
   LineageOptions,

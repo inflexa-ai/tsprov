@@ -110,10 +110,13 @@ export type LineageOptions = {
 };
 
 /**
- * A single direction run — never `"both"`, since a cutoff always belongs to one
- * concrete walk (the `"both"` result carries entries from each run).
+ * The concrete direction of a single walk run — one of the two orientations a
+ * {@link LineageDirection} expands to, never `"both"` (a cutoff always belongs to
+ * one concrete run; a `"both"` result carries {@link FrontierEntry} entries from
+ * each run). Exported so {@link FrontierEntry.direction}'s type is nameable at the
+ * call site, like its sibling {@link LineageDirection}.
  */
-type WalkDirection = "backward" | "forward";
+export type WalkDirection = "backward" | "forward";
 
 /**
  * One truncation point: a node that was reached but whose onward edges were NOT
@@ -441,7 +444,17 @@ function normalizeRoots(
 
 // ── Depth bounds (design D4) ──────────────────────────────────────────────────
 
-/** The hop bound and its truncation reason for one direction run. */
+/**
+ * The hop bound and its truncation reason for one direction run.
+ *
+ * A `NaN` bound throws {@link TypeError}: `current.depth >= NaN` is always false,
+ * so a `NaN` depth would silently defeat the {@link MAX_WALK_DEPTH} ceiling and
+ * walk unbounded. A `NaN` is a programmer error (a leaked `parseInt`/arithmetic
+ * failure), not a query outcome, so we surface it rather than mask it — both the
+ * bare-number and the `{ back, forward }` forms are checked. `Infinity` is legal
+ * (explicit "no bound"): the caller's per-run visited set still terminates the
+ * walk, so only `NaN` is rejected.
+ */
 function boundFor(
   depth: LineageOptions["depth"],
   direction: WalkDirection,
@@ -450,6 +463,9 @@ function boundFor(
     return { bound: MAX_WALK_DEPTH, reason: "ceiling" };
   }
   if (typeof depth === "number") {
+    if (Number.isNaN(depth)) {
+      throw new TypeError("lineage: depth must not be NaN");
+    }
     return { bound: depth, reason: "depth" };
   }
   const value = direction === "backward" ? depth.back : depth.forward;
@@ -457,6 +473,9 @@ function boundFor(
   // ceiling as an entirely unset `depth`.
   if (value === undefined) {
     return { bound: MAX_WALK_DEPTH, reason: "ceiling" };
+  }
+  if (Number.isNaN(value)) {
+    throw new TypeError("lineage: depth must not be NaN");
   }
   return { bound: value, reason: "depth" };
 }
@@ -483,7 +502,10 @@ function runsFor(direction: LineageDirection): readonly WalkDirection[] {
  * a query outcome — unresolvable roots are surfaced in `unknownRoots` (design D5).
  *
  * Defaults: `direction: "backward"` (ancestry), `relations: "dataflow"`, and an
- * unbounded depth backed by {@link MAX_WALK_DEPTH}.
+ * unbounded depth backed by {@link MAX_WALK_DEPTH}. A `depth` of `Infinity` is a
+ * legal "no bound" — the per-direction visited set still terminates the walk (a
+ * node expands once), so it exhausts the reachable component with an empty
+ * frontier rather than truncating at the ceiling.
  *
  * The walk is reference-based and non-mutating: `nodes`/`edges` are `graph`'s own
  * objects, and neither the graph nor its document is touched (materialization is
@@ -494,6 +516,10 @@ function runsFor(direction: LineageDirection): readonly WalkDirection[] {
  * @param graph   The graph to walk.
  * @param roots   One root or an array (see {@link LineageRoot}).
  * @param options Direction, relation scope, depth bounds, and edge predicate.
+ * @throws {TypeError} If `options.depth` is `NaN`, in either the bare-number or
+ *   the `{ back, forward }` form — a `NaN` bound is a programmer error (a leaked
+ *   `parseInt`/arithmetic failure) that would silently defeat the
+ *   {@link MAX_WALK_DEPTH} ceiling, so it is rejected rather than reinterpreted.
  */
 export function lineage(
   graph: ProvGraph,
