@@ -11,9 +11,27 @@
 | 1 | `add-graph-view` — MultiDiGraph substrate + `provToGraph`/`graphToProv` parity | ✅ **shipped + archived** (2026-07-10) |
 | 2 | `add-record-resolution` — selector stage + injectable matcher | ✅ **shipped + archived** (2026-07-10) |
 | 3 | `add-lineage-walk` — directional bounded walk over relation profiles | ✅ **shipped + archived** (2026-07-11) |
-| 4 | `add-lineage-views` — `.document()` closure view, `.graph()`, `paths()` | ⬜ not started |
+| 4 | `add-lineage-views` — document/flat/paths views | ✅ **shipped + archived** (2026-07-11) |
 
 ## Iteration log (newest first)
+
+### 2026-07-11 · iteration 4 — `add-lineage-views` shipped (sequence complete)
+
+- `src/graph/views.ts` (+ tests, + barrel lines): `toProvDocument(graph, result,
+  { closure: "referenced" | "none", annotateFrontier })` → `{ document, closureAdded }` —
+  the ProvSAP-style answer-as-PROV-document; reference-fixpoint closure pulls n-ary legs
+  (derivation's activity/generation/usage and what THEY reference) without ever chasing
+  adjacency (depth bounds never bypassed); `closureAdded` carries the re-created output
+  records; opt-in `tsprovq:truncated` annotation with lazy namespace declaration (default
+  output vocabulary-clean). `toFlatGraph(result)` — JSON-safe, kind-discriminated,
+  asserted-orientation projection with truncated-vs-terminal distinguishable.
+  `lineagePaths(graph, result, target, { from?, limit? })` — simple-path DFS over the
+  result's edges only, asserted/reversed orientation labels, explicit `truncated` cap flag.
+- Worker stalled once (0 tool calls) and was resumed via SendMessage; completed fully on
+  resume. Verify found no spec-vs-code divergence.
+- Gates: `bun test` 1112 pass / 0 fail (24 files) · tsc clean · build + smoke green ·
+  walk/resolve/substrate/core untouched.
+- **All four changes archived. Next: PR + Opus-run /review passes (loop closing section).**
 
 ### 2026-07-11 · iteration 3 — `add-lineage-walk` shipped
 

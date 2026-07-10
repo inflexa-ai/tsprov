@@ -45,6 +45,44 @@ purely post-v1: PROV-N byte-differential, then M7 CLI / M8 graph+dot / M9 XML+RD
 
 ---
 
+## 2026-07-11 · entry 31 — feat: `tsprov/graph` lineage views (lineage change 4/4 — sequence complete)
+
+**Build:** `bun test` 1112 pass / 0 fail (24 files) · `tsc --noEmit` clean · build + smoke
+green · no new dependencies · walk/resolve/substrate/core untouched.
+
+### The change
+
+OPSX change `add-lineage-views` (archived at
+`openspec/changes/archive/2026-07-11-add-lineage-views/`): the representations over a walk
+result, completing the native lineage capability (`docs/research/lineage-direction.md`).
+
+- `toProvDocument(graph, result, options?)` → `{ document, closureAdded }`: the lineage
+  answer as a standalone, serializable PROV document (PROV-JSON round-trip equality +
+  PROV-N serialization tested). Default `closure: "referenced"` runs a reference fixpoint
+  (n-ary legs — a derivation's activity/generation/usage relation records — and what they
+  reference are pulled as declarations; adjacency is never chased, so depth bounds hold);
+  `closureAdded` reports the pulled (re-created) records; `closure: "none"` gives the
+  exact slice with legal dangling references. Opt-in `annotateFrontier` marks truncation
+  in-band (`tsprovq:truncated`, lazily-declared namespace); the default output carries no
+  vendor vocabulary.
+- `toFlatGraph(result)`: JSON-safe projection — kind-discriminated nodes with
+  `inferred`/`truncated` marks (truncation distinguishable from exhaustion by key
+  absence), edges in asserted PROV orientation regardless of walk direction.
+- `lineagePaths(graph, result, target, { from?, limit? })`: simple-path DFS over the
+  result's edges only, both orientations labeled `asserted`/`reversed`, default limit 100
+  with an explicit `truncated` flag.
+
+The full pipeline now composes: `ProvGraph.of(doc)` → `resolve(graph, selector)` →
+`lineage(graph, matches.records, opts)` → `toProvDocument` / `toFlatGraph` /
+`lineagePaths` — all under `tsprov/graph`, zero new dependencies.
+
+### Next
+
+The lineage effort's PR off `feat/graph-lineage` + review passes; after that, remaining
+post-v1 roadmap items are M7 CLI / M8 dot / M9 XML+RDF.
+
+---
+
 ## 2026-07-11 · entry 30 — feat: `tsprov/graph` lineage walk (lineage change 3/4)
 
 **Build:** `bun test` 1100 pass / 0 fail (23 files) · `tsc --noEmit` clean · build + smoke

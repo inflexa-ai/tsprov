@@ -32,3 +32,24 @@ export type {
   FrontierEntry,
   LineageResult,
 } from "./lineage.js";
+
+export {
+  toProvDocument,
+  toFlatGraph,
+  lineagePaths,
+  TSPROVQ,
+  DEFAULT_PATH_LIMIT,
+} from "./views.js";
+export type {
+  ClosurePolicy,
+  ToProvDocumentOptions,
+  LineageDocument,
+  FlatNodeKind,
+  LineageFlatNode,
+  LineageFlatEdge,
+  LineageFlatGraph,
+  PathOrientation,
+  LineagePath,
+  LineagePathsOptions,
+  LineagePathsResult,
+} from "./views.js";
