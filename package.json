@@ -39,6 +39,17 @@
         "default": "./dist/cjs/index.js"
       },
       "default": "./dist/index.js"
+    },
+    "./graph": {
+      "import": {
+        "types": "./dist/graph/index.d.ts",
+        "default": "./dist/graph/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/graph/index.d.ts",
+        "default": "./dist/cjs/graph/index.js"
+      },
+      "default": "./dist/graph/index.js"
     }
   },
   "files": [

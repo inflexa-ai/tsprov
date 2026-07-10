@@ -45,6 +45,45 @@ purely post-v1: PROV-N byte-differential, then M7 CLI / M8 graph+dot / M9 XML+RD
 
 ---
 
+## 2026-07-10 · entry 28 — feat: `tsprov/graph` — `ProvGraph` substrate + converters (M8 graph half; lineage change 1/4)
+
+**Build:** `bun test` 1059 pass / 0 fail (21 files) · `tsc --noEmit` clean · `bun run build`
+green (ESM + CJS, now emitting `dist/graph/`) · `bun run smoke` green (root + graph subpath,
+ESM + CJS) · nodenext consumer typecheck green.
+
+### The change
+
+The graph half of roadmap M8, reframed as the substrate for the native lineage effort
+(`docs/research/lineage-direction.md`; OPSX change `add-graph-view`, archived at
+`openspec/changes/archive/2026-07-10-add-graph-view/`). New `./graph` subpath export —
+the core barrel is untouched and the core stays luxon-only:
+
+- `ProvGraph.of(doc, options?)`: hand-rolled multi-digraph (zero new deps,
+  `03-dependency-analysis.md:75-80`) built from `doc.flattened().unified(options)`; element
+  nodes keyed by `identifier.uri`; one edge per relation (first two formal attributes) with
+  the **full relation record as payload**; forward AND reverse adjacency; observable skip
+  accounting. `graph.document` exposes the transform the graph indexed.
+- `provToGraph`/`graphToProv`: Python-parity converters (`graph.py:59-113`). An `inferred`
+  node flag replaces Python's `bundle=None` sentinel (TS constructors require a resolver;
+  synthetic elements are never registered). Python's unreachable `prov:bundle` inferred-map
+  entry is deliberately not ported (rationale in `graph.ts`).
+- Corpus oracle: all 398 JSON files round-trip — 334 equal `flattened().unified()` exactly,
+  36 are skip-explained (accounting recovers the key set), 28 throw in `unified("throw")`
+  with parity asserted. Partition pinned by a sum assertion.
+
+### Deviations
+
+DEVIATIONS **D13** (bundled records participate via `flattened().unified()`; Python's
+converter never sees inside bundles, `graph.py:68`) and **D14** (`inferred` flag replaces
+the null-bundle sentinel, `record.ts:165-175`).
+
+### Next
+
+Lineage change 2/4: `add-record-resolution` (selector stage + injectable matcher), then
+`add-lineage-walk`, `add-lineage-views` per `docs/research/lineage-direction.md`.
+
+---
+
 ## 2026-07-06 · entry 27 — feat: opt-in `unified()` formal-attribute conflict policy (issue #3)
 
 **Build:** `bun test` 640 pass / 0 fail (20 files) · `tsc --noEmit -p tsconfig.json` clean ·
