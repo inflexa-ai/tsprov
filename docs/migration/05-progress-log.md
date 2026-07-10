@@ -45,6 +45,35 @@ purely post-v1: PROV-N byte-differential, then M7 CLI / M8 graph+dot / M9 XML+RD
 
 ---
 
+## 2026-07-11 · entry 30 — feat: `tsprov/graph` lineage walk (lineage change 3/4)
+
+**Build:** `bun test` 1100 pass / 0 fail (23 files) · `tsc --noEmit` clean · build + smoke
+green · no new dependencies · substrate and core untouched.
+
+### The change
+
+OPSX change `add-lineage-walk` (archived at
+`openspec/changes/archive/2026-07-11-add-lineage-walk/`): the query core.
+`lineage(graph, roots, options?)` — roots accept elements, relations (seeding both
+endpoints — an edge is a legal query subject), `QualifiedName`s, or strings; unresolvable
+roots surface in `unknownRoots` rather than throwing. Direction `"backward"` follows the
+effect→cause edge orientation (verified uniform across all 15 relation classes),
+`"forward"` reverses it, `"both"` is the union of the two runs — deliberately not the
+undirected component. `alternateOf` is traversed symmetrically (PROV-DM declares it
+symmetric). Relation profiles `dataflow`/`responsibility`/`structure`/`all` (+ explicit
+class lists + injected `edgeWhere`); `wasInfluencedBy` is `all`-only. Depth bounds are
+per-direction hops (`number` or `{ back, forward }`), unbounded backed by a 1000-hop
+ceiling; every cutoff is an explicit frontier entry and exhausted terminals are never
+frontier. Result is flat, deduplicated, reference-based; the BFS is an internal fold
+(module-private visitor — the future algebra seam).
+
+### Next
+
+Lineage change 4/4: `add-lineage-views` (`.document()` reference-closure view,
+`.graph()` flat view, `paths()`), then the PR + Opus-run `/review` passes.
+
+---
+
 ## 2026-07-10 · entry 29 — feat: `tsprov/graph` record resolution (lineage change 2/4)
 
 **Build:** `bun test` 1082 pass / 0 fail (22 files) · `tsc --noEmit` clean · build + smoke

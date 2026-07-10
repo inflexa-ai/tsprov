@@ -22,3 +22,13 @@ export type {
   Resolution,
   UniqueResolution,
 } from "./resolve.js";
+
+export { lineage, MAX_WALK_DEPTH } from "./lineage.js";
+export type {
+  LineageDirection,
+  RelationProfile,
+  LineageRoot,
+  LineageOptions,
+  FrontierEntry,
+  LineageResult,
+} from "./lineage.js";

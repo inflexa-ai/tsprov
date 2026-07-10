@@ -10,10 +10,30 @@
 |---|---|---|
 | 1 | `add-graph-view` — MultiDiGraph substrate + `provToGraph`/`graphToProv` parity | ✅ **shipped + archived** (2026-07-10) |
 | 2 | `add-record-resolution` — selector stage + injectable matcher | ✅ **shipped + archived** (2026-07-10) |
-| 3 | `add-lineage-walk` — directional bounded walk over relation profiles | ⬜ not started |
+| 3 | `add-lineage-walk` — directional bounded walk over relation profiles | ✅ **shipped + archived** (2026-07-11) |
 | 4 | `add-lineage-views` — `.document()` closure view, `.graph()`, `paths()` | ⬜ not started |
 
 ## Iteration log (newest first)
+
+### 2026-07-11 · iteration 3 — `add-lineage-walk` shipped
+
+- `src/graph/lineage.ts` (+ tests, + barrel lines): `lineage(graph, roots, options?)` —
+  multi-root BFS with per-run visited sets; direction backward (effect→cause, default) /
+  forward / both (= backward ∪ forward, never the undirected component); `alternateOf`
+  traversed symmetrically under any profile that includes it; relation profiles
+  dataflow (default) / responsibility / structure / all (Influence is all-only) +
+  injectable `edgeWhere` (derivation-subtype refinement via asserted types); depth as
+  number or `{ back, forward }` behind `MAX_WALK_DEPTH = 1000` ceiling; frontier entries
+  `{ uri, direction, reason: "depth" | "ceiling" }` only when traversable onward edges
+  were declined (exhaustion ≠ truncation); flat reference-based `LineageResult` with
+  `unknownRoots` surfaced as data. BFS internal fold kept module-private
+  (`TODO(extend)` algebra seam).
+- Verify fixed the alternateOf spec scenario in the code's favor (profiles gate every
+  edge; the scenario now names `relations: "structure"`). Worker deviation accepted:
+  `all` profile = `[ProvRelation]` base class (cannot silently drop a class).
+- Gates: `bun test` 1100 pass / 0 fail (23 files) · tsc clean · build + smoke green ·
+  substrate/core untouched. Implementation by Opus 4.8 worker.
+- **Next:** change 4, `add-lineage-views` — then the PR + Opus-run /review passes.
 
 ### 2026-07-10 · iteration 2 — `add-record-resolution` shipped
 
