@@ -9,11 +9,28 @@
 | # | OPSX change | State |
 |---|---|---|
 | 1 | `add-graph-view` — MultiDiGraph substrate + `provToGraph`/`graphToProv` parity | ✅ **shipped + archived** (2026-07-10) |
-| 2 | `add-record-resolution` — selector stage + injectable matcher | ⬜ not started |
+| 2 | `add-record-resolution` — selector stage + injectable matcher | ✅ **shipped + archived** (2026-07-10) |
 | 3 | `add-lineage-walk` — directional bounded walk over relation profiles | ⬜ not started |
 | 4 | `add-lineage-views` — `.document()` closure view, `.graph()`, `paths()` | ⬜ not started |
 
 ## Iteration log (newest first)
+
+### 2026-07-10 · iteration 2 — `add-record-resolution` shipped
+
+- `src/graph/resolve.ts` (+ tests, + barrel lines): `RecordSelector` (id / idPrefix /
+  idSuffix / idIncludes / idMatches / localpart / type / attributes / `where` injection —
+  AND-composed; `{}` matches all), `AttributePredicate` (equals/includes/startsWith, any
+  value matches) over one exported normalization (`normalizeAttrValue`: QName by uri OR
+  display form; Literal lexical value; deliberately not `valueKey`), `resolve` /
+  `resolveUnique` returning discriminated unions (matched-all / not-found+10-id sample /
+  resolved / ambiguous+candidates) — no query outcome throws, no new deps.
+- Resolution runs over `graph.document.getRecords()` (elements AND relations; inferred
+  synthetics proven unresolvable). PR #72's path/hash-prefix contract reproduced with
+  built-ins in a shape test — the inf-cli adapter needs no library changes.
+- Gates: `bun test` 1082 pass / 0 fail (22 files) · tsc clean · build + smoke green ·
+  substrate/core diff empty. Implementation by Opus 4.8 worker; verify found no
+  spec-vs-code divergence.
+- **Next:** change 3, `add-lineage-walk`.
 
 ### 2026-07-10 · iteration 1 — `add-graph-view` shipped
 

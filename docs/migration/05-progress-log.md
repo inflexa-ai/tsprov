@@ -45,6 +45,34 @@ purely post-v1: PROV-N byte-differential, then M7 CLI / M8 graph+dot / M9 XML+RD
 
 ---
 
+## 2026-07-10 · entry 29 — feat: `tsprov/graph` record resolution (lineage change 2/4)
+
+**Build:** `bun test` 1082 pass / 0 fail (22 files) · `tsc --noEmit` clean · build + smoke
+green · no new dependencies · core barrel and `ProvGraph` substrate untouched.
+
+### The change
+
+OPSX change `add-record-resolution` (archived at
+`openspec/changes/archive/2026-07-10-add-record-resolution/`): the selector stage of the
+lineage sequence. `resolve(graph, selector)` / `resolveUnique(graph, selector)` over
+`graph.document.getRecords()` — elements AND relations are query subjects; the graph's
+inferred synthetics are not (never asserted). `RecordSelector` composes by AND: exact id
+(URI / `QualifiedName` / `prefix:localpart` resolved via the document's namespaces),
+idPrefix/idSuffix/idIncludes/idMatches/localpart on `identifier.uri`, record-class filter,
+attribute predicates (equals/includes/startsWith over one exported normalization —
+QName matches by uri or display form, Literal by lexical value; deliberately not
+`valueKey`), plus the caller-injected `where` predicate. Outcomes are discriminated
+unions with a git-style contract: all matches in document order / not-found with a
+10-identifier orientation sample / ambiguous with candidates — query outcomes are data,
+never throws. A shape test reproduces inf-cli PR #72's path + unique-hash-prefix
+resolution with built-ins only.
+
+### Next
+
+Lineage change 3/4: `add-lineage-walk` per `docs/research/lineage-direction.md`.
+
+---
+
 ## 2026-07-10 · entry 28 — feat: `tsprov/graph` — `ProvGraph` substrate + converters (M8 graph half; lineage change 1/4)
 
 **Build:** `bun test` 1059 pass / 0 fail (21 files) · `tsc --noEmit` clean · `bun run build`

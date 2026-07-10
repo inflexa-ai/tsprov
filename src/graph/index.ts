@@ -14,3 +14,11 @@ export type {
   SkipReason,
   SkippedRelation,
 } from "./graph.js";
+
+export { resolve, resolveUnique, normalizeAttrValue } from "./resolve.js";
+export type {
+  RecordSelector,
+  AttributePredicate,
+  Resolution,
+  UniqueResolution,
+} from "./resolve.js";
