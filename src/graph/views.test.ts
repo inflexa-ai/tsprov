@@ -175,6 +175,11 @@ describe("toProvDocument — reference closure (spec: referenced declarations pu
     expect(document.getRecords(ProvUsage).length).toBe(1);
     expect(document.getRecord("ex:e0").length).toBe(1);
 
+    // The closured document round-trips through PROV-JSON unchanged — the pulled
+    // n-ary legs survive serialize/deserialize as faithfully as the walked slice.
+    const json = document.serialize("json");
+    expect(ProvDocument.deserialize(json, "json").equals(document)).toBe(true);
+
     // closure: "none" — the exact slice; every leg dangles and nothing is listed.
     const { document: bare, closureAdded: none } = toProvDocument(g, result, {
       closure: "none",

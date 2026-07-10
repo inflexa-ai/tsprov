@@ -10,7 +10,7 @@ import {
 import { PROV_REVISION } from "../constants.js";
 import type { GraphEdge } from "./graph.js";
 import { provToGraph } from "./graph.js";
-import { lineage, type LineageResult } from "./lineage.js";
+import { lineage, MAX_WALK_DEPTH, type LineageResult } from "./lineage.js";
 
 /** Resolves a `prefix:local` candidate to its full URI against a document's namespaces. */
 function uriOf(doc: ProvDocument, candidate: string): string {
@@ -363,6 +363,52 @@ describe("lineage — depth bounds (spec: per-direction hops, explicit frontier)
     expect(result.nodes.length).toBe(2);
     expect(result.edges.length).toBe(2);
     expect(result.frontier.length).toBe(0);
+  });
+});
+
+describe("lineage — unbounded ceiling (spec: MAX_WALK_DEPTH truncates as reason 'ceiling', D4)", () => {
+  /**
+   * A simple backward gen/used chain longer than MAX_WALK_DEPTH hops: entities
+   * `e0..eM` and activities `a0..a{M-1}` linked so that `e_{i+1} --gen--> a_i`
+   * and `a_i --used--> e_i`. An unbounded backward walk from `eM` therefore
+   * crosses `2*M` edges as a single path, discovering each node at a unique hop
+   * (`e_{M-k}` at hop `2k`, `a_{M-1-k}` at hop `2k+1`). Building ~1k records is
+   * milliseconds in bun, so the fixture stays cheap despite its length.
+   */
+  function longBackwardChain(m: number): ProvDocument {
+    const doc = exDoc();
+    doc.entity("ex:e0");
+    for (let i = 0; i < m; i += 1) {
+      doc.entity(`ex:e${i + 1}`);
+      doc.activity(`ex:a${i}`);
+      doc.wasGeneratedBy(`ex:e${i + 1}`, `ex:a${i}`); // e_{i+1} -> a_i
+      doc.used(`ex:a${i}`, `ex:e${i}`); // a_i -> e_i
+    }
+    return doc;
+  }
+
+  // Scenario: An unbounded walk deeper than the safety ceiling truncates there.
+  test("an unbounded walk past MAX_WALK_DEPTH stops at exactly one ceiling frontier and omits the far terminal", () => {
+    // MAX_WALK_DEPTH is even (1000), so the ceiling hop lands on an entity
+    // (`e_{M - MAX_WALK_DEPTH/2}`). Size the chain a few hops past the ceiling so
+    // that node still has an untraversed onward edge and the terminal e0 sits
+    // beyond it (2*m = MAX_WALK_DEPTH + 20 hops).
+    const m = MAX_WALK_DEPTH / 2 + 10;
+    const doc = longBackwardChain(m);
+    const g = provToGraph(doc);
+
+    const result = lineage(g, `ex:e${m}`); // unbounded backward from the chain end
+
+    // Terminates (the test completing at all is the proof) with a single
+    // truncation: the lone node at the ceiling hop still has an onward gen edge.
+    expect(result.frontier.length).toBe(1);
+    expect(result.frontier[0]?.reason).toBe("ceiling");
+    expect(result.frontier[0]?.direction).toBe("backward");
+    expect(result.frontier[0]?.uri).toBe(
+      uriOf(doc, `ex:e${m - MAX_WALK_DEPTH / 2}`),
+    );
+    // The chain's far terminal is beyond the ceiling — never reached.
+    expect(nodeUris(result).has(uriOf(doc, "ex:e0"))).toBe(false);
   });
 });
 
