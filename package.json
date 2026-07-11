@@ -1,6 +1,6 @@
 {
   "name": "@inflexa-ai/tsprov",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "An idiomatic TypeScript implementation of the W3C PROV Data Model (a port of Python prov): author provenance documents and round-trip them through PROV-JSON and PROV-N.",
   "keywords": [
     "prov",
@@ -39,6 +39,17 @@
         "default": "./dist/cjs/index.js"
       },
       "default": "./dist/index.js"
+    },
+    "./graph": {
+      "import": {
+        "types": "./dist/graph/index.d.ts",
+        "default": "./dist/graph/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/graph/index.d.ts",
+        "default": "./dist/cjs/graph/index.js"
+      },
+      "default": "./dist/graph/index.js"
     }
   },
   "files": [

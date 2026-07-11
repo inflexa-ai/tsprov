@@ -17,11 +17,12 @@
 5. [The data model in depth](#5-the-data-model-in-depth)
 6. [Serialization](#6-serialization)
 7. [Transformations](#7-transformations)
-8. [Relationship to the Python `prov` library](#8-relationship-to-the-python-prov-library)
-9. [How it's built](#9-how-its-built)
-10. [Scope](#10-scope)
-11. [Development](#11-development)
-12. [References](#12-references)
+8. [Graph & lineage queries](#8-graph--lineage-queries)
+9. [Relationship to the Python `prov` library](#9-relationship-to-the-python-prov-library)
+10. [How it's built](#10-how-its-built)
+11. [Scope](#11-scope)
+12. [Development](#12-development)
+13. [References](#13-references)
 
 ---
 
@@ -55,7 +56,7 @@ PROV defines several interchange syntaxes; tsprov implements the two text-friend
 - **[PROV-JSON](https://openprovenance.org/prov-json/)** — a JSON encoding.
 
 (PROV also has [PROV-O](https://www.w3.org/TR/prov-o/) for RDF/OWL and a PROV-XML encoding; those are
-out of scope here — see [§10](#10-scope).)
+out of scope here — see [§11](#11-scope).)
 
 ---
 
@@ -73,7 +74,7 @@ while preserving PROV-DM semantics exactly:
   typed attribute bags.
 - **Value-equality that actually works.** `doc.equals(other)` is content-based — the single hardest
   thing to get right when porting a Python library that keys dicts/sets on `__hash__`/`__eq__` (see
-  [§9](#how-it-works-the-value-equality-trick)).
+  [§10](#how-it-works-the-value-equality-trick)).
 - **A dependency-light, browser-safe core.** Only [luxon](https://moment.github.io/luxon/) (for
   datetime fidelity). Dual ESM + CJS, tree-shakeable.
 
@@ -361,7 +362,205 @@ doc.addBundle(someBundle, id);    // attach an existing bundle under an identifi
 
 ---
 
-## 8. Relationship to the Python `prov` library
+## 8. Graph & lineage queries
+
+Provenance is a graph — entities, activities, and agents joined by relations — so the natural
+questions are graph questions: *where did this come from?*, *what came from this?*, *how are these
+two things connected?* tsprov answers them in a layer shipped **behind the optional
+`@inflexa-ai/tsprov/graph` subpath**, so the core stays luxon-only; importing it pulls in **zero
+extra dependencies**. The layer is four small stages — a graph *view*, record *resolution*, a
+directional *walk*, and *views over the walk result* — and its headline is that **a lineage answer
+is itself a valid PROV document** you can serialize and hand to any PROV tool (the precedent is
+IVOA's ProvSAP).
+
+```ts
+import { ProvGraph, resolve, lineage, toProvDocument } from "@inflexa-ai/tsprov/graph";
+```
+
+### The graph view
+
+`ProvGraph.of(doc)` builds a **multi-digraph** over the document: every `ProvElement` becomes a
+**node** keyed by its identifier URI (string keys, never object references — the same value-equality
+discipline as the rest of the library), and every relation becomes one **edge** from its first
+formal attribute to its second, carrying the *full relation record* as the edge payload (so n-ary
+data — roles, times, extra attributes — is never lost to a bare `(from, to)` pair). It builds from
+`doc.flattened().unified()`, not the bare `unified()` Python's `prov_to_graph` uses, so **records
+authored inside bundles participate** as nodes and edges — a deliberate divergence
+([`DEVIATIONS.md` D13](../DEVIATIONS.md)); `graph.document` is that flattened, unified transform,
+and the caller's original document is never mutated.
+
+An endpoint that is *referenced but never declared* becomes an **`inferred` node** holding a
+synthetic element (Python's `INFERRED_ELEMENT_CLASS`), and a relation that can't be turned into an
+edge — a missing endpoint, or an unmapped one — is recorded on `graph.skipped` rather than dropped
+silently. `provToGraph` / `graphToProv` are the Python-parity pair; `graphToProv` rebuilds a
+document, dropping inferred nodes (the TypeScript-honest replacement for Python's `bundle is None`
+sentinel, [`DEVIATIONS.md` D14](../DEVIATIONS.md)):
+
+```ts
+import { ProvDocument } from "@inflexa-ai/tsprov";
+import { ProvGraph, provToGraph, graphToProv } from "@inflexa-ai/tsprov/graph";
+
+const doc = new ProvDocument();
+doc.addNamespace("ex", "http://example.org/");
+doc.entity("ex:article").wasGeneratedBy("ex:compile", "2024-01-01T09:05:00+00:00"); // ex:compile undeclared
+
+const graph = ProvGraph.of(doc);
+graph.nodes.map((n) => [n.uri, n.inferred]);
+// → ex:article: false (declared), ex:compile: true (a synthetic, inferred ProvActivity)
+graph.edges.length;   // 1
+graph.skipped.length; // 0 — nothing was dropped
+
+graphToProv(provToGraph(doc)).serialize("provn");
+// → entity(ex:article) + wasGeneratedBy(...), but NO activity(ex:compile): the inferred node
+//   is never re-asserted, so its reference dangles — legal PROV.
+```
+
+One caveat falls out of the `flattened().unified()` construction: because every bundle's records are
+hoisted into one identifier-keyed scope, a record that *shares an identifier* with an element
+union-merges into that element and never reaches edge extraction — so give elements and relations
+distinct identifiers.
+
+### Resolving a query subject
+
+A walk needs a starting record, and callers rarely have the exact URI — they have a class, an
+attribute, a hash prefix. `resolve(graph, selector)` matches a plain-object `RecordSelector` against
+`graph.document`'s records (elements *and* relations — a relation is a legal query subject that seeds
+a walk from both its endpoints; inferred synthetics are never asserted records, so they are never
+resolvable). Every supplied field composes by **AND**: `id` (a URI, a `QualifiedName`, or a
+`prefix:localpart` resolved through the document's namespaces), the `idPrefix` / `idSuffix` /
+`idIncludes` / `idMatches` fragment tests, `localpart`, `type` (a record class or classes),
+`attributes` predicates, and an injected `where` — the custom-matcher escape hatch, the same
+injection philosophy as the walk's `edgeWhere`.
+
+An `AttributePredicate` (`{ name, equals | includes | startsWith }`) matches when **any** value under
+`name` satisfies it, compared over one exported, documented normalization (`normalizeAttrValue`): a
+`QualifiedName` value matches on its `uri` **or** its `prefix:localpart` display form, a `Literal` on
+its lexical value. Outcomes are **typed data, never thrown**: `resolve` returns `{ kind: "matched",
+records }` with *every* match in document order (multiplicity is surfaced, never hidden) or
+`{ kind: "not-found", sample }` with a bounded orientation sample of what *is* in the document;
+`resolveUnique` adds a git-style `{ kind: "ambiguous", candidates }` for a subject that matches more
+than one record, instead of guessing.
+
+```ts
+import { ProvGraph, resolveUnique } from "@inflexa-ai/tsprov/graph";
+// doc has entities ex:blob-a1b2c3 (ex:hash "a1b2c3…") and ex:blob-a1b2ff (ex:hash "a1b2ff…")
+const graph = ProvGraph.of(doc);
+
+resolveUnique(graph, { attributes: [{ name: "ex:hash", startsWith: "a1b2c3" }] });
+// → { kind: "resolved", record: <ex:blob-a1b2c3> }   — a unique hash prefix resolves
+
+resolveUnique(graph, { attributes: [{ name: "ex:hash", startsWith: "a1b2" }] });
+// → { kind: "ambiguous", candidates: [<ex:blob-a1b2c3>, <ex:blob-a1b2ff>] }  — list, don't guess
+```
+
+### Walking lineage
+
+`lineage(graph, roots, options?)` is a **breadth-first, cycle-safe, bounded** walk from one or more
+roots (each a record, a `QualifiedName`, or a string). Direction *is* edge orientation: every
+relation's edge points **effect → cause**, so `"backward"` (the default) is ancestry — *where did
+this come from?* — `"forward"` follows edges reversed for descendants, and `"both"` is the **union**
+of one backward and one forward walk from the same roots. `"both"` is deliberately **not** the
+undirected connected component: an undirected walk through a shared input would drag in every sibling
+output (*what else did my ancestor produce?*), a different question that belongs to `lineagePaths`.
+
+The `relations` option scopes *which* edges are traversable, by profile: `"dataflow"` (the default —
+Generation, Usage, Derivation, Communication, Start, End, Invalidation), `"responsibility"`
+(Attribution, Association, Delegation), `"structure"` (Specialization/Mention, Alternate,
+Membership), or `"all"`. `wasInfluencedBy` (`ProvInfluence`) is in **no** profile but `"all"` — it is
+PROV's unspecific superrelation, and folding it into a scoped profile would smuggle unknown-kind
+edges into a walk that promised "data flow". `edgeWhere` refines further (AND with the profile) —
+derivation-subtype filtering is expressed through it, not a bespoke option, by testing the
+relation's asserted types:
+
+```ts
+import { PROV_REVISION, QualifiedName } from "@inflexa-ai/tsprov";
+import { lineage } from "@inflexa-ai/tsprov/graph";
+
+lineage(graph, "ex:article");                       // backward dataflow: reaches ex:compile, ex:draft
+lineage(graph, "ex:article", { relations: "all" }); // …also crosses the attribution to ex:alice
+
+// Only wasRevisionOf-typed derivations:
+lineage(graph, "ex:v2", {
+  edgeWhere: (edge) =>
+    edge.relation.getAssertedTypes().some((t) => t instanceof QualifiedName && t.equals(PROV_REVISION)),
+});
+```
+
+`depth` bounds the hops — a bare `number` for every direction, or `{ back, forward }` for asymmetric
+bounds (dbt's `3+model+2` is `{ direction: "both", depth: { back: 3, forward: 2 } }`); an unset depth
+is unbounded behind a hard **1000-hop safety ceiling** (`MAX_WALK_DEPTH`). The result is **honest**:
+every node whose onward edges were *not* traversed because a bound was hit appears in `frontier` with
+its `reason` (`"depth"` for a caller bound, `"ceiling"` for the safety cap) — while a node that
+simply ran out of onward edges is *exhaustion*, not truncation, and never appears there. Roots that
+resolve to no node are surfaced in `unknownRoots` (one bad root can't sink a multi-root query), and a
+`NaN` depth **throws** a `TypeError` rather than silently defeating the ceiling.
+
+```ts
+const bounded = lineage(graph, "ex:e3", { depth: 1 });
+bounded.nodes.map((n) => n.uri);   // stops one hop in
+bounded.frontier;
+// → [{ uri: "…/a2", direction: "backward", reason: "depth" }]  — the cut is data, not a silent stop
+```
+
+### Representing the answer
+
+The walk returns a flat, reference-based `LineageResult`; three **views** turn it into something you
+can serialize, script against, or explain. `toProvDocument(graph, result)` is the headline — it
+re-creates every non-inferred node and traversed edge into a **fresh, serializable
+`ProvDocument`** — restricted to the walked slice. Its default `closure: "referenced"` then completes
+that slice to a **reference fixpoint**: any identifier an included record names through its formal
+attributes that is declared in `graph.document` but missing from the output is pulled in (references
+of pulled records are chased too; **adjacency never is**, so the walk's depth bound is never
+bypassed). The pulled records are reported separately in `closureAdded`; `closure: "none"` emits the
+exact slice with dangling references (legal PROV). `annotateFrontier: true` marks each truncation
+point with a `tsprovq:truncated` attribute under the exported `TSPROVQ` namespace — declared **only
+when used**, so a default document stays vocabulary-clean.
+
+```ts
+import { ProvDerivation } from "@inflexa-ai/tsprov";
+import { toProvDocument, toFlatGraph, lineagePaths } from "@inflexa-ai/tsprov/graph";
+
+// An activity-aware derivation whose a1/g1/u1 legs are declared but not walked:
+const result = lineage(graph, "ex:e2", { relations: [ProvDerivation] });
+const { document, closureAdded } = toProvDocument(graph, result);
+closureAdded.map((r) => String(r.identifier)); // ["ex:a1", "ex:g1", "ex:u1", "ex:e0"] — the pulled legs
+document.serialize("provn");                    // a standalone PROV document, ready for any tool
+
+// annotateFrontier surfaces the cut in the serialized form:
+toProvDocument(graph, bounded, { annotateFrontier: true }).document.serialize("provn");
+// → activity(ex:a2, -, -, [tsprovq:truncated="depth"]) and a `prefix tsprovq` declaration
+```
+
+`toFlatGraph(result)` is the **JSON-safe** projection (`JSON.stringify` works with no replacer):
+nodes as `{ uri, kind, inferred, truncated? }` and edges as `{ from, to, relation }` in **asserted
+PROV orientation regardless of the walk direction** — so a backward and a forward projection of the
+same chain carry the *same* edge triples, and a script can re-derive either walk from the output.
+`lineagePaths(graph, result, target)` enumerates the simple paths that connect the endpoints, over
+**`result.edges` only** (never edges the walk excluded), labeling each `"asserted"` (from → target)
+or `"reversed"` (target → from, how a forward result reads). Full path enumeration doesn't scale, so
+it is **explicitly capped**: `limit` (default 100) with a `truncated` flag that is conservatively
+`true` even at exactly the cap — a capped search must never present itself as complete.
+
+```ts
+toFlatGraph(lineage(graph, "ex:e3", { direction: "backward" })).edges;
+toFlatGraph(lineage(graph, "ex:e2", { direction: "forward"  })).edges;
+// → both carry { from: "…/e3", to: "…/a2", relation: "prov:Generation" } and the usage edge:
+//   the same asserted triples whichever way we walked (only the roots and reachable subset differ).
+
+const paths = lineagePaths(graph, lineage(graph, "ex:e3"), "ex:e2");
+paths.paths.map((p) => [p.orientation, p.nodes]); // [["asserted", ["…/e3", "…/a2", "…/e2"]]]
+lineagePaths(graph, lineage(graph, "ex:e3"), "ex:e2", { limit: 1 }).truncated; // true
+```
+
+Deliberately **not** here (and not by accident — see the deferred list in
+[`docs/research/lineage-direction.md`](research/lineage-direction.md)): PROV-CONSTRAINTS inference,
+`connect(x, y)` bidirectional search, ProvRank-style relevance ranking, and a `tsprov/dot`
+visualiser. The layer indexes and walks provenance; it does not infer new facts, rank them, or draw
+them.
+
+---
+
+## 9. Relationship to the Python `prov` library
 
 tsprov mirrors Python `prov` v2.1.1 closely enough that the **entire 398-file PROV-JSON conformance
 corpus round-trips** (`deserialize → serialize → deserialize` is `.equals()`-stable). Where the two
@@ -382,7 +581,7 @@ necessarily diverge — because of language differences — the differences are 
 
 ---
 
-## 9. How it's built
+## 10. How it's built
 
 ### Project layout
 
@@ -438,19 +637,21 @@ port), and the implementation history in
 
 ---
 
-## 10. Scope
+## 11. Scope
 
 **Included (v1):** the complete in-memory PROV-DM model; the fluent authoring API; **PROV-JSON**
 (serialize + deserialize) and **PROV-N** (serialize); `read()` auto-detection; content-based
-`equals()`; bundles, `flattened`, `unified`, `update`.
+`equals()`; bundles, `flattened`, `unified`, `update`; and the **graph & lineage** layer
+([§8](#8-graph--lineage-queries)) behind the optional `@inflexa-ai/tsprov/graph` subpath.
 
-**Not included:** PROV-XML, PROV-RDF / PROV-O, graph/DOT visualisation, and a CLI. These are tracked
-as post-v1 milestones in the [migration roadmap](migration/02-migration-roadmap.md) and would ship
+**Not included:** PROV-XML, PROV-RDF / PROV-O, DOT / graph-image rendering (the `graph` subpath
+ships the graph *model* and lineage queries, not a visualiser), and a CLI. These are tracked as
+post-v1 milestones in the [migration roadmap](migration/02-migration-roadmap.md) and would ship
 behind optional subpath exports so the core stays dependency-light.
 
 ---
 
-## 11. Development
+## 12. Development
 
 ```bash
 bun install
@@ -463,7 +664,7 @@ as the test oracle.
 
 ---
 
-## 12. References
+## 13. References
 
 - **W3C PROV overview** — <https://www.w3.org/TR/prov-overview/>
 - **PROV-DM** (data model) — <https://www.w3.org/TR/prov-dm/>

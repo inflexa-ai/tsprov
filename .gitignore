@@ -113,3 +113,10 @@ dist
 .tern-port
 
 reference/
+
+# Local agent-loop prompts — session tooling, never published
+/loop.md
+/loop.example.md
+
+# Local playground/teaching scripts — session tooling, never published
+/scratchpad/

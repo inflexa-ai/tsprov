@@ -7,8 +7,45 @@ All notable changes to `tsprov` are documented here. The format is based on
 
 ### Not yet included
 
-PROV-XML, PROV-RDF, graph/DOT visualisation, and the CLI. See `docs/migration/` for the roadmap
-and `DEVIATIONS.md` for intentional divergences from the Python reference.
+PROV-XML, PROV-RDF, DOT (graph-visualisation) rendering, and the CLI. See `docs/migration/` for
+the roadmap and `DEVIATIONS.md` for intentional divergences from the Python reference. Note the
+`@inflexa-ai/tsprov/graph` layer (multi-digraph + lineage queries) *did* ship in `0.5.0`; only
+DOT/image rendering of that graph remains out of scope.
+
+## [0.5.0] — 2026-07-11
+
+### Added
+
+- **Graph & lineage layer under the `@inflexa-ai/tsprov/graph` subpath.** A new optional entry
+  point — the core public surface and its `luxon`-only dependency are unchanged — for querying
+  provenance as a graph. Zero new dependencies.
+  - **`ProvGraph`** with `provToGraph` / `graphToProv`: a hand-rolled multi-digraph built from
+    `document.flattened().unified()`, matching Python `prov.graph` behavior (first-two-formal-
+    attributes edges, inferred-endpoint sentinel). Two deliberate divergences: bundled records
+    participate as nodes/edges, and the null-bundle sentinel becomes an explicit `inferred` flag
+    (`DEVIATIONS.md` D13/D14).
+  - **`resolve` / `resolveUnique`**: a composable selector stage (exact QName/URI, localpart/suffix,
+    substring/regex, record-class filter, attribute predicates, injectable matcher) that surfaces
+    *all* matches with typed matched/ambiguous/not-found results.
+  - **`lineage`**: a directional (`backward` / `forward` / `both`), bounded, cycle-safe
+    breadth-first walk returning a flat result (nodes, edges, roots, truncation frontier).
+  - **Views** — `toProvDocument` (a standalone document under a `referenced` reference-closure
+    fixpoint or `none`, with opt-in `tsprovq` frontier annotation), `toFlatGraph` (JSON-safe
+    projection), and `lineagePaths` (bounded, orientation-labeled simple-path enumeration).
+
+## [0.4.0] — 2026-07-06
+
+### Added
+
+- **Opt-in single-valued merge for caller-named non-formal attributes.** `UnifiedOptions` now
+  accepts `singleValued?: Iterable<QualifiedNameCandidate>` — non-formal attribute names that
+  `unified()` resolves under the existing `formalAttributeConflict` policy instead of unioning
+  their values into a multi-value. Naming an attribute here makes a later record's value supersede
+  (`"last"`) or be discarded (`"first"`), exactly as a single-valued formal attribute already does,
+  so a status/outcome attribute re-emitted across a durable-workflow resume keeps only its latest
+  value rather than a contradictory union — while an idempotent replay of identical values still
+  dedupes. Unresolvable candidates are ignored (that attribute stays multi-valued). Additive and
+  backward-compatible; the default merge is byte-identical to before. See commit `97941c7`.
 
 ## [0.3.0] — 2026-07-06
 

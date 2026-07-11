@@ -45,6 +45,140 @@ purely post-v1: PROV-N byte-differential, then M7 CLI / M8 graph+dot / M9 XML+RD
 
 ---
 
+## 2026-07-11 · entry 31 — feat: `tsprov/graph` lineage views (lineage change 4/4 — sequence complete)
+
+**Build:** `bun test` 1112 pass / 0 fail (24 files) · `tsc --noEmit` clean · build + smoke
+green · no new dependencies · walk/resolve/substrate/core untouched.
+
+### The change
+
+OPSX change `add-lineage-views` (archived at
+`openspec/changes/archive/2026-07-11-add-lineage-views/`): the representations over a walk
+result, completing the native lineage capability (`docs/research/lineage-direction.md`).
+
+- `toProvDocument(graph, result, options?)` → `{ document, closureAdded }`: the lineage
+  answer as a standalone, serializable PROV document (PROV-JSON round-trip equality +
+  PROV-N serialization tested). Default `closure: "referenced"` runs a reference fixpoint
+  (n-ary legs — a derivation's activity/generation/usage relation records — and what they
+  reference are pulled as declarations; adjacency is never chased, so depth bounds hold);
+  `closureAdded` reports the pulled (re-created) records; `closure: "none"` gives the
+  exact slice with legal dangling references. Opt-in `annotateFrontier` marks truncation
+  in-band (`tsprovq:truncated`, lazily-declared namespace); the default output carries no
+  vendor vocabulary.
+- `toFlatGraph(result)`: JSON-safe projection — kind-discriminated nodes with
+  `inferred`/`truncated` marks (truncation distinguishable from exhaustion by key
+  absence), edges in asserted PROV orientation regardless of walk direction.
+- `lineagePaths(graph, result, target, { from?, limit? })`: simple-path DFS over the
+  result's edges only, both orientations labeled `asserted`/`reversed`, default limit 100
+  with an explicit `truncated` flag.
+
+The full pipeline now composes: `ProvGraph.of(doc)` → `resolve(graph, selector)` →
+`lineage(graph, matches.records, opts)` → `toProvDocument` / `toFlatGraph` /
+`lineagePaths` — all under `tsprov/graph`, zero new dependencies.
+
+### Next
+
+The lineage effort's PR off `feat/graph-lineage` + review passes; after that, remaining
+post-v1 roadmap items are M7 CLI / M8 dot / M9 XML+RDF.
+
+---
+
+## 2026-07-11 · entry 30 — feat: `tsprov/graph` lineage walk (lineage change 3/4)
+
+**Build:** `bun test` 1100 pass / 0 fail (23 files) · `tsc --noEmit` clean · build + smoke
+green · no new dependencies · substrate and core untouched.
+
+### The change
+
+OPSX change `add-lineage-walk` (archived at
+`openspec/changes/archive/2026-07-11-add-lineage-walk/`): the query core.
+`lineage(graph, roots, options?)` — roots accept elements, relations (seeding both
+endpoints — an edge is a legal query subject), `QualifiedName`s, or strings; unresolvable
+roots surface in `unknownRoots` rather than throwing. Direction `"backward"` follows the
+effect→cause edge orientation (verified uniform across all 15 relation classes),
+`"forward"` reverses it, `"both"` is the union of the two runs — deliberately not the
+undirected component. `alternateOf` is traversed symmetrically (PROV-DM declares it
+symmetric). Relation profiles `dataflow`/`responsibility`/`structure`/`all` (+ explicit
+class lists + injected `edgeWhere`); `wasInfluencedBy` is `all`-only. Depth bounds are
+per-direction hops (`number` or `{ back, forward }`), unbounded backed by a 1000-hop
+ceiling; every cutoff is an explicit frontier entry and exhausted terminals are never
+frontier. Result is flat, deduplicated, reference-based; the BFS is an internal fold
+(module-private visitor — the future algebra seam).
+
+### Next
+
+Lineage change 4/4: `add-lineage-views` (`.document()` reference-closure view,
+`.graph()` flat view, `paths()`), then the PR + Opus-run `/review` passes.
+
+---
+
+## 2026-07-10 · entry 29 — feat: `tsprov/graph` record resolution (lineage change 2/4)
+
+**Build:** `bun test` 1082 pass / 0 fail (22 files) · `tsc --noEmit` clean · build + smoke
+green · no new dependencies · core barrel and `ProvGraph` substrate untouched.
+
+### The change
+
+OPSX change `add-record-resolution` (archived at
+`openspec/changes/archive/2026-07-10-add-record-resolution/`): the selector stage of the
+lineage sequence. `resolve(graph, selector)` / `resolveUnique(graph, selector)` over
+`graph.document.getRecords()` — elements AND relations are query subjects; the graph's
+inferred synthetics are not (never asserted). `RecordSelector` composes by AND: exact id
+(URI / `QualifiedName` / `prefix:localpart` resolved via the document's namespaces),
+idPrefix/idSuffix/idIncludes/idMatches/localpart on `identifier.uri`, record-class filter,
+attribute predicates (equals/includes/startsWith over one exported normalization —
+QName matches by uri or display form, Literal by lexical value; deliberately not
+`valueKey`), plus the caller-injected `where` predicate. Outcomes are discriminated
+unions with a git-style contract: all matches in document order / not-found with a
+10-identifier orientation sample / ambiguous with candidates — query outcomes are data,
+never throws. A shape test reproduces inf-cli PR #72's path + unique-hash-prefix
+resolution with built-ins only.
+
+### Next
+
+Lineage change 3/4: `add-lineage-walk` per `docs/research/lineage-direction.md`.
+
+---
+
+## 2026-07-10 · entry 28 — feat: `tsprov/graph` — `ProvGraph` substrate + converters (M8 graph half; lineage change 1/4)
+
+**Build:** `bun test` 1059 pass / 0 fail (21 files) · `tsc --noEmit` clean · `bun run build`
+green (ESM + CJS, now emitting `dist/graph/`) · `bun run smoke` green (root + graph subpath,
+ESM + CJS) · nodenext consumer typecheck green.
+
+### The change
+
+The graph half of roadmap M8, reframed as the substrate for the native lineage effort
+(`docs/research/lineage-direction.md`; OPSX change `add-graph-view`, archived at
+`openspec/changes/archive/2026-07-10-add-graph-view/`). New `./graph` subpath export —
+the core barrel is untouched and the core stays luxon-only:
+
+- `ProvGraph.of(doc, options?)`: hand-rolled multi-digraph (zero new deps,
+  `03-dependency-analysis.md:75-80`) built from `doc.flattened().unified(options)`; element
+  nodes keyed by `identifier.uri`; one edge per relation (first two formal attributes) with
+  the **full relation record as payload**; forward AND reverse adjacency; observable skip
+  accounting. `graph.document` exposes the transform the graph indexed.
+- `provToGraph`/`graphToProv`: Python-parity converters (`graph.py:59-113`). An `inferred`
+  node flag replaces Python's `bundle=None` sentinel (TS constructors require a resolver;
+  synthetic elements are never registered). Python's unreachable `prov:bundle` inferred-map
+  entry is deliberately not ported (rationale in `graph.ts`).
+- Corpus oracle: all 398 JSON files round-trip — 334 equal `flattened().unified()` exactly,
+  36 are skip-explained (accounting recovers the key set), 28 throw in `unified("throw")`
+  with parity asserted. Partition pinned by a sum assertion.
+
+### Deviations
+
+DEVIATIONS **D13** (bundled records participate via `flattened().unified()`; Python's
+converter never sees inside bundles, `graph.py:68`) and **D14** (`inferred` flag replaces
+the null-bundle sentinel, `record.ts:165-175`).
+
+### Next
+
+Lineage change 2/4: `add-record-resolution` (selector stage + injectable matcher), then
+`add-lineage-walk`, `add-lineage-views` per `docs/research/lineage-direction.md`.
+
+---
+
 ## 2026-07-06 · entry 27 — feat: opt-in `unified()` formal-attribute conflict policy (issue #3)
 
 **Build:** `bun test` 640 pass / 0 fail (20 files) · `tsc --noEmit -p tsconfig.json` clean ·
