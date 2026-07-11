@@ -102,6 +102,48 @@ doc.entity("ex:dataset", { "ex:rows": new Literal(10_000, XSD_INT) });
 
 A bare `number` defaults to `xsd:double` on encode; a bare `string` is an `xsd:string`.
 
+## Graph & lineage
+
+Provenance *is* a graph, so tsprov ships a graph view and a lineage walker under the optional
+`@inflexa-ai/tsprov/graph` subpath — zero extra dependencies (the core stays luxon-only). The
+headline: **a lineage answer is itself a PROV document** you can serialize and feed to any PROV
+tool.
+
+```ts
+import { ProvDocument } from "@inflexa-ai/tsprov";
+import { ProvGraph, resolve, lineage, toProvDocument } from "@inflexa-ai/tsprov/graph";
+
+const doc = new ProvDocument();
+doc.addNamespace("ex", "http://example.org/");
+const article = doc.entity("ex:article", { "prov:type": "ex:Article" });
+const compile = doc.activity("ex:compile", "2024-01-01T09:00:00+00:00", "2024-01-01T09:05:00+00:00");
+article.wasGeneratedBy(compile).wasDerivedFrom(doc.entity("ex:draft"));
+
+const graph = ProvGraph.of(doc);                         // flattened().unified() multi-digraph
+const found = resolve(graph, { localpart: "article" });  // git-style resolve → all matches
+if (found.kind !== "matched") throw new Error("no such record");
+
+const ancestry = lineage(graph, found.records, { direction: "backward" }); // "where did this come from?"
+const { document } = toProvDocument(graph, ancestry);    // …the answer is itself a PROV document
+
+console.log(document.serialize("provn"));
+// document
+//   prefix ex <http://example.org/>
+//
+//   entity(ex:article, [prov:type="ex:Article"])
+//   activity(ex:compile, 2024-01-01T09:00:00+00:00, 2024-01-01T09:05:00+00:00)
+//   entity(ex:draft)
+//   wasGeneratedBy(ex:article, ex:compile, -)
+//   wasDerivedFrom(ex:article, ex:draft, -, -, -)
+// endDocument
+```
+
+The default `backward`/`"dataflow"` walk answers ancestry; `direction: "forward"` and `"both"`
+answer descendants, `depth` bounds the hops (every cutoff surfaces as explicit `frontier` data,
+never a silent truncation). `toFlatGraph(result)` gives a JSON-safe `{ nodes, edges }` projection,
+and `lineagePaths(graph, result, target)` enumerates the connecting paths. See
+[**§8 of the guide**](docs/guide.md#8-graph--lineage-queries) for the full tour.
+
 ## What's included
 
 - The full PROV-DM in-memory model: `Identifier` / `QualifiedName` / `Namespace` / `Literal`, all 3
@@ -109,10 +151,9 @@ A bare `number` defaults to `xsd:double` on encode; a bare `string` is an `xsd:s
 - The complete fluent authoring API (camelCase PROV vocabulary primary; descriptive aliases).
 - **PROV-JSON** (serialize + deserialize) and **PROV-N** (serialize), with `read()` auto-detection.
 - Content-based `equals()`, plus `flattened()` and sub-bundles.
-- **Graph & lineage** under the optional `@inflexa-ai/tsprov/graph` subpath: a multi-digraph view
-  (`ProvGraph`, `provToGraph` / `graphToProv`), composable record `resolve()`, and a directional,
-  bounded `lineage()` walk with standalone-document / flat-graph / paths views — zero extra
-  dependencies (core stays luxon-only).
+- **[Graph & lineage](#graph--lineage)** under the optional `@inflexa-ai/tsprov/graph` subpath —
+  a multi-digraph view, composable record `resolve()`, and a directional, bounded `lineage()` walk,
+  with no extra dependencies.
 
 PROV-XML, PROV-RDF, DOT (graph-visualisation) rendering, and the CLI are out of scope for now.
 
