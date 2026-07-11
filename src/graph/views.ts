@@ -1,16 +1,15 @@
-// Views over a lineage walk result — change #4 (final) of the lineage sequence.
+// Views over a lineage walk result.
 //
 // The walk (lineage.ts) returns a flat, reference-based `LineageResult`; this
-// module provides the three representations decided in
-// openspec/changes/add-lineage-views/design.md (D1–D6):
+// module provides three representations of it:
 //   - `toProvDocument` — the headline: a lineage answer that is itself a valid,
 //     serializable PROV document (the IVOA ProvSAP precedent), with a reference-
-//     closure policy (D3) and opt-in frontier annotation (D4).
-//   - `toFlatGraph`   — the JSON-safe projection for scripts (D5).
-//   - `lineagePaths`  — bounded simple-path explanation over the result (D6).
+//     closure policy and opt-in frontier annotation.
+//   - `toFlatGraph`   — the JSON-safe projection for scripts.
+//   - `lineagePaths`  — bounded simple-path explanation over the result.
 //
-// D1: these are free functions over `(graph, result)`, not `LineageResult`
-// methods — the walk shipped its result as a plain object, and free named
+// These are free functions over `(graph, result)`, not `LineageResult`
+// methods — the walk's result is a plain object, and free named
 // functions match the module's idiom (`resolve`, `lineage`). Nothing here
 // mutates the graph, its document, or the result: output documents are built
 // fresh via `addRecord` re-creation (the same mechanism `graphToProv` relies
@@ -26,9 +25,10 @@ import {
   ProvAgent,
   type ProvElement,
 } from "../record/element.js";
-import { ProvRelation, ProvAlternate } from "../record/relation.js";
+import { ProvAlternate } from "../record/relation.js";
 import type { ProvGraph, GraphEdge } from "./graph.js";
-import type { LineageResult, LineageRoot, FrontierEntry } from "./lineage.js";
+import type { LineageResult, FrontierEntry } from "./lineage.js";
+import { rootToUris, type LineageRoot } from "./roots.js";
 
 /**
  * The tsprov query namespace (prefix `tsprovq`) — the vendor vocabulary for
@@ -36,20 +36,20 @@ import type { LineageResult, LineageRoot, FrontierEntry } from "./lineage.js";
  * consumer can resolve or strip the annotation attributes
  * (`TSPROVQ.qn("truncated")`); it is declared on an output document ONLY when
  * `annotateFrontier` actually annotated something, so a default
- * {@link toProvDocument} output carries no non-standard vocabulary at all
- * (design D4). Interned via `ns`, so it is the process-wide singleton for this
+ * {@link toProvDocument} output carries no non-standard vocabulary at all.
+ * Interned via `ns`, so it is the process-wide singleton for this
  * `(prefix, uri)` pair.
  */
 export const TSPROVQ = ns("tsprovq", "https://tsprov.dev/ns/query#");
 
 // The one attribute currently minted from TSPROVQ. Module-private on purpose:
-// design D4 keeps the exported surface to the single namespace constant, so the
-// vocabulary has exactly one anchor; consumers reach the attribute as
+// keeping the exported surface to the single namespace constant gives the
+// vocabulary exactly one anchor; consumers reach the attribute as
 // `TSPROVQ.qn("truncated")` (memoized, so it is this very object).
 const TSPROVQ_TRUNCATED = TSPROVQ.qn("truncated");
 
 /**
- * How {@link toProvDocument} completes references (design D3).
+ * How {@link toProvDocument} completes references.
  *
  * - `"referenced"` (the default) — fixpoint reference closure: any identifier a
  *   record in the output references through its formal-attribute values that is
@@ -68,7 +68,7 @@ export type ClosurePolicy = "referenced" | "none";
  * @property annotateFrontier When `true`, each frontier node's re-created
  *   element carries `tsprovq:truncated = "depth" | "ceiling"` and the
  *   {@link TSPROVQ} namespace is declared on the output document. Default off:
- *   the default output must be vocabulary-clean (design D4) — programmatic
+ *   the default output must be vocabulary-clean — programmatic
  *   consumers already get `result.frontier` and `closureAdded` as data.
  */
 export type ToProvDocumentOptions = {
@@ -94,7 +94,7 @@ export type LineageDocument = {
 };
 
 /**
- * Materializes a walk result as a standalone {@link ProvDocument} (design D2):
+ * Materializes a walk result as a standalone {@link ProvDocument}:
  * every non-inferred visited node's element and every traversed edge's relation
  * are re-created into a fresh document via `addRecord` — `graphToProv`
  * restricted to the result. Inferred nodes are never emitted (they were never
@@ -118,7 +118,7 @@ export function toProvDocument(
 ): LineageDocument {
   const document = new ProvDocument();
 
-  // ── Emission (design D2) ────────────────────────────────────────────────
+  // ── Emission ────────────────────────────────────────────────────────────
   // Output-membership bookkeeping is split across three structures because
   // `addRecord` RE-CREATES records (bundle.ts:438-445) — the output never holds
   // the graph's objects, so membership cannot be tracked by reference alone:
@@ -153,7 +153,7 @@ export function toProvDocument(
     document.addRecord(edge.relation);
   }
 
-  // ── Reference closure (design D3) ───────────────────────────────────────
+  // ── Reference closure ───────────────────────────────────────────────────
   const closureAdded: ProvRecord[] = [];
   const closure = options?.closure ?? "referenced";
   switch (closure) {
@@ -209,7 +209,7 @@ export function toProvDocument(
     }
   }
 
-  // ── Frontier annotation (design D4) ─────────────────────────────────────
+  // ── Frontier annotation ─────────────────────────────────────────────────
   if (options?.annotateFrontier === true) {
     // One annotation per node: a node can carry several frontier entries (one
     // per direction under `"both"`); the first entry wins. Arbitrary but
@@ -230,7 +230,7 @@ export function toProvDocument(
       }
       // Declare the namespace lazily, on the FIRST actual annotation: with an
       // empty frontier (or an all-inferred one) even `annotateFrontier: true`
-      // must leave the serialized output free of tsprovq (design D4). The
+      // must leave the serialized output free of tsprovq. The
       // declaration API is the document's `addNamespace` (bundle.ts:238-248) —
       // registration there is exactly what the serializers emit as prefix
       // declarations (json.ts:87-90, bundle.ts:368-371).
@@ -245,7 +245,7 @@ export function toProvDocument(
   return { document, closureAdded };
 }
 
-// ── The flat projection (design D5) ─────────────────────────────────────────
+// ── The flat projection ─────────────────────────────────────────────────────
 
 /**
  * The element-kind discriminator of a {@link LineageFlatNode}. `"element"`
@@ -277,7 +277,7 @@ export type LineageFlatNode = {
  * One edge of the flat projection, in ASSERTED PROV orientation regardless of
  * the walk's direction — the walk records the graph's own edges, which always
  * point effect → cause, so a script can re-derive either walk from the same
- * output (design D5).
+ * output.
  *
  * @property from     Source URI (the relation's first formal-attribute value).
  * @property to       Target URI (the relation's second formal-attribute value).
@@ -293,7 +293,7 @@ export type LineageFlatEdge = {
 
 /**
  * The JSON-safe projection of a {@link LineageResult}: plain data throughout —
- * `JSON.stringify` works with no replacer (design D5).
+ * `JSON.stringify` works with no replacer.
  *
  * @property roots        The resolved root URIs the walk seeded from.
  * @property unknownRoots Roots that resolved to no node (the walk's contract).
@@ -320,11 +320,11 @@ function kindOf(element: ProvElement): FlatNodeKind {
   if (element instanceof ProvAgent) {
     return "agent";
   }
-  return "element"; // a consumer-registered ProvElement subclass (design D5)
+  return "element"; // a consumer-registered ProvElement subclass
 }
 
 /**
- * Projects a walk result to plain, JSON-safe data (design D5). Needs no graph
+ * Projects a walk result to plain, JSON-safe data. Needs no graph
  * parameter — the result's nodes carry their elements. The input result is
  * never mutated; every array and object in the return is fresh, so mutating
  * the projection cannot reach back into the result.
@@ -349,7 +349,7 @@ export function toFlatGraph(result: LineageResult): LineageFlatGraph {
     // Two literal shapes instead of a conditional spread: the `truncated` key
     // must be genuinely ABSENT (not present-but-undefined) on non-frontier
     // nodes, so that `"truncated" in node` and `JSON.stringify` both draw the
-    // truncated/terminal distinction the spec requires.
+    // truncated/terminal distinction.
     return reason === undefined
       ? { uri: node.uri, kind, inferred: node.inferred }
       : { uri: node.uri, kind, inferred: node.inferred, truncated: reason };
@@ -370,7 +370,7 @@ export function toFlatGraph(result: LineageResult): LineageFlatGraph {
   };
 }
 
-// ── Path enumeration (design D6) ────────────────────────────────────────────
+// ── Path enumeration ────────────────────────────────────────────────────────
 
 /**
  * Which way a path runs between the endpoints, both in ASSERTED edge direction:
@@ -418,7 +418,7 @@ export type LineagePathsOptions = {
  *   reached. Deliberately conservative: when EXACTLY `limit` paths exist the
  *   flag is still `true` — proving completeness would cost the very
  *   enumeration the cap exists to avoid, and "possibly incomplete" is the
- *   honest reading of a capped search (design D6: a capped enumeration must
+ *   honest reading of a capped search (a capped enumeration must
  *   never present itself as complete).
  */
 export type LineagePathsResult = {
@@ -429,7 +429,8 @@ export type LineagePathsResult = {
 /**
  * The default {@link LineagePathsOptions.limit}: generous for explanation
  * output a human or tool will consume, small enough that a diamond-dense
- * result cannot blow up the enumeration (inf-cli PR #72 precedent).
+ * result (whose path count grows exponentially in the number of diamonds)
+ * cannot blow up the enumeration.
  */
 export const DEFAULT_PATH_LIMIT = 100;
 
@@ -451,20 +452,15 @@ type PathFrame = {
 };
 
 /**
- * Resolves path endpoints the way the walk's root normalization does
- * (lineage.ts `normalizeRoots`, design D5): a string resolves against the
- * graph document's namespaces; a `QualifiedName` contributes its URI; a
- * relation record contributes the URIs of its first two formal-attribute
- * values (an edge is a legal endpoint, seeding both sides); any other record
- * contributes its identifier URI. That helper is module-private to lineage.ts
- * and this change must not modify the walk, so the resolution is restated
- * locally.
+ * Resolves path endpoints via the shared root resolver ({@link rootToUris})
+ * — the same form-by-form resolution the walk uses.
  *
  * Unlike the walk there is deliberately no `unknownRoots` channel here: an
  * endpoint that does not resolve (or resolves to a URI absent from the
  * result's edges) simply contributes no paths — the walk already surfaced
  * unknown roots when the result was produced, and an empty enumeration is the
- * honest answer for a disconnected pair.
+ * honest answer for a disconnected pair. So an unresolvable string is dropped
+ * (only its resolved URIs, if any, are collected).
  */
 function resolveEndpointUris(
   graph: ProvGraph,
@@ -481,29 +477,11 @@ function resolveEndpointUris(
 
   // `Array.isArray` does not narrow the `readonly` array arm of the union, so
   // the non-array branch needs the assertion; sound because the union has
-  // exactly these two arms (same idiom as lineage.ts:404).
+  // exactly these two arms.
   const list = Array.isArray(input) ? input : [input as LineageRoot];
   for (const endpoint of list) {
-    if (typeof endpoint === "string") {
-      const qn = graph.document.validQualifiedName(endpoint);
-      if (qn !== null) {
-        push(qn.uri);
-      }
-    } else if (endpoint instanceof ProvRecord) {
-      if (endpoint instanceof ProvRelation) {
-        // A relation endpoint means "either of its first two endpoints" — the
-        // walk's rule for relation roots.
-        for (const value of endpoint.args.slice(0, 2)) {
-          if (value instanceof QualifiedName) {
-            push(value.uri);
-          }
-        }
-      } else if (endpoint.identifier !== null) {
-        push(endpoint.identifier.uri);
-      }
-    } else {
-      // A QualifiedName: its uri is already canonical.
-      push(endpoint.uri);
+    for (const uri of rootToUris(graph, endpoint).uris) {
+      push(uri);
     }
   }
   return uris;
@@ -511,7 +489,7 @@ function resolveEndpointUris(
 
 /**
  * Enumerates simple paths between `from` and `target` over the RESULT's edges
- * only (design D6) — never the full graph, so a path explanation cannot
+ * only — never the full graph, so a path explanation cannot
  * smuggle in edges the walk excluded. Paths are searched in each asserted
  * orientation (see {@link PathOrientation}); `alternateOf` edges are crossable
  * from either endpoint within a path (the walk's symmetry rule). The
@@ -556,7 +534,7 @@ export function lineagePaths(
   // edge is additionally indexed from its target back to its source, so BOTH
   // orientations of the search can cross it from either endpoint — PROV-DM
   // declares alternateOf symmetric, and a one-way traversal would assert an
-  // ordering PROV does not (the walk's design D2, restated for paths in D6).
+  // ordering PROV does not (the walk's symmetry rule, restated for paths).
   const steps = new Map<string, PathStep[]>();
   const pushStep = (uri: string, step: PathStep): void => {
     const list = steps.get(uri);
@@ -627,7 +605,7 @@ export function lineagePaths(
       // steps (continuing could never reach the now-visited goal again).
       if (frame.cursor === 0 && frame.uri === goal) {
         // Pre-push guard: a degenerate `limit <= 0` yields zero paths. Post-push
-        // check: stop AT the cap (design D6 — see `LineagePathsResult.truncated`
+        // check: stop AT the cap (see `LineagePathsResult.truncated`
         // for why exactly-limit reads as truncated).
         if (paths.length < limit) {
           paths.push({ orientation, nodes: [...nodePath], edges: [...edgePath] });

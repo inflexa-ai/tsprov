@@ -1,29 +1,27 @@
 // Directional, bounded, cycle-safe lineage walk over a `ProvGraph`.
 //
-// Change #3 of the lineage sequence (docs/research/lineage-direction.md), the
-// stage that answers "where did this come from / what came from this?"
-// (inf-cli #66). Resolution (change #2, resolve.ts) finds the query subject; this
-// module walks from it. Views over the returned edges (PROV document, flat graph,
-// paths) are change #4 — this walk deliberately never materializes a document,
-// never infers, and never widens beyond the edges it traverses.
+// This is the stage that answers "where did this come from / what came from
+// this?". Resolution (resolve.ts) finds the query subject; this module walks
+// from it; views over the returned edges (PROV document, flat graph, paths)
+// live in views.ts. The walk deliberately never materializes a document, never
+// infers, and never widens beyond the edges it traverses.
 //
-// The design contract lives in openspec/changes/add-lineage-walk/design.md
-// (decisions D1–D6); the anchors that matter here:
-//   - D1: ONE breadth-first pass from all seeds at once, one visited set per
+// The load-bearing choices:
+//   - ONE breadth-first pass from all seeds at once, one visited set per
 //     direction run. BFS reaches every node at its minimum hop distance, so a
-//     depth-cut node is cut at its shallowest — the DFS "don't-mark-visited"
-//     artifact (inf-cli PR #72) cannot arise, which is why the depth rules stay
-//     this simple.
-//   - D2: direction is edge orientation. Every relation's first-two-formal-
+//     depth-cut node is cut at its shallowest — the depth-bounded-DFS artifact
+//     where a node first reached on a DEEP path gets marked visited and a later
+//     shallower path can no longer improve its cut cannot arise, which is why
+//     the depth rules stay this simple.
+//   - Direction is edge orientation. Every relation's first-two-formal-
 //     attributes edge points effect → cause (verified for all 15 classes,
 //     graph.ts builds exactly those edges). `alternateOf` is the one symmetric
 //     exception (traversed from both endpoints under every direction).
-//   - D6: the result is flat and reference-based (the graph's own `GraphNode`/
-//     `GraphEdge` objects), and the BFS is an internal fold over visit events so
-//     change #4 consumes the same core without a public algebra API today.
+//   - The result is flat and reference-based (the graph's own `GraphNode`/
+//     `GraphEdge` objects), and the BFS is an internal fold over visit events,
+//     so other consumers can attach a different visitor to the same traversal
+//     without a public algebra API existing today.
 
-import { QualifiedName } from "../identifier.js";
-import { ProvRecord } from "../record/record.js";
 import type { RecordClass } from "../bundle.js";
 import {
   ProvRelation,
@@ -42,6 +40,11 @@ import {
   ProvMembership,
 } from "../record/relation.js";
 import type { ProvGraph, GraphNode, GraphEdge } from "./graph.js";
+import { rootToUris, type LineageRoot } from "./roots.js";
+
+// Re-exported so the public `./graph` barrel (which points at this module) is
+// unchanged; the definition lives with the resolution it feeds (roots.ts).
+export type { LineageRoot };
 
 /**
  * Which way a walk follows edges.
@@ -54,16 +57,17 @@ import type { ProvGraph, GraphNode, GraphEdge } from "./graph.js";
  *   roots, each with its own visited set and depth bound. Deliberately NOT the
  *   undirected connected component: an undirected walk through a shared input
  *   would pull in every sibling output ("what else did my ancestor produce?"),
- *   a different question (change #4's `paths` territory). See design D2.
+ *   a different question — `lineagePaths` territory.
  */
 export type LineageDirection = "backward" | "forward" | "both";
 
 /**
  * A named set of relation classes the walk may traverse (composes with
- * `edgeWhere` by AND). See design D3 for the membership rationale.
+ * `edgeWhere` by AND).
  *
  * - `"dataflow"` (the default) — Generation, Usage, Derivation, Communication,
- *   Start, End, Invalidation: the event/data edges #66 walks.
+ *   Start, End, Invalidation: the edges along which data and events flow, i.e.
+ *   what "where did this artifact come from?" traverses.
  * - `"responsibility"` — Attribution, Association, Delegation.
  * - `"structure"` — Specialization (and therefore Mention, its subclass, matched
  *   by `instanceof ProvSpecialization`), Alternate, Membership.
@@ -76,12 +80,6 @@ export type LineageDirection = "backward" | "forward" | "both";
  */
 export type RelationProfile = "dataflow" | "responsibility" | "structure" | "all";
 
-/**
- * A lineage root: a resolved {@link ProvRecord} (element or relation), a
- * {@link QualifiedName}, or a string (a URI or `prefix:localpart`, resolved
- * against the graph's document like resolution's `id`). See design D5.
- */
-export type LineageRoot = ProvRecord | QualifiedName | string;
 
 /**
  * Options for {@link lineage}.
@@ -121,8 +119,8 @@ export type WalkDirection = "backward" | "forward";
 /**
  * One truncation point: a node that was reached but whose onward edges were NOT
  * traversed because a bound was hit. `reason` distinguishes a caller `depth`
- * bound from the {@link MAX_WALK_DEPTH} `ceiling` (design D4 — nothing truncates
- * silently). A node with no traversable onward edges is exhaustion, not
+ * bound from the {@link MAX_WALK_DEPTH} `ceiling` — nothing truncates
+ * silently. A node with no traversable onward edges is exhaustion, not
  * truncation, and never appears here.
  *
  * @property uri       The reached node's URI.
@@ -136,12 +134,12 @@ export type FrontierEntry = {
 };
 
 /**
- * The outcome of {@link lineage}: flat, deduplicated, reference-based (design D6).
+ * The outcome of {@link lineage}: flat, deduplicated, reference-based.
  *
  * @property roots        The resolved root URIs that ARE nodes in the graph
  *   (dedup, first-seen order) — the walk's actual seeds.
  * @property unknownRoots Roots that resolved to no node, surfaced as data rather
- *   than thrown (design D5): a resolvable-but-absent reference contributes its
+ *   than thrown: a resolvable-but-absent reference contributes its
  *   URI; a string that cannot even resolve to a qualified name contributes its
  *   raw form (there is no URI to key a node by, so the caller sees exactly what
  *   they passed).
@@ -161,15 +159,15 @@ export type LineageResult = {
 };
 
 /**
- * The hard safety ceiling on hops when a direction is unbounded (inf-cli PR #72's
- * `1000`): beyond any real pipeline, but it prevents a pathological chain from
+ * The hard safety ceiling on hops when a direction is unbounded: far beyond any
+ * real pipeline's depth, but it prevents a pathological chain from
  * walking forever. Hitting it produces the same explicit frontier as a caller
  * bound, with `reason: "ceiling"` — so a caller who legitimately needs more can
  * detect the cap and re-run with an explicit larger `depth`.
  */
 export const MAX_WALK_DEPTH = 1000;
 
-// ── Relation profiles (design D3) ─────────────────────────────────────────────
+// ── Relation profiles ─────────────────────────────────────────────────────────
 // Fixed class sets; membership is documented on `RelationProfile`. `instanceof`
 // against a base class subsumes its subclasses, which is load-bearing twice:
 // `ProvSpecialization` catches `ProvMention` (structure), and — for `"all"` —
@@ -231,14 +229,14 @@ function relationClassesOf(
   }
 }
 
-// ── The BFS core as an internal fold (design D1, D6) ──────────────────────────
+// ── The BFS core as an internal fold ──────────────────────────────────────────
 
 /**
  * The visit-event sink the BFS folds into: a node was discovered, an edge was
  * traversed, or a node was cut off (frontier). Kept module-private on purpose.
  *
- * TODO(extend): this is the algebra seam. Change #4 views (and a future
- * semiring/weighted walk from the direction doc's phase 3) attach a different
+ * TODO(extend): this is the algebra seam. A future traversal variant (a
+ * semiring/weighted walk, say) attaches a different
  * visitor to the same event stream — so the traversal is written once and folded
  * many ways, without committing to a public algebra API now.
  */
@@ -258,7 +256,7 @@ type OnwardStep = { readonly edge: GraphEdge; readonly next: string };
  * `edge.from`). In BOTH directions, `alternateOf` edges are additionally
  * traversed from the endpoint they would otherwise be unreachable from — PROV-DM
  * declares `alternateOf` symmetric, so a one-way traversal would assert an
- * ordering PROV does not (design D2). The alternate edges are still subject to
+ * ordering PROV does not. The alternate edges are still subject to
  * `traversable`, so a profile that excludes Alternate never traverses them.
  */
 function onwardSteps(
@@ -301,13 +299,13 @@ function onwardSteps(
  * One breadth-first direction run from all `seeds` at once, emitting visit events
  * to `visitor`. A private per-run visited set makes cycles terminate (a node
  * expands once) and — because BFS discovers each node at its minimum hop distance
- * — makes the depth bound exact without the DFS "shallower path" caveat (D1).
+ * — makes the depth bound exact without the DFS "shallower path" caveat.
  *
  * A node at depth `< bound` is expanded (its onward edges traversed); a node at
  * depth `=== bound` is NOT expanded, and becomes a frontier entry IFF it has at
  * least one traversable onward edge — checked against the FILTERED onward set, so
  * a node whose onward edges are all profile-/predicate-excluded is exhausted, not
- * truncated (design D4). Every edge is emitted even when its neighbor is already
+ * truncated. Every edge is emitted even when its neighbor is already
  * visited (so the diamond's second path and the cycle's back-edge are recorded);
  * reference dedup happens in the visitor.
  */
@@ -366,7 +364,7 @@ function walkDirection(
   }
 }
 
-// ── Root normalization (design D5) ────────────────────────────────────────────
+// ── Root normalization ────────────────────────────────────────────────────────
 
 /** The seeds to walk from, plus the roots/unknownRoots accounting. */
 type NormalizedRoots = { readonly roots: string[]; readonly unknownRoots: string[] };
@@ -374,7 +372,7 @@ type NormalizedRoots = { readonly roots: string[]; readonly unknownRoots: string
 /**
  * Turns the caller's roots into seed URIs, partitioning each into `roots` (URIs
  * that are graph nodes — the actual seeds) or `unknownRoots` (surfaced, never
- * thrown, so one bad root cannot destroy a multi-root query). See design D5 and
+ * thrown, so one bad root cannot destroy a multi-root query). See
  * {@link LineageResult} for what `unknownRoots` carries.
  */
 function normalizeRoots(
@@ -404,45 +402,26 @@ function normalizeRoots(
     }
   };
 
+  // `Array.isArray` does not narrow the `readonly` array arm of the union, so
+  // the non-array branch needs the assertion; sound because the union has
+  // exactly these two arms.
   const list = Array.isArray(input) ? input : [input as LineageRoot];
   for (const root of list) {
-    if (typeof root === "string") {
-      const qn = graph.document.validQualifiedName(root);
-      if (qn === null) {
-        // Unresolvable (unregistered prefix, blank-node id, …): there is no URI
-        // to key a node by, so surface the raw string the caller passed.
-        pushUnknown(root);
-      } else {
-        classifyUri(qn.uri);
-      }
-    } else if (root instanceof ProvRecord) {
-      if (root instanceof ProvRelation) {
-        // A relation's lineage is the closure from both endpoints: seed the URIs
-        // of its first two formal-attribute values that are present.
-        for (const value of root.args.slice(0, 2)) {
-          if (value instanceof QualifiedName) {
-            classifyUri(value.uri);
-          }
-        }
-      } else {
-        // A non-relation record is an element, which always carries an identifier
-        // (its constructor enforces this), so `identifier` is non-null here.
-        const id = root.identifier;
-        if (id !== null) {
-          classifyUri(id.uri);
-        }
-      }
-    } else {
-      // A QualifiedName: its `uri` is already canonical — a node is keyed by URI,
-      // so no namespace resolution is needed.
-      classifyUri(root.uri);
+    const { uris, unresolved } = rootToUris(graph, root);
+    // An unresolvable string has no node key, so its raw form is directly unknown;
+    // a resolved URI seeds the walk iff it names a node, else it is unknown too.
+    if (unresolved !== undefined) {
+      pushUnknown(unresolved);
+    }
+    for (const uri of uris) {
+      classifyUri(uri);
     }
   }
 
   return { roots, unknownRoots };
 }
 
-// ── Depth bounds (design D4) ──────────────────────────────────────────────────
+// ── Depth bounds ──────────────────────────────────────────────────────────────
 
 /**
  * The hop bound and its truncation reason for one direction run.
@@ -499,7 +478,7 @@ function runsFor(direction: LineageDirection): readonly WalkDirection[] {
 /**
  * Walks the lineage of `roots` over `graph`, returning a flat {@link LineageResult}
  * of the visited nodes, traversed edges, and truncation frontier. Never throws for
- * a query outcome — unresolvable roots are surfaced in `unknownRoots` (design D5).
+ * a query outcome — unresolvable roots are surfaced in `unknownRoots`.
  *
  * Defaults: `direction: "backward"` (ancestry), `relations: "dataflow"`, and an
  * unbounded depth backed by {@link MAX_WALK_DEPTH}. A `depth` of `Infinity` is a
@@ -509,9 +488,9 @@ function runsFor(direction: LineageDirection): readonly WalkDirection[] {
  *
  * The walk is reference-based and non-mutating: `nodes`/`edges` are `graph`'s own
  * objects, and neither the graph nor its document is touched (materialization is
- * change #4). Edge dedup across the `"both"` union is by object reference — the
- * `GraphEdge` objects are stable identities owned by `ProvGraph`, so a `Set` of
- * references is exact without value-keying (design D6).
+ * `toProvDocument`'s job). Edge dedup across the `"both"` union is by object
+ * reference — the `GraphEdge` objects are stable identities owned by
+ * `ProvGraph`, so a `Set` of references is exact without value-keying.
  *
  * @param graph   The graph to walk.
  * @param roots   One root or an array (see {@link LineageRoot}).

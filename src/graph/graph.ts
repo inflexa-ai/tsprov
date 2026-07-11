@@ -332,19 +332,25 @@ export class ProvGraph {
     return new ProvGraph(transformed, nodes, edges, outEdges, inEdges, skipped);
   }
 
+  // The three aggregate snapshots (`nodes`/`edges`/`skipped`) each return a fresh
+  // array, so a consumer that mutates one (ignoring the readonly type at runtime)
+  // cannot corrupt the graph's internal state. They are consumer-facing snapshots,
+  // not hot-path calls, so the per-access copy is negligible — unlike the
+  // adjacency accessors below, which the walk calls once per node.
+
   /** Every node, in insertion order (declared elements first, then inferred endpoints). */
   get nodes(): GraphNode[] {
     return [...this._nodes.values()];
   }
 
   /** Every edge, in document (relation) order — parallel edges between the same endpoints are all present. */
-  get edges(): readonly GraphEdge[] {
-    return this._edges;
+  get edges(): GraphEdge[] {
+    return [...this._edges];
   }
 
   /** The relations that produced no edge, each with its {@link SkipReason} — the observable skip accounting. */
-  get skipped(): readonly SkippedRelation[] {
-    return this._skipped;
+  get skipped(): SkippedRelation[] {
+    return [...this._skipped];
   }
 
   /** The node for `uri`, or `undefined` if there is none. */
@@ -356,6 +362,11 @@ export class ProvGraph {
   hasNode(uri: string): boolean {
     return this._nodes.has(uri);
   }
+
+  // The adjacency accessors return the internal per-uri lists as `readonly`
+  // VIEWS, not copies: the walk calls them once per visited node, so copying
+  // would allocate on the hot path for no benefit — the `readonly` return type
+  // is the mutation guard here, and the walk only ever reads them.
 
   /** Forward adjacency: the edges leaving `uri` (empty if none). "What does X point at?" */
   outEdges(uri: string): readonly GraphEdge[] {
