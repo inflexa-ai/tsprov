@@ -113,3 +113,7 @@ dist
 .tern-port
 
 reference/
+
+# Local agent-loop prompts — session tooling, never published
+/loop.md
+/loop.example.md
