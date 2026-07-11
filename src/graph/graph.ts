@@ -89,7 +89,7 @@ export type SkipReason =
 
 /**
  * A relation that {@link ProvGraph.of} could not turn into an edge, recorded so
- * the loss is observable rather than silent (spec: "Skips SHALL be observable").
+ * the loss is observable rather than silent.
  */
 export type SkippedRelation = {
   readonly relation: ProvRelation;

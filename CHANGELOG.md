@@ -12,6 +12,18 @@ the roadmap and `DEVIATIONS.md` for intentional divergences from the Python refe
 `@inflexa-ai/tsprov/graph` layer (multi-digraph + lineage queries) *did* ship in `0.5.0`; only
 DOT/image rendering of that graph remains out of scope.
 
+## [0.5.1] — 2026-07-11
+
+### Fixed
+
+- **`src/graph/resolve.ts` contained a literal NUL (U+0000) byte** inside the `normalizeAttrValue`
+  JSDoc (the value-key separator was embedded as the raw character instead of a printable
+  stand-in). The byte made some tools classify the source file as binary — silently excluded from
+  text searches, shown as `Bin` in diffs. It is now the printable `␀` (U+2400) symbol. No code
+  change; published `dist/` output is unaffected in behavior.
+- Graph-layer doc comments no longer reference internal planning artifacts; the rationale is
+  stated inline where a citation used to be.
+
 ## [0.5.0] — 2026-07-11
 
 ### Added
