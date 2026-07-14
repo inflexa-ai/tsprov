@@ -161,10 +161,25 @@ PROV-XML, PROV-RDF, DOT (graph-visualisation) rendering, and the CLI are out of 
 
 ```bash
 bun install
-bun test            # run the test suite (incl. the 398-file PROV-JSON corpus oracle)
+bun run bootstrap   # fetch the 398-file PROV-JSON conformance corpus into reference/
+bun test            # run the test suite (incl. the corpus oracle)
 bun run build       # emit dist/ (ESM + CJS + .d.ts)
 ```
 
+The corpus is the Python reference implementation's, and is deliberately not vendored — see
+[**CONTRIBUTING.md**](CONTRIBUTING.md#development-setup) for why. Without `bootstrap`, the two
+suites that read it fail with `ENOENT`.
+
+## Contributing
+
+Contributions are welcome, and PROV is a standard we implement rather than own — so if you work
+on PROV elsewhere in the ecosystem, we would rather have you inside this project than outside it.
+Start with [**CONTRIBUTING.md**](CONTRIBUTING.md); [**GOVERNANCE.md**](GOVERNANCE.md) explains how
+decisions get made and what is openly missing (PROV-XML, PROV-RDF, a PROV-N parser,
+PROV-CONSTRAINTS validation). Vulnerabilities go through [**SECURITY.md**](SECURITY.md), never a
+public issue.
+
 ## License
 
-Apache-2.0.
+Apache-2.0. tsprov is a port of the Python [`prov`](https://github.com/trungdong/prov) library,
+used under the MIT License — see [`NOTICE`](NOTICE).
