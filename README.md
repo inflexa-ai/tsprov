@@ -1,5 +1,13 @@
 # tsprov
 
+[![Test](https://github.com/inflexa-ai/tsprov/actions/workflows/test.yml/badge.svg)](https://github.com/inflexa-ai/tsprov/actions/workflows/test.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/inflexa-ai/tsprov/badge)](https://scorecard.dev/viewer/?uri=github.com/inflexa-ai/tsprov)
+[![DOI](https://zenodo.org/badge/1273314586.svg)](https://doi.org/10.5281/zenodo.21356355)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/github/package-json/v/inflexa-ai/tsprov?label=version)](#install)
+[![Types: TypeScript](https://img.shields.io/badge/types-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
+![PROV-JSON corpus: 398/398](https://img.shields.io/badge/PROV--JSON%20corpus-398%2F398-brightgreen.svg)
+
 An idiomatic TypeScript implementation of the [W3C PROV Data Model](https://www.w3.org/TR/prov-dm/) —
 a port of the Python [`prov`](https://github.com/trungdong/prov) library. Author provenance documents
 with a fully-typed fluent API, and round-trip them through PROV-JSON and PROV-N.
