@@ -1,0 +1,26 @@
+name: DCO
+
+# Enforces the Developer Certificate of Origin via KineticCafe/actions-dco: every
+# commit in a PR must carry a `Signed-off-by:` trailer matching its author (see
+# CONTRIBUTING.md). The action skips merge commits automatically. The bot allowlist
+# is pre-emptive — Dependabot is not enabled on this repo today, but its commits
+# cannot carry a sign-off trailer, so without the exemption turning it on later would
+# silently block every one of its PRs. Because the job always runs, it reports a real
+# success/failure and so works correctly as a required status check.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  dco:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: KineticCafe/actions-dco@v3.1.0
+        with:
+          config: |
+            [bot]
+            policy = "allowlist"
+            allow = ["dependabot[bot]"]
