@@ -58,11 +58,13 @@
     "!src/**/*.test.ts"
   ],
   "scripts": {
+    "bootstrap": "node scripts/bootstrap.mjs",
     "clean": "rm -rf dist",
     "build": "bun run clean && bun run build:esm && bun run build:cjs",
     "build:esm": "tsc -p tsconfig.build.json",
     "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
     "smoke": "node scripts/smoke.mjs",
+    "pretest": "node scripts/bootstrap.mjs",
     "test": "bun test",
     "prepublishOnly": "bun run build && bun run smoke"
   },
