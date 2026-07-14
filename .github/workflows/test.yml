@@ -1,0 +1,63 @@
+name: Test
+
+# Validates every pull request: the unit suites, the 398-document PROV-JSON
+# conformance corpus, the typecheck, and the built artifacts.
+#
+# The corpus is fetched as an explicit step rather than by leaning on the `pretest`
+# hook, so that a failure to obtain the oracle is distinguishable in the logs from a
+# genuine test failure — they mean very different things.
+#
+# The bootstrap tracks upstream `master` on purpose (see `scripts/bootstrap.mjs`):
+# for a port whose entire value is fidelity to the reference, a corpus change
+# upstream SHOULD surface here as a red build rather than as silent drift. If that
+# ever gets noisy, pin it by setting `TSPROV_PROV_REF` on the bootstrap step.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # The smoke step runs under Node on purpose: its ESM/CJS resolution is stricter
+      # than Bun's, and it is the runtime our consumers actually use.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Fetch the PROV-JSON conformance corpus
+        run: bun run bootstrap
+
+      - name: Test
+        run: bun test
+
+      # `bun run build` runs tsc over the whole package, so this is the typecheck as
+      # well as the build. There is deliberately no separate typecheck script.
+      - name: Build (this is also the typecheck)
+        run: bun run build
+
+      - name: Smoke-test the built artifacts
+        run: bun run smoke
