@@ -1,7 +1,7 @@
 # Dependabot keeps two very different things fresh, for two different reasons.
 #
-# `github-actions` — .github/workflows/scorecard.yml pins its actions by commit SHA, and
-# a SHA pin is only as good as the thing that bumps it. Without an updater, pinning
+# `github-actions` — every workflow in .github/workflows/ pins its actions by commit SHA,
+# and a SHA pin is only as good as the thing that bumps it. Without an updater, pinning
 # quietly degrades into running months-old actions forever, which is a worse posture than
 # the mutable tags it replaced. Dependabot rewrites the SHA *and* the `# vX.Y.Z` comment
 # beside it, which is what makes repo-wide SHA pinning maintainable at all.

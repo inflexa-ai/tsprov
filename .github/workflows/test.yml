@@ -31,17 +31,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: latest
 
       # The smoke step runs under Node on purpose: its ESM/CJS resolution is stricter
-      # than Bun's, and it is the runtime our consumers actually use.
+      # than Bun's, and it is the runtime our consumers actually use. 22 is the oldest
+      # LTS line still in support — the floor consumers realistically run — while
+      # release.yml smokes under 24, so both lines get coverage.
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22"
 
