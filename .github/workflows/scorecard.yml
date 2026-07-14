@@ -9,11 +9,10 @@ name: Scorecard
 # SARIF generator and the badge stays "unknown". Publishing exposes nothing that is not
 # already public: the repo is public, and the API stores the score, not the source.
 #
-# Actions here are pinned by commit SHA while the other workflows still track tags. That
-# is deliberate, not an inconsistency: this is the only job in the repo granted
-# `id-token: write` (OIDC) and `security-events: write`, so a hijacked mutable tag would
-# be the highest-impact supply-chain vector we have. The version comment on each `uses:`
-# is the human-readable half of the pin — keep them in sync when bumping.
+# Every workflow in this repo pins its actions by commit SHA — a mutable tag can be
+# retargeted at malicious code by anyone who compromises the action's repo, and a SHA
+# cannot. The version comment on each `uses:` is the human-readable half of the pin —
+# keep them in sync when bumping (Dependabot's github-actions updater rewrites both).
 on:
   # Scorecard can only publish from the default branch: fork PRs get no OIDC token, so a
   # `pull_request` trigger would produce runs that cannot update the badge. Scoring is

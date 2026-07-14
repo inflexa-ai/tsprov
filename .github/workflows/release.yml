@@ -30,11 +30,11 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
 
+# Write access lives on the job, not here: job-level permissions replace the top-level
+# grant entirely, so any job added to this workflow later starts from read-only instead
+# of silently inheriting the release job's write scopes.
 permissions:
-  # Creating the vX.Y.Z tag and the GitHub Release.
-  contents: write
-  # The OIDC token npm exchanges for its short-lived publish credential.
-  id-token: write
+  contents: read
 
 jobs:
   release:
@@ -42,14 +42,19 @@ jobs:
     # hole, which would otherwise let a manual run release from any branch.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      # Creating the vX.Y.Z tag and the GitHub Release.
+      contents: write
+      # The OIDC token npm exchanges for its short-lived publish credential.
+      id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       # Bun runs the install and build steps (`bun install`, `bun run build`) and the
       # prepublishOnly hook that npm fires during publish.
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: latest
 
@@ -57,15 +62,17 @@ jobs:
       # auth from ${NODE_AUTH_TOKEN}, and npm hard-fails on an unset env var in .npmrc.
       # Trusted publishing is tokenless — npm resolves the registry from publishConfig
       # and authenticates via OIDC on its own.
+      #
+      # Node 24 rather than 22, unlike test.yml: trusted publishing requires npm >=
+      # 11.5.1, and Node 24 is the LTS line whose bundled npm satisfies that floor
+      # (22 ships npm 10.x). Using the bundled npm avoids an `npm install -g npm`
+      # step, which is both a mutable-tag fetch and unpinnable (npm has no hash
+      # pinning). test.yml keeps 22 so the maintenance-LTS line still gets smoke
+      # coverage on every PR.
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: "22"
-
-      # Trusted publishing requires npm >= 11.5.1; the npm bundled with the runner's
-      # Node is not guaranteed to be new enough, so pin the floor explicitly.
-      - name: Update npm for trusted publishing
-        run: npm install -g npm@latest
+          node-version: "24"
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
