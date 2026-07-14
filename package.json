@@ -22,7 +22,8 @@
     "url": "https://github.com/inflexa-ai/tsprov/issues"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -55,7 +56,9 @@
   "files": [
     "dist",
     "src",
-    "!src/**/*.test.ts"
+    "!src/**/*.test.ts",
+    "NOTICE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "bootstrap": "node scripts/bootstrap.mjs",

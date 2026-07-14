@@ -18,15 +18,9 @@ with a fully-typed fluent API, and round-trip them through PROV-JSON and PROV-N.
 
 ## Install
 
-tsprov is published to [GitHub Packages](https://docs.github.com/en/packages). Map the
-`@inflexa-ai` scope to the GitHub registry in an `.npmrc` (and authenticate with a token that
-has `read:packages`):
-
-```ini
-# .npmrc
-@inflexa-ai:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
+tsprov is published to the public [npm registry](https://www.npmjs.com/package/@inflexa-ai/tsprov)
+with [provenance attestations](https://docs.npmjs.com/generating-provenance-statements) — every
+release is built and signed on GitHub Actions from this repository.
 
 ```bash
 npm install @inflexa-ai/tsprov     # or: bun add @inflexa-ai/tsprov

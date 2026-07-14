@@ -75,7 +75,7 @@ If one of these matters to you, it is not sitting on a roadmap waiting for us to
 
 ## Releases
 
-Releases follow [semantic versioning](https://semver.org/) and are recorded in [`CHANGELOG.md`](./CHANGELOG.md) in [Keep a Changelog](https://keepachangelog.com/) form. Security issues follow the private process in [`SECURITY.md`](./SECURITY.md) and are not discussed in public issues until a fix is available.
+Releases follow [semantic versioning](https://semver.org/) and are recorded in [`CHANGELOG.md`](./CHANGELOG.md) in [Keep a Changelog](https://keepachangelog.com/) form. A release is cut by merging a version bump to `main`: CI publishes to npm with provenance and creates the matching tag and GitHub Release (see [`.github/workflows/release.yml`](./.github/workflows/release.yml)). Security issues follow the private process in [`SECURITY.md`](./SECURITY.md) and are not discussed in public issues until a fix is available.
 
 ## Code of Conduct
 

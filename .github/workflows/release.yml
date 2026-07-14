@@ -1,0 +1,162 @@
+name: Release
+
+# Cuts a release from main: publishes to the public npm registry, then creates the
+# vX.Y.Z tag and the GitHub Release. The trigger is a *version-gate*, not a tag: any
+# push to main whose package.json version is not yet on npm is a release, and every
+# other push is a no-op. This keeps releasing a plain PR flow (bump the version, update
+# CHANGELOG.md, merge) with no bot PRs, no extra dev dependency, and no manual tagging —
+# the alternatives (release-please, changesets) were considered and rejected for now as
+# process overhead for a single-package repo.
+#
+# Auth is npm *trusted publishing* (OIDC): npmjs.com is configured to trust this exact
+# repo + workflow file, and npm mints a short-lived credential per run — there is no
+# NPM_TOKEN secret to leak or rotate, and provenance attestations are generated
+# automatically. Renaming this file breaks that trust binding until the publisher
+# config on npmjs.com is updated to match.
+#
+# Every mutating step is guarded by its own existence check (version on npm, release on
+# GitHub), so a partially-failed run can simply be re-run: completed steps skip, the
+# missing ones execute.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Queue rather than cancel: killing a run between the npm publish and the tag/release
+# steps would strand a published version without its release. Runs are cheap no-ops
+# when there is nothing to publish, so serializing them costs little.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  # Creating the vX.Y.Z tag and the GitHub Release.
+  contents: write
+  # The OIDC token npm exchanges for its short-lived publish credential.
+  id-token: write
+
+jobs:
+  release:
+    # The push trigger is already main-only; this guard closes the workflow_dispatch
+    # hole, which would otherwise let a manual run release from any branch.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Bun runs the install and build steps (`bun install`, `bun run build`) and the
+      # prepublishOnly hook that npm fires during publish.
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Deliberately NO `registry-url` here: that option writes an .npmrc that reads
+      # auth from ${NODE_AUTH_TOKEN}, and npm hard-fails on an unset env var in .npmrc.
+      # Trusted publishing is tokenless — npm resolves the registry from publishConfig
+      # and authenticates via OIDC on its own.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Trusted publishing requires npm >= 11.5.1; the npm bundled with the runner's
+      # Node is not guaranteed to be new enough, so pin the floor explicitly.
+      - name: Update npm for trusted publishing
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Resolve package version
+        id: pkg
+        run: |
+          echo "name=$(node -p "require('./package.json').name")" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      # The version-gate. `npm view` needs no auth against the public registry; it also
+      # exits non-zero when the package has never been published at all, which is
+      # exactly the "not yet on npm" answer we want for the very first release.
+      # Outputs flow through env vars rather than inline `${{ }}` so nothing from
+      # package.json is ever spliced into shell source.
+      - name: Check whether this version is already on npm
+        id: npm-check
+        env:
+          PKG_NAME: ${{ steps.pkg.outputs.name }}
+          PKG_VERSION: ${{ steps.pkg.outputs.version }}
+        run: |
+          if npm view "${PKG_NAME}@${PKG_VERSION}" version 2>/dev/null; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::${PKG_NAME}@${PKG_VERSION} is already on npm — skipping publish"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build
+        if: steps.npm-check.outputs.published == 'false'
+        run: bun run build
+
+      # Gate the publish on the artifacts actually executing: a type-correct build can
+      # still be runtime-empty, so this loads both the ESM and CJS entry points under
+      # Node (the stricter resolver, and the runtime consumers actually use) and
+      # round-trips a document, failing here rather than after a broken publish.
+      - name: Smoke-test built artifacts
+        if: steps.npm-check.outputs.published == 'false'
+        run: bun run smoke
+
+      # Tokenless: OIDC trusted publishing supplies the credential, publishConfig
+      # supplies registry + public access, and provenance is attested automatically.
+      # prepublishOnly re-runs build + smoke — redundant with the steps above, but it
+      # is the last line of defense against a future edit publishing unbuilt output,
+      # and it keeps local (first-time) publishes honest too.
+      - name: Publish to npm
+        if: steps.npm-check.outputs.published == 'false'
+        run: npm publish
+
+      # A release may be missing even when the npm version exists (e.g. a previous run
+      # died between publish and here), so this check is independent of the npm gate.
+      - name: Check whether the GitHub release already exists
+        id: release-check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PKG_VERSION: ${{ steps.pkg.outputs.version }}
+        run: |
+          if gh release view "v${PKG_VERSION}" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::release v${PKG_VERSION} already exists — skipping"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # `gh release create` also creates the tag at the released commit when it does
+      # not exist yet, so tag + release stay a single atomic-enough step. The notes are
+      # the CHANGELOG.md section for this exact version (Keep a Changelog headings),
+      # falling back to GitHub's generated notes if the section is missing or empty —
+      # a release with autogenerated notes beats a run that fails after publishing.
+      - name: Create tag and GitHub release
+        if: steps.release-check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.pkg.outputs.version }}
+        run: |
+          awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" { on = 1; next }
+            on && /^## / { exit }
+            on { print }
+          ' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          if [ -s "$RUNNER_TEMP/notes.md" ] && grep -q '[^[:space:]]' "$RUNNER_TEMP/notes.md"; then
+            gh release create "v$VERSION" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "v$VERSION" \
+              --notes-file "$RUNNER_TEMP/notes.md"
+          else
+            echo "::warning::no CHANGELOG.md section found for $VERSION — using generated notes"
+            gh release create "v$VERSION" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "v$VERSION" \
+              --generate-notes
+          fi
