@@ -5,6 +5,14 @@ All notable changes to `tsprov` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+
+- **tsprov is now published to the public [npm registry](https://www.npmjs.com/package/@inflexa-ai/tsprov)**
+  instead of GitHub Packages: `npm install @inflexa-ai/tsprov` works with no `.npmrc` scope mapping
+  and no auth token. Releases are published from CI with npm provenance attestations, and each
+  release is tagged (`vX.Y.Z`) with a matching GitHub Release. The published package now also ships
+  `NOTICE` and `CHANGELOG.md`.
+
 ### Not yet included
 
 PROV-XML, PROV-RDF, DOT (graph-visualisation) rendering, and the CLI. See `docs/migration/` for
