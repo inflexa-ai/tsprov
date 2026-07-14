@@ -1,0 +1,97 @@
+# Citation File Format 1.2.0  —  https://citation-file-format.github.io/
+# GitHub renders a "Cite this repository" button from this file and exports BibTeX/APA.
+
+cff-version: 1.2.0
+message: "If you use tsprov in your research, please cite it as below."
+title: "tsprov"
+abstract: >-
+    tsprov is an idiomatic TypeScript implementation of the W3C PROV Data Model,
+    ported from the Python prov library. It offers a fully-typed fluent API for
+    authoring provenance documents, content-based value equality, round-tripping
+    through PROV-JSON and PROV-N, and an optional graph layer whose directional,
+    bounded lineage answers are themselves PROV documents.
+type: software
+authors:
+    # Citation order matters — listed in the order they will be credited.
+    - given-names: Stefan
+      family-names: Buciu
+      affiliation: "Inflexa, Inc."
+      orcid: "https://orcid.org/0009-0005-8000-0055"
+    - given-names: Robert
+      family-names: Krajla
+      affiliation: "Inflexa, Inc."
+      orcid: "https://orcid.org/0009-0009-7758-0684"
+    - given-names: "Radu Andrei"
+      family-names: Tanasa
+      affiliation: "Inflexa, Inc."
+      orcid: "https://orcid.org/0009-0007-2817-4589"
+    - name: "Inflexa, Inc."
+
+version: 0.5.1
+date-released: "2026-07-11"
+repository-code: "https://github.com/inflexa-ai/tsprov"
+url: "https://github.com/inflexa-ai/tsprov#readme"
+
+license: Apache-2.0
+
+keywords:
+    - provenance
+    - PROV
+    - PROV-DM
+    - PROV-JSON
+    - PROV-N
+    - W3C
+    - data lineage
+    - metadata
+    - reproducibility
+    - TypeScript
+
+# tsprov implements a specification it does not own, and ports an implementation it
+# did not write. Both are cited here so that citing tsprov carries its upstream credit
+# along with it — see GOVERNANCE.md, "we are downstream of the spec".
+references:
+    - type: standard
+      title: "PROV-DM: The PROV Data Model"
+      authors:
+          - given-names: Luc
+            family-names: Moreau
+          - given-names: Paolo
+            family-names: Missier
+      institution:
+          name: "World Wide Web Consortium (W3C)"
+      year: 2013
+      url: "https://www.w3.org/TR/prov-dm/"
+      notes: "W3C Recommendation. The specification tsprov implements."
+
+    - type: software
+      title: "prov: A Python library for W3C Provenance Data Model (PROV)"
+      authors:
+          - given-names: "Trung Dong"
+            family-names: Huynh
+      repository-code: "https://github.com/trungdong/prov"
+      license: MIT
+      notes: >-
+          The reference implementation tsprov is ported from, and whose PROV-JSON
+          conformance corpus tsprov is validated against.
+
+# --- Add AFTER a Zenodo release mints a DOI (use the CONCEPT DOI, which always
+#     resolves to the latest version). Uncomment and fill in. ---
+# doi: "10.5281/zenodo.XXXXXXX"
+# identifiers:
+#   - type: doi
+#     value: "10.5281/zenodo.XXXXXXX"
+#     description: "Concept DOI — always resolves to the latest tsprov release."
+
+# --- Add LATER, once a JOSS paper or preprint exists, so citations point to the paper
+#     instead of (or in addition to) the software. Uncomment and fill in. ---
+# preferred-citation:
+#   type: article
+#   title: "tsprov: an idiomatic TypeScript implementation of the W3C PROV Data Model"
+#   authors:
+#     - given-names: Stefan
+#       family-names: Buciu
+#       affiliation: "Inflexa, Inc."
+#       orcid: "https://orcid.org/0009-0005-8000-0055"
+#   year: 2026
+#   journal: "Journal of Open Source Software"
+#   doi: "10.xxxxx/xxxxx"
