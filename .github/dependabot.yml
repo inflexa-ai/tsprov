@@ -1,0 +1,49 @@
+# Dependabot keeps two very different things fresh, for two different reasons.
+#
+# `github-actions` — .github/workflows/scorecard.yml pins its actions by commit SHA, and
+# a SHA pin is only as good as the thing that bumps it. Without an updater, pinning
+# quietly degrades into running months-old actions forever, which is a worse posture than
+# the mutable tags it replaced. Dependabot rewrites the SHA *and* the `# vX.Y.Z` comment
+# beside it, which is what makes repo-wide SHA pinning maintainable at all.
+#
+# `bun` — version updates ONLY. Dependabot has no security-update support for the bun
+# ecosystem (it does for npm), so a CVE in a transitive dep surfaces as a Dependabot
+# *alert* but will not open a PR by itself: the weekly version bump is what actually
+# closes it. Do not read a quiet PR queue as a clean dependency tree.
+#
+# Dependabot's commits cannot carry a `Signed-off-by:` trailer, which would otherwise fail
+# the DCO check on every one of its PRs — .github/workflows/dco.yml already allowlists
+# `dependabot[bot]` for exactly this.
+version: 2
+
+updates:
+    - package-ecosystem: "github-actions"
+      directory: "/"
+      schedule:
+          interval: "weekly"
+          day: "monday"
+      # One PR for all action bumps. They are near-always trivial and they are verified by
+      # the same CI run, so grouping trades no real review signal for a fraction of the
+      # PR noise.
+      groups:
+          github-actions:
+              patterns: ["*"]
+      commit-message:
+          prefix: "ci"
+          include: "scope"
+
+    - package-ecosystem: "bun"
+      directory: "/"
+      schedule:
+          interval: "weekly"
+          day: "monday"
+      # Dev dependencies are grouped, but luxon is deliberately left to raise its own PR:
+      # it is the package's single runtime dependency and the only one a bump can break
+      # for consumers, so it earns an individual review rather than riding along in a
+      # batch that is tempting to rubber-stamp.
+      groups:
+          dev-dependencies:
+              dependency-type: "development"
+      commit-message:
+          prefix: "chore"
+          include: "scope"
