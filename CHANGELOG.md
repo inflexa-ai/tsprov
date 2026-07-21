@@ -12,6 +12,12 @@ All notable changes to `tsprov` are documented here. The format is based on
   and no auth token. Releases are published from CI with npm provenance attestations, and each
   release is tagged (`vX.Y.Z`) with a matching GitHub Release. The published package now also ships
   `NOTICE` and `CHANGELOG.md`.
+- **`CITATION.cff`'s `version` is derived from `package.json`** instead of being maintained by
+  hand: release PRs run `.github/citation/sync.sh` alongside the version bump, and the `test`
+  check fails any PR where the two drift apart. The per-version Zenodo DOI no longer appears in
+  `CITATION.cff` — Zenodo mints it only after the tag is published, so a value written into the
+  file could only ever name the previous release; the concept DOI (which always resolves to the
+  latest release) remains.
 
 ### Not yet included
 

@@ -33,6 +33,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
+      # CITATION.cff restates package.json's version as citation metadata, and
+      # it is what GitHub's "Cite this repository" button renders — so a stale
+      # value ships as a wrong citation rather than as a broken build, which no
+      # other check would catch. Zenodo archives this file off the tag too, but
+      # derives its own record version from the tag name and ignores the version
+      # key, so this guard serves the GitHub citation box and human readers, not
+      # the DOI. Checked on every run, not only on bump PRs, because the drift
+      # can equally arrive from an edit to CITATION.cff itself. Placed before
+      # the toolchain and corpus steps because it needs nothing but the checkout.
+      - name: Check CITATION.cff is in step with package.json
+        run: .github/citation/sync.sh --check
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:

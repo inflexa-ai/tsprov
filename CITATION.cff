@@ -74,17 +74,13 @@ references:
       The reference implementation tsprov is ported from, and whose PROV-JSON
       conformance corpus tsprov is validated against.
 
-# The concept DOI, not the DOI of any one deposit: it always resolves to the newest
-# tsprov release, so a citation minted against this file keeps landing on a live, current
-# record long after the version it was written next to has been superseded. The
-# version-specific DOI is carried alongside it for the reader who needs to pin the exact
-# artefact a result was produced with — reproducibility wants the deposit, credit wants
-# the concept. Both, not either.
+# Only the concept DOI is listed, deliberately. Zenodo mints a version DOI per
+# release, but it does not exist until after the tag is published and archived —
+# so a version DOI written here could only ever name the PREVIOUS release, and
+# the file is read at the tag it ships in. The concept DOI resolves to the
+# latest version and needs no maintenance.
 doi: "10.5281/zenodo.21356355"
 identifiers:
   - type: doi
     value: "10.5281/zenodo.21356355"
     description: "Concept DOI — always resolves to the latest tsprov release."
-  - type: doi
-    value: "10.5281/zenodo.21356356"
-    description: "Version DOI — the archived deposit for tsprov 0.5.1 specifically."
