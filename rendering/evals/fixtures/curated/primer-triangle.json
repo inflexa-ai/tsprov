@@ -1,0 +1,15 @@
+{
+  "prefix": { "ex": "http://example.org/" },
+  "entity": { "ex:article": {} },
+  "activity": { "ex:edit": {} },
+  "agent": { "ex:alice": {} },
+  "wasGeneratedBy": {
+    "ex:gen": { "prov:entity": "ex:article", "prov:activity": "ex:edit" }
+  },
+  "wasAssociatedWith": {
+    "ex:assoc": { "prov:activity": "ex:edit", "prov:agent": "ex:alice" }
+  },
+  "wasAttributedTo": {
+    "ex:attr": { "prov:entity": "ex:article", "prov:agent": "ex:alice" }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "prefix": { "ex": "http://example.org/" },
+  "entity": {
+    "ex:doc": {
+      "prov:type": { "$": "ex:Report", "type": "prov:QUALIFIED_NAME" },
+      "ex:author": { "$": "ex:alice", "type": "prov:QUALIFIED_NAME" },
+      "ex:version": { "$": "3", "type": "xsd:int" }
+    }
+  }
+}

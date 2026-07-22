@@ -1,0 +1,4 @@
+{
+  "_comment": "Per-fixture render options, keyed by fixture basename. Any key omitted uses the prov_to_dot / DotRenderer reference default (useLabels=false, showNary=true, includeElementAttributes=true, includeRelationAttributes=true, direction=BT). Both scripts/generate-python-goldens.py and golden-parity.test.ts read this file so the golden and the TS render use identical options.",
+  "uselabels": { "useLabels": true }
+}

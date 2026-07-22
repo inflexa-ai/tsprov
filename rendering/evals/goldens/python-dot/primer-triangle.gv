@@ -1,0 +1,12 @@
+digraph G {
+rankdir=BT;
+charset="utf-8";
+n1 [label="ex:article", URL="http://example.org/article", shape=oval, style=filled, fillcolor="#FFFC87", color="#808080"];
+n2 [label="ex:edit", URL="http://example.org/edit", shape=box, style=filled, fillcolor="#9FB1FC", color="#0000FF"];
+n3 [label="ex:alice", URL="http://example.org/alice", shape=house, style=filled, fillcolor="#FED37F"];
+n1 -> n2 [label=wasGeneratedBy, fontsize=10.0, color=darkgreen, fontcolor=darkgreen];
+b1 [label="", shape=point, color=gray];
+n2 -> b1 [arrowhead=none, label=wasAssociatedWith, fontsize=10.0, color="#FED37F"];
+b1 -> n3 [fontsize=10.0, color="#FED37F"];
+n1 -> n3 [label=wasAttributedTo, fontsize=10.0, color="#FED37F"];
+}

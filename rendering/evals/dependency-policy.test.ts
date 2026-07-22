@@ -9,13 +9,17 @@ import { readdirSync, existsSync, statSync } from "node:fs";
 // The rules (from the loop / design):
 //  1. `@inflexa-ai/tsprov` is NEVER a runtime `dependency`; a renderer takes it as a
 //     `peerDependency` plus a `workspace:*` dev link, nothing else.
-//  2. render-core / dot / mermaid declare ZERO runtime dependencies.
+//  2. A renderer package may declare `@inflexa-ai/tsprov-render-core` as its ONLY
+//     regular dependency — value-semantic family code (plain data + pure functions),
+//     so the "zero-weight" rule means zero THIRD-PARTY dependencies. `render-core`
+//     itself declares ZERO runtime dependencies.
 //  3. The only heavy runtime deps ever allowed are `@dagrejs/dagre` (svg/interactive,
 //     as a normal dep) and `@hpcc-js/wasm-graphviz` (graphviz, as a peer) — each only
 //     in the package whose name names that renderer.
 //  4. The core package itself depends on `luxon` only.
 
 const TSPROV = "@inflexa-ai/tsprov";
+const RENDER_CORE = "@inflexa-ai/tsprov-render-core";
 const RENDERING_DIR = `${import.meta.dir}/..`;
 const CORE_PKG_PATH = `${import.meta.dir}/../../packages/tsprov/package.json`;
 
@@ -91,16 +95,29 @@ test("every rendering runtime dependency is loop-approved and in its sanctioned 
   for (const { label, manifest } of await loadRenderingPackages()) {
     const name = manifest.name ?? label;
     for (const dep of Object.keys(manifest.dependencies ?? {})) {
+      // The render-core sibling is a permitted regular dependency of any OTHER renderer
+      // package (it is value-semantic family code, not a third-party weight); render-core
+      // must not depend on itself.
+      const siblingAllowed = dep === RENDER_CORE && name !== RENDER_CORE;
       const approved = APPROVED_HEAVY_DEPS[dep];
-      const allowed =
+      const heavyAllowed =
         approved !== undefined &&
         approved.field === "dependencies" &&
         approved.nameTokens.some((token) => name.includes(token));
+      const allowed = siblingAllowed || heavyAllowed;
       expect(`${label} runtime dep "${dep}" allowed? ${allowed}`).toBe(
         `${label} runtime dep "${dep}" allowed? true`,
       );
     }
   }
+});
+
+test("a renderer may declare the render-core sibling as its only regular dependency", async () => {
+  const packages = await loadRenderingPackages();
+  const renderDot = packages.find((p) => p.manifest.name === "@inflexa-ai/tsprov-render-dot");
+  if (renderDot === undefined) throw new Error("render-dot package not found");
+  // The sibling dependency is present and is the ONLY regular dependency.
+  expect(Object.keys(renderDot.manifest.dependencies ?? {})).toEqual([RENDER_CORE]);
 });
 
 test("every rendering peer dependency is tsprov or a loop-approved heavy peer", async () => {

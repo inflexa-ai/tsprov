@@ -14,11 +14,80 @@
 |---|---|---|
 | 0 — workspace restructure | core → `packages/tsprov`, private workspace root | ✅ **done** (2026-07-22) |
 | 1 — `tsprov-render-core` | scene graph + `PROV_THEME` + `Renderer` + eval harness | ✅ **done** (2026-07-22) |
-| 2 — `tsprov-render-dot` | DOT emitter + Python-parity goldens | ⬜ not started |
+| 2 — `tsprov-render-dot` | DOT emitter + Python-parity goldens | ✅ **done** (2026-07-22) |
 | 3 — `tsprov-render-mermaid` | Mermaid emitter + goldens | ⬜ not started |
 | 4 — `tsprov-render-svg` | dagre layout + string SVG | ⬜ not started |
 | 5 — `tsprov-render-interactive` | self-contained interactive HTML | ⬜ not started |
 | 6 — `tsprov-render-graphviz` (stretch) | WASM engine over stage-2 DOT | ⬜ gated on go-ahead |
+
+---
+
+## 2026-07-22 · entry 3 — stage 2: `tsprov-render-dot` + Python-parity goldens
+
+**Build:** bare `bun test` 1177 pass / 1 skip / 0 fail (36 files) · `bun run eval`
+60 pass / 0 fail (~3.3 s; golden parity ×13, style conformance ×401, packaging incl.
+render-dot tarball) · dual build + `tsc --noEmit` clean · core and render-core
+zero-line diff · branch `feat/rendering-workspaces`.
+
+### The change
+
+OPSX change `rendering-stage2-dot-renderer` (archived, untracked). New package
+`rendering/tsprov-render-dot` (`@inflexa-ai/tsprov-render-dot` 0.1.0): `DotRenderer`
+implements `Renderer<string>`, a pure scene-driven string emitter reproducing
+`prov_to_dot`'s structure — styled nodes with `URL`, n-ary blank-node routing,
+HTML-TABLE annotation notes on dashed links, bundle clusters, dot.py's counter
+scheme. Sole runtime dep: render-core `^0.1.0` (the sibling-dep policy formalized as
+a MODIFIED `rendering-evals` spec delta: zero-weight = zero THIRD-PARTY deps).
+
+**Goldens are real Python output**: `uv run --with pydot --with lxml --with rdflib
+--with ./reference/prov` (python 3.12.4, pydot 4.0.1, prov 2.1.1) over 13 curated
+fixtures (6 hand-authored + 7 corpus picks, rationale README committed). The
+structural comparator (`dot-extract.ts`) reconstructs relations across optional
+blank nodes and fails loudly on unrecognized statements; D15 exclusions are
+count-matched to `scene.skipped`, never fuzzed (exercised by `start1`).
+
+### Measured sizes
+
+render-dot: **1591 B** gzipped+minified (budget 1760). A DOT-rendering consumer
+installs tsprov + render-core + render-dot ≈ **3.6 KB** gz of rendering code.
+
+### Decisions / deviations
+
+- **D17**: annotation rows keep scene insertion order (`sorted_attributes` is
+  presentation; comparator compares rows as a set).
+- **D18** (post-review, code-anchored): no blank node for >2-slot relations whose
+  tail slots are all unset — Python splits on slot COUNT (`dot.py:352`) yielding an
+  information-free mid-edge dot; we draw the direct edge.
+- Design correction applied to the archived artifact: HTML-label escaping mirrors
+  `html.escape(s, quote=True)` exactly (the design's "quotes stay literal" was
+  wrong; implementation byte-verified against real `prov.dot` output).
+- Packaging eval pins the unpublished sibling via consumer `overrides` → tarball
+  (the standard pre-publish substitution); revisit after first npm publish.
+- Curated set is 13 not 12: `bundle3` dropped (byte-identical to `bundle1`),
+  `bundle4` dropped from goldens (see below).
+
+### Known issue for a SEPARATE core change (hard rule 1 — not touched here)
+
+`bundle4` exposed a real tsprov↔Python divergence in `unified()`: tsprov resolves a
+bundle's own identifier QName in the DOCUMENT-level namespace
+(`http://another.org/bundle1`) where Python uses the bundle-LOCAL namespace
+(`http://example.org/bundle1`). Cluster members match; only the bundle's own
+URI/label differ. Needs investigation → fix or DEVIATIONS entry in
+`packages/tsprov`, as its own justified change.
+
+### Valuation
+
+A consumer can now render any PROV document to Graphviz DOT that a `prov.dot` user
+recognizes, pipe it to `dot`/WASM/online viewers, and trust it: the styling is
+enforced across all 401 corpus+real docs and the structure is held to actual Python
+reference output. Cheapest install: three packages, ~3.6 KB gz, zero third-party
+deps.
+
+### Next
+
+Stage 3: `tsprov-render-mermaid` (flowchart emitter, PROV classDefs, subgraph
+bundles, hexagon-agent deviation logged) + goldens. The mermaid syntax spot-check
+can use the beautiful-mermaid render pass.
 
 ---
 

@@ -1,0 +1,34 @@
+digraph G {
+rankdir=BT;
+charset="utf-8";
+n1 [label="ex:bundle1", URL="http://example.org/bundle1", shape=oval, style=filled, fillcolor="#FFFC87", color="#808080"];
+ann1 [label=<<TABLE cellpadding="0" border="0">
+    <TR>
+        <TD align="left" href="http://www.w3.org/ns/prov#type">prov:type</TD>
+        <TD align="left" href="http://www.w3.org/ns/prov#Bundle">prov:Bundle</TD>
+    </TR>
+    </TABLE>>, shape=note, color=gray, fontcolor=black, fontsize=10];
+ann1 -> n1 [arrowhead=none, style=dashed, color=gray];
+n2 [label="ex:bundle2", URL="http://example.org/bundle2", shape=oval, style=filled, fillcolor="#FFFC87", color="#808080"];
+ann2 [label=<<TABLE cellpadding="0" border="0">
+    <TR>
+        <TD align="left" href="http://www.w3.org/ns/prov#type">prov:type</TD>
+        <TD align="left" href="http://www.w3.org/ns/prov#Bundle">prov:Bundle</TD>
+    </TR>
+    </TABLE>>, shape=note, color=gray, fontcolor=black, fontsize=10];
+ann2 -> n2 [arrowhead=none, style=dashed, color=gray];
+subgraph cluster_c1 {
+URL="http://example.org/bundle1";
+label="ex:bundle1";
+n3 [label="ex:e1", URL="http://example.org/e1", shape=oval, style=filled, fillcolor="#FFFC87", color="#808080"];
+n4 [label="ex:a1", URL="http://example.org/a1", shape=box, style=filled, fillcolor="#9FB1FC", color="#0000FF"];
+n4 -> n3 [label=used, fontsize=10.0, color=red4, fontcolor=red];
+}
+subgraph cluster_c2 {
+URL="http://example.org/bundle2";
+label="ex:bundle2";
+n5 [label="ex:ee1", URL="http://example.org/ee1", shape=oval, style=filled, fillcolor="#FFFC87", color="#808080"];
+n6 [label="ex:aa1", URL="http://example.org/aa1", shape=box, style=filled, fillcolor="#9FB1FC", color="#0000FF"];
+n6 -> n5 [label=used, fontsize=10.0, color=red4, fontcolor=red];
+}
+}

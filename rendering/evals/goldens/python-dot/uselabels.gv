@@ -1,0 +1,21 @@
+digraph G {
+rankdir=BT;
+charset="utf-8";
+n1 [label=<Draft Article<br /><font color="#333333" point-size="10">ex:article</font>>, URL="http://example.org/article", shape=oval, style=filled, fillcolor="#FFFC87", color="#808080"];
+ann1 [label=<<TABLE cellpadding="0" border="0">
+    <TR>
+        <TD align="left" href="http://www.w3.org/ns/prov#label">prov:label</TD>
+        <TD align="left">Draft Article</TD>
+    </TR>
+    </TABLE>>, shape=note, color=gray, fontcolor=black, fontsize=10];
+ann1 -> n1 [arrowhead=none, style=dashed, color=gray];
+n2 [label=<Editing Session<br /><font color="#333333" point-size="10">ex:edit</font>>, URL="http://example.org/edit", shape=box, style=filled, fillcolor="#9FB1FC", color="#0000FF"];
+ann2 [label=<<TABLE cellpadding="0" border="0">
+    <TR>
+        <TD align="left" href="http://www.w3.org/ns/prov#label">prov:label</TD>
+        <TD align="left">Editing Session</TD>
+    </TR>
+    </TABLE>>, shape=note, color=gray, fontcolor=black, fontsize=10];
+ann2 -> n2 [arrowhead=none, style=dashed, color=gray];
+n1 -> n2 [label=wasGeneratedBy, fontsize=10.0, color=darkgreen, fontcolor=darkgreen];
+}
