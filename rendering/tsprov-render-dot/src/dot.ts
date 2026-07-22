@@ -116,6 +116,9 @@ function mergeStyleRecord<K extends string, S extends object>(
 ): Record<K, S> {
   const merged: Record<K, S> = { ...base };
   if (override === undefined) return merged;
+  // `override` is typed `Record<K, S>`, so its own keys are exactly `K`; `Object.keys`
+  // only widens to `string[]` because TS cannot prove a plain record carries no extra
+  // keys. The cast restores the key type the parameter already guarantees.
   for (const key of Object.keys(override) as K[]) {
     merged[key] = { ...base[key], ...override[key] };
   }

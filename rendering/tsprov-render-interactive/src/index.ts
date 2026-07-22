@@ -12,5 +12,7 @@ export {
   buildScenePayload,
   WHOLE_GRAPH_MAX,
   DISCLOSURE_HOPS,
+  INITIAL_CAP,
+  EXPAND_CAP,
 } from "./interactive.js";
 export type { InteractiveRenderOptions, ScenePayload } from "./interactive.js";

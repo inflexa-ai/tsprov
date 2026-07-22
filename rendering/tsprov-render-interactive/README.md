@@ -60,11 +60,13 @@ toggles + a `theme` override) with a layout `direction`, a disclosure `focus`, a
 - **Pan & zoom** — drag to pan, scroll to zoom (cursor-anchored). Programmatic view changes
   (fit, focus, expand) ease the `viewBox` with `requestAnimationFrame` (the `viewBox` is not
   CSS-transitionable, so it is animated by hand).
-- **Progressive disclosure** — a graph with **≤ 50 nodes** shows in full; a larger one opens
-  on a **focus node + its 2-hop neighborhood**, so a hundreds-of-record document is legible
-  on load. Every visible node with hidden neighbors carries a **count badge**; clicking it
-  (or the panel's *Expand neighbors*) reveals its neighbors with a CSS transition, and the
-  view re-fits. **Show all** / **Reset** and a per-node **Collapse** round it out.
+- **Progressive disclosure** — a graph with **≤ `WHOLE_GRAPH_MAX` (50) nodes** shows in full; a
+  larger one opens on a **focus node + its `DISCLOSURE_HOPS` (2)-hop neighborhood**, capped at
+  **`INITIAL_CAP` (40) nodes**, so a hundreds-of-record document is legible on load. Every visible
+  node with hidden neighbors carries a **count badge**; clicking it (or the panel's *Expand
+  neighbors*) reveals up to **`EXPAND_CAP` (20)** more neighbors with a CSS transition, and the
+  view re-fits. **Show all** / **Reset** and a per-node **Collapse** round it out. These four
+  disclosure bounds are exported from the package barrel.
 - **Attribute panel** — click (or Enter on) a node to inspect its qualified name, a
   themed kind chip, a link to its URI, its attribute table, its degree, and expand/collapse
   actions.

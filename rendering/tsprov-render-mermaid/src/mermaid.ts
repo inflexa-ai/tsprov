@@ -53,17 +53,24 @@ export type MermaidRenderOptions = RendererOptions & {
 const VALID_DIRECTIONS: ReadonlySet<string> = new Set(["BT", "TB", "LR", "RL"]);
 
 /**
- * Escapes a string for a Mermaid double-quoted label. Every label this renderer
- * emits is wrapped in `"…"`; inside such a quoted span the ONLY character that can
- * terminate the span early is a literal `"`, which Mermaid's own escape replaces
- * with the HTML entity code `#quot;` (Mermaid uses `#`-prefixed entity codes, not
- * `&`-prefixed ones, for quotes inside labels). `<`/`>`/`&` are deliberately left
- * intact: node text is a QName or short `prov:label`, and the PROV convention treats
- * a quoted label's angle brackets as literal glyphs. Arbitrary corpus literals only
- * reach {@link escapeRow} (annotation values), which escapes far more aggressively.
+ * Escapes a string for a Mermaid double-quoted label. Node text is ARBITRARY: a QName,
+ * but under `useLabels` also a `prov:label` literal that can be any corpus string. Every
+ * label is wrapped in `"…"` and Mermaid renders it as HTML, so both breaking out of the
+ * quoted span AND forging markup have to be neutralized — otherwise a label like
+ * `<img src=x onerror=…>` would reach the page verbatim. Each such character is therefore
+ * entity-escaped, exactly as the sibling {@link escapeRow} does: `&`→`&amp;` (first, so the
+ * entities the later steps introduce are not re-escaped), `<`→`&lt;`, `>`→`&gt;`, and
+ * `"`→`#quot;` (Mermaid uses `#`-prefixed entity codes, not `&`-prefixed ones, for a quote
+ * inside a label). The two-line `useLabels` label's structural `<br/>` is inserted by the
+ * caller ({@link nodeLabel}) AFTER escaping each line, so that intentional line break
+ * survives while any `<br/>` inside the text itself lands inert as `&lt;br/&gt;`.
  */
 function escapeLabel(value: string): string {
-  return value.replace(/"/g, "#quot;");
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "#quot;");
 }
 
 /**
@@ -125,6 +132,9 @@ function mergeStyleRecord<K extends string, S extends object>(
 ): Record<K, S> {
   const merged: Record<K, S> = { ...base };
   if (override === undefined) return merged;
+  // `override` is typed `Record<K, S>`, so its own keys are exactly `K`; `Object.keys`
+  // only widens to `string[]` because TS cannot prove a plain record carries no extra
+  // keys. The cast restores the key type the parameter already guarantees.
   for (const key of Object.keys(override) as K[]) {
     merged[key] = { ...base[key], ...override[key] };
   }
