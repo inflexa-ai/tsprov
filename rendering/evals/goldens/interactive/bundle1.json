@@ -150,16 +150,12 @@
   "edges": [
     {
       "id": "e1",
-      "relation": "prov:Usage",
-      "label": "used",
       "source": "n4",
       "target": "n3",
       "naryLegs": []
     },
     {
       "id": "e2",
-      "relation": "prov:Usage",
-      "label": "used",
       "source": "n6",
       "target": "n5",
       "naryLegs": []
@@ -311,8 +307,7 @@
         "y": -2,
         "width": 125.73,
         "height": 165.79
-      },
-      "uri": "http://example.org/bundle1"
+      }
     },
     {
       "id": "c2",
@@ -322,8 +317,7 @@
         "y": -2,
         "width": 138.32,
         "height": 165.79
-      },
-      "uri": "http://example.org/bundle2"
+      }
     }
   ],
   "markerColors": [
@@ -413,19 +407,11 @@
     }
   },
   "meta": {
-    "title": "Provenance graph",
     "counts": {
       "nodes": 6,
       "edges": 2,
       "bundles": 2,
       "skipped": 0
-    },
-    "options": {
-      "useLabels": false,
-      "includeElementAttributes": true,
-      "includeRelationAttributes": true,
-      "showNary": true,
-      "direction": "BT"
     },
     "disclosure": {
       "wholeGraph": true,

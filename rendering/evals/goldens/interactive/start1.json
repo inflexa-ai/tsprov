@@ -92,19 +92,11 @@
     }
   },
   "meta": {
-    "title": "Provenance graph",
     "counts": {
       "nodes": 0,
       "edges": 0,
       "bundles": 0,
       "skipped": 1
-    },
-    "options": {
-      "useLabels": false,
-      "includeElementAttributes": true,
-      "includeRelationAttributes": true,
-      "showNary": true,
-      "direction": "BT"
     },
     "disclosure": {
       "wholeGraph": true,

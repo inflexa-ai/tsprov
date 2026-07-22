@@ -31,6 +31,7 @@ import {
   type RenderAttr,
   type RenderBundle,
   toRenderScene,
+  safeLinkUri,
 } from "@inflexa-ai/tsprov-render-core";
 import type { ProvDocument } from "@inflexa-ai/tsprov";
 
@@ -463,9 +464,14 @@ function emitNode(state: EmitState, node: RenderNode, theme: ProvTheme, useLabel
   state.usedClasses.add(className);
   state.lines.push(`${shapeNode(node.id, node.kind, nodeLabel(node, useLabels))}:::${className}`);
   // Every node with a URI gets a click-through link — parity with DOT's unconditional
-  // `URL`. Renderers that forbid links (GitHub strips them) degrade gracefully.
+  // `URL`. Renderers that forbid links (GitHub strips them) degrade gracefully. Only an
+  // allowlisted scheme is linked: a `javascript:`/`data:` href would execute when a
+  // Mermaid-rendered page is opened, so a hostile-scheme node simply gets no click line.
   if (node.uri !== undefined) {
-    state.clicks.push(`click ${node.id} href "${escapeHref(node.uri)}" _blank`);
+    const href = safeLinkUri(node.uri);
+    if (href !== undefined) {
+      state.clicks.push(`click ${node.id} href "${escapeHref(href)}" _blank`);
+    }
   }
   emitAnnotation(state, node.attributes, node.id);
 }

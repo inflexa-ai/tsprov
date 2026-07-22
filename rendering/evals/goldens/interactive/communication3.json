@@ -48,8 +48,6 @@
   "edges": [
     {
       "id": "e1",
-      "relation": "prov:Communication",
-      "label": "wasInformedBy",
       "source": "n1",
       "target": "n2",
       "naryLegs": []
@@ -176,19 +174,11 @@
     }
   },
   "meta": {
-    "title": "Provenance graph",
     "counts": {
       "nodes": 2,
       "edges": 1,
       "bundles": 0,
       "skipped": 0
-    },
-    "options": {
-      "useLabels": false,
-      "includeElementAttributes": true,
-      "includeRelationAttributes": true,
-      "showNary": true,
-      "direction": "BT"
     },
     "disclosure": {
       "wholeGraph": true,

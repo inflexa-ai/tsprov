@@ -60,6 +60,20 @@ ignores `href`.
 - `bundle1` / `bundle2` — bundle rects carry their id/label and the enclosing `rect`.
 - `uselabels` — two-line `labelLines` (`prov:label` over the identifier).
 
+## Payload carries only client-read fields, and every link URI is scheme-safe
+
+The payload is intentionally lean: it embeds only the fields `template/app.js` actually reads.
+The edge's own `relation`/`label` and each n-ary leg's `role` are omitted (the drawn label lives
+on the segment; the client walks edges purely for adjacency), as are `bundle.uri`, `meta.title`,
+and `meta.options` (unread by the client) — so an edge is `{id, source, target, naryLegs:[{target}]}`,
+a bundle is `{id, label, rect}`, and `meta` is `{counts, disclosure}`.
+
+Every URI a golden carries in a `uri`/`valueUri` field is one that passed render-core's
+`safeLinkUri` allowlist (`http`/`https`/`mailto`, or scheme-less): a hostile-scheme identifier
+(`javascript:`/`data:`) never reaches the payload, so it can never become a live `href` in the
+shipped page (see D21 and `../../link-scheme.test.ts`). No golden contains a non-allowlisted
+scheme, so a reviewed regeneration cannot silently introduce one.
+
 **Do not hand-edit a golden.** If output changes, fix the emitter/template (never the golden),
 regenerate under `render-options.json`, and re-review the diff.
 

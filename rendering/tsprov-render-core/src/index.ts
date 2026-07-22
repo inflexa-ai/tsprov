@@ -32,3 +32,5 @@ export type {
 } from "./theme.js";
 
 export type { Renderer, RendererOptions } from "./renderer.js";
+
+export { safeLinkUri } from "./uri.js";

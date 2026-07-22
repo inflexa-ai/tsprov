@@ -87,26 +87,20 @@
   "edges": [
     {
       "id": "e1",
-      "relation": "prov:Delegation",
-      "label": "actedOnBehalfOf",
       "source": "n1",
       "target": "n2",
       "naryLegs": [
         {
-          "role": "activity",
           "target": "n4"
         }
       ]
     },
     {
       "id": "e2",
-      "relation": "prov:Delegation",
-      "label": "actedOnBehalfOf",
       "source": "n2",
       "target": "n3",
       "naryLegs": [
         {
-          "role": "activity",
           "target": "n4"
         }
       ]
@@ -412,19 +406,11 @@
     }
   },
   "meta": {
-    "title": "Provenance graph",
     "counts": {
       "nodes": 4,
       "edges": 2,
       "bundles": 0,
       "skipped": 0
-    },
-    "options": {
-      "useLabels": false,
-      "includeElementAttributes": true,
-      "includeRelationAttributes": true,
-      "showNary": true,
-      "direction": "BT"
     },
     "disclosure": {
       "wholeGraph": true,

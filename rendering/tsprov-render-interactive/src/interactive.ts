@@ -27,6 +27,7 @@ import {
   type RendererOptions,
   type RenderScene,
   type RenderAttr,
+  safeLinkUri,
 } from "@inflexa-ai/tsprov-render-core";
 import {
   layoutScene,
@@ -123,14 +124,17 @@ type PayloadNode = {
   readonly box: LayoutBox;
 };
 
-/** A payload edge: the logical adjacency the disclosure engine walks (geometry is in segments). */
+/**
+ * A payload edge: the logical adjacency the disclosure engine walks (geometry is in segments).
+ * Only the fields the client actually reads are carried — `source`/`target`/`naryLegs.target`
+ * build the undirected graph for badges and expansion; the drawn relation label lives on the
+ * segment, so the edge's own `relation`/`label` and each leg's `role` are deliberately omitted.
+ */
 type PayloadEdge = {
   readonly id: string;
-  readonly relation: RelationKind;
-  readonly label: string;
   readonly source: string;
   readonly target: string;
-  readonly naryLegs: readonly { readonly role: string; readonly target: string }[];
+  readonly naryLegs: readonly { readonly target: string }[];
 };
 
 /** A payload segment: the drawable polyline + the node ids that gate its visibility. */
@@ -166,19 +170,11 @@ export type ScenePayload = {
   readonly segments: readonly PayloadSegment[];
   readonly blanks: readonly { readonly box: LayoutBox; readonly gates: readonly string[] }[];
   readonly notes: readonly { readonly rows: readonly string[]; readonly box: LayoutBox; readonly gates: readonly string[] }[];
-  readonly bundles: readonly { readonly id: string; readonly label: string; readonly uri?: string; readonly rect: LayoutBox | null }[];
+  readonly bundles: readonly { readonly id: string; readonly label: string; readonly rect: LayoutBox | null }[];
   readonly markerColors: readonly string[];
   readonly theme: ProjectedTheme;
   readonly meta: {
-    readonly title: string;
     readonly counts: { readonly nodes: number; readonly edges: number; readonly bundles: number; readonly skipped: number };
-    readonly options: {
-      readonly useLabels: boolean;
-      readonly includeElementAttributes: boolean;
-      readonly includeRelationAttributes: boolean;
-      readonly showNary: boolean;
-      readonly direction: Direction;
-    };
     readonly disclosure: PayloadDisclosure;
   };
 };
@@ -262,7 +258,12 @@ export function buildScenePayload(doc: ProvDocument, options?: InteractiveRender
     // the one scene walk), so every positioned id has a logical twin.
     const qualifiedName = logical?.qualifiedName ?? pn.id;
     const label = logical?.label ?? qualifiedName;
-    const attributes = logical?.attributes ?? [];
+    // Scheme-filter every link the client could turn into a live anchor BEFORE it enters the
+    // payload, so a hostile `javascript:`/`data:` URI never reaches the shipped page (the
+    // client re-checks too, as defense in depth against a hand-edited payload). Real PROV
+    // URIs are http(s), so this drops nothing from a legitimate document.
+    const attributes = sanitizeAttrLinks(logical?.attributes ?? []);
+    const uri = pn.uri === undefined ? undefined : safeLinkUri(pn.uri);
     const node: PayloadNode = {
       id: pn.id,
       kind: pn.kind,
@@ -278,18 +279,16 @@ export function buildScenePayload(doc: ProvDocument, options?: InteractiveRender
     return {
       ...node,
       ...(pn.stroke !== undefined ? { stroke: pn.stroke } : {}),
-      ...(pn.uri !== undefined ? { uri: pn.uri } : {}),
+      ...(uri !== undefined ? { uri } : {}),
       ...(pn.bundleId !== undefined ? { bundleId: pn.bundleId } : {}),
     };
   });
 
   const edges: PayloadEdge[] = scene.edges.map((e) => ({
     id: e.id,
-    relation: e.relation,
-    label: e.label,
     source: e.source,
     target: e.target,
-    naryLegs: e.naryLegs.map((leg) => ({ role: leg.role, target: leg.target })),
+    naryLegs: e.naryLegs.map((leg) => ({ target: leg.target })),
   }));
 
   const segments: PayloadSegment[] = positioned.segments.map((s): PayloadSegment => {
@@ -314,7 +313,6 @@ export function buildScenePayload(doc: ProvDocument, options?: InteractiveRender
     id: b.id,
     label: b.label,
     rect: b.rect === null ? null : roundBox(b.rect),
-    ...(b.uri !== undefined ? { uri: b.uri } : {}),
   }));
 
   const disclosure = computeDisclosure(scene, options?.focus);
@@ -331,23 +329,28 @@ export function buildScenePayload(doc: ProvDocument, options?: InteractiveRender
     markerColors: positioned.markerColors,
     theme: projectTheme(theme),
     meta: {
-      title: options?.title ?? "Provenance graph",
       counts: {
         nodes: scene.nodes.length,
         edges: scene.edges.length,
         bundles: scene.bundles.length,
         skipped: scene.skipped.length,
       },
-      options: {
-        useLabels: options?.useLabels ?? false,
-        includeElementAttributes: options?.includeElementAttributes ?? true,
-        includeRelationAttributes: options?.includeRelationAttributes ?? true,
-        showNary: options?.showNary ?? true,
-        direction: resolveDirection(options?.direction, theme.direction),
-      },
       disclosure,
     },
   };
+}
+
+/**
+ * Strips a `valueUri` from any attribute whose scheme is not link-safe, so the payload never
+ * carries a URI the panel would turn into a live anchor from a hostile scheme. The display
+ * `value` is kept, so a filtered attribute still renders — as inert text, not a link. The
+ * client never links an attribute's `nameUri`, so it is passed through untouched.
+ */
+function sanitizeAttrLinks(attributes: readonly RenderAttr[]): RenderAttr[] {
+  return attributes.map((attr) => {
+    if (attr.valueUri === undefined || safeLinkUri(attr.valueUri) !== undefined) return attr;
+    return { name: attr.name, nameUri: attr.nameUri, value: attr.value };
+  });
 }
 
 // ── Disclosure ────────────────────────────────────────────────────────────────────
@@ -533,15 +536,6 @@ function mergeStyleRecord<K extends string, S extends object>(
     merged[key] = { ...base[key], ...override[key] };
   }
   return merged;
-}
-
-/** The four valid directions; a runtime guard for untyped JS callers. */
-const VALID_DIRECTIONS: ReadonlySet<string> = new Set(["BT", "TB", "LR", "RL"]);
-
-/** Resolves the effective layout direction, mirroring render-svg's guard. */
-function resolveDirection(requested: Direction | undefined, themeDefault: Direction): Direction {
-  if (requested === undefined) return themeDefault;
-  return VALID_DIRECTIONS.has(requested) ? requested : "BT";
 }
 
 /**
