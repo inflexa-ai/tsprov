@@ -1,0 +1,8 @@
+{
+  "packages": {
+    "@inflexa-ai/tsprov-render-core": {
+      "gzipBudgetBytes": 2260,
+      "measuredSeedBytes": 2047
+    }
+  }
+}

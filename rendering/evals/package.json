@@ -1,0 +1,16 @@
+{
+  "name": "@inflexa-ai/tsprov-rendering-evals",
+  "version": "0.0.0",
+  "description": "Private cross-package eval harness for the tsprov rendering workspaces — corpus sweep, dependency policy, single-instance packaging, and size budgets. Never published.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@inflexa-ai/tsprov": "workspace:*",
+    "@inflexa-ai/tsprov-render-core": "workspace:*",
+    "@types/bun": "latest",
+    "typescript": "^5 || ^6"
+  }
+}
