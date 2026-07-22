@@ -7,6 +7,10 @@
     "@inflexa-ai/tsprov-render-dot": {
       "gzipBudgetBytes": 1760,
       "measuredSeedBytes": 1591
+    },
+    "@inflexa-ai/tsprov-render-mermaid": {
+      "gzipBudgetBytes": 1830,
+      "measuredSeedBytes": 1660
     }
   }
 }

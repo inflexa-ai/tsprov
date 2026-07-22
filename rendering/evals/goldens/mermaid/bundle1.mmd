@@ -1,0 +1,28 @@
+flowchart BT
+n1(["ex:bundle1"]):::entity
+ann1["prov:type = prov:Bundle"]:::annotation
+ann1 -.- n1
+n2(["ex:bundle2"]):::entity
+ann2["prov:type = prov:Bundle"]:::annotation
+ann2 -.- n2
+subgraph c1["ex:bundle1"]
+n3(["ex:e1"]):::entity
+n4["ex:a1"]:::activity
+end
+subgraph c2["ex:bundle2"]
+n5(["ex:ee1"]):::entity
+n6["ex:aa1"]:::activity
+end
+n4 -->|used| n3
+n6 -->|used| n5
+click n1 href "http://example.org/bundle1" _blank
+click n2 href "http://example.org/bundle2" _blank
+click n3 href "http://example.org/e1" _blank
+click n4 href "http://example.org/a1" _blank
+click n5 href "http://example.org/ee1" _blank
+click n6 href "http://example.org/aa1" _blank
+classDef entity fill:#FFFC87,stroke:#808080
+classDef activity fill:#9FB1FC,stroke:#0000FF
+classDef annotation stroke:gray,color:black
+linkStyle 2 stroke:#8B0000,color:red
+linkStyle 3 stroke:#8B0000,color:red

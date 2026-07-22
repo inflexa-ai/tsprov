@@ -1,0 +1,26 @@
+flowchart BT
+n1{{"ex:ag1"}}:::agent
+n2{{"ex:ag2"}}:::agent
+n3{{"ex:ag3"}}:::agent
+n4["ex:act"]:::activity
+b1((" ")):::bnode
+n1 ---|actedOnBehalfOf| b1
+b1 --> n2
+b1 -->|activity| n4
+b2((" ")):::bnode
+n2 ---|actedOnBehalfOf| b2
+b2 --> n3
+b2 -->|activity| n4
+click n1 href "http://example.org/ag1" _blank
+click n2 href "http://example.org/ag2" _blank
+click n3 href "http://example.org/ag3" _blank
+click n4 href "http://example.org/act" _blank
+classDef activity fill:#9FB1FC,stroke:#0000FF
+classDef agent fill:#FED37F
+classDef bnode fill:gray,stroke:gray
+linkStyle 0 stroke:#FED37F
+linkStyle 1 stroke:#FED37F
+linkStyle 2 stroke:gray,color:dimgray
+linkStyle 3 stroke:#FED37F
+linkStyle 4 stroke:#FED37F
+linkStyle 5 stroke:gray,color:dimgray

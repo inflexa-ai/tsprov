@@ -1,0 +1,16 @@
+flowchart BT
+n1(["ex:article"]):::entity
+n2["ex:edit"]:::activity
+n3{{"ex:alice"}}:::agent
+n1 -->|wasGeneratedBy| n2
+n2 -->|wasAssociatedWith| n3
+n1 -->|wasAttributedTo| n3
+click n1 href "http://example.org/article" _blank
+click n2 href "http://example.org/edit" _blank
+click n3 href "http://example.org/alice" _blank
+classDef entity fill:#FFFC87,stroke:#808080
+classDef activity fill:#9FB1FC,stroke:#0000FF
+classDef agent fill:#FED37F
+linkStyle 0 stroke:darkgreen,color:darkgreen
+linkStyle 1 stroke:#FED37F
+linkStyle 2 stroke:#FED37F

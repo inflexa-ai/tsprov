@@ -23,6 +23,7 @@ const REPO_ROOT = `${import.meta.dir}/../..`;
 const CORE_DIR = join(REPO_ROOT, "packages/tsprov");
 const RENDER_CORE_DIR = join(REPO_ROOT, "rendering/tsprov-render-core");
 const RENDER_DOT_DIR = join(REPO_ROOT, "rendering/tsprov-render-dot");
+const RENDER_MERMAID_DIR = join(REPO_ROOT, "rendering/tsprov-render-mermaid");
 
 /** Recursively counts directories named exactly `@inflexa-ai/tsprov` (not `-render-core`). */
 function countTsprovInstances(root: string): string[] {
@@ -52,7 +53,7 @@ test.skipIf(!FULL)(
 
     try {
       // 1. Build every publishable package so its `dist/` is present in the tarballs.
-      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR]) {
+      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR]) {
         const built = await $`bun run build`.cwd(dir).quiet().nothrow();
         expect(`build ${dir} exit ${built.exitCode}`).toBe(
           `build ${dir} exit 0`,
@@ -60,7 +61,7 @@ test.skipIf(!FULL)(
       }
 
       // 2. Pack each into a tarball (no registry).
-      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR]) {
+      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR]) {
         const packed =
           await $`bun pm pack --destination ${packDir}`.cwd(dir).quiet().nothrow();
         expect(`pack ${dir} exit ${packed.exitCode}`).toBe(`pack ${dir} exit 0`);
@@ -71,13 +72,20 @@ test.skipIf(!FULL)(
       const coreTgz = tarballs.find((f) => f.includes("tsprov-0."));
       const renderTgz = tarballs.find((f) => f.includes("render-core"));
       const renderDotTgz = tarballs.find((f) => f.includes("render-dot"));
-      if (coreTgz === undefined || renderTgz === undefined || renderDotTgz === undefined) {
+      const renderMermaidTgz = tarballs.find((f) => f.includes("render-mermaid"));
+      if (
+        coreTgz === undefined ||
+        renderTgz === undefined ||
+        renderDotTgz === undefined ||
+        renderMermaidTgz === undefined
+      ) {
         throw new Error(`missing tarballs: ${tarballs.join(", ")}`);
       }
 
-      // 3. A fresh consumer project installs ALL THREE tarballs. The core tarball
-      //    satisfies both siblings' tsprov peer, and the render-core tarball satisfies
-      //    render-dot's `^0.1.0` sibling dependency — all without any registry lookup.
+      // 3. A fresh consumer project installs ALL FOUR tarballs. The core tarball
+      //    satisfies every sibling's tsprov peer, and the render-core tarball satisfies
+      //    both render-dot's and render-mermaid's `^0.1.0` sibling dependency — all
+      //    without any registry lookup.
       await Bun.write(
         join(consumer, "package.json"),
         `${JSON.stringify(
@@ -86,9 +94,9 @@ test.skipIf(!FULL)(
             version: "0.0.0",
             private: true,
             type: "module",
-            // render-dot's tarball declares `@inflexa-ai/tsprov-render-core: ^0.1.0`;
-            // with no registry, an `overrides` entry pins that resolution to the
-            // render-core tarball so the sibling dependency resolves offline (exactly
+            // render-dot and render-mermaid each declare `@inflexa-ai/tsprov-render-core:
+            // ^0.1.0`; with no registry, an `overrides` entry pins that resolution to the
+            // render-core tarball so both siblings' dependency resolves offline (exactly
             // the local-file substitution a monorepo consumer would use pre-publish).
             overrides: { "@inflexa-ai/tsprov-render-core": renderTgz },
           },
@@ -97,7 +105,10 @@ test.skipIf(!FULL)(
         )}\n`,
       );
       const added =
-        await $`bun add ${coreTgz} ${renderTgz} ${renderDotTgz}`.cwd(consumer).quiet().nothrow();
+        await $`bun add ${coreTgz} ${renderTgz} ${renderDotTgz} ${renderMermaidTgz}`
+          .cwd(consumer)
+          .quiet()
+          .nothrow();
       expect(`bun add exit ${added.exitCode}`).toBe("bun add exit 0");
 
       // 4. Exactly one @inflexa-ai/tsprov in the consumer tree (neither sibling dragged
@@ -155,6 +166,29 @@ test.skipIf(!FULL)(
       const dotRun = await $`bun run dot.mjs`.cwd(consumer).quiet().nothrow();
       expect(`dot exit ${dotRun.exitCode}`).toBe("dot exit 0");
 
+      // 5c. render-mermaid works end to end too: the same consumer-built document
+      //    renders to a flowchart with the themed entity classDef.
+      await Bun.write(
+        join(consumer, "mermaid.mjs"),
+        [
+          `import { ProvDocument, ns } from "@inflexa-ai/tsprov";`,
+          `import { MermaidRenderer } from "@inflexa-ai/tsprov-render-mermaid";`,
+          `const ex = ns("ex", "http://example.org/");`,
+          `const doc = new ProvDocument();`,
+          `doc.addNamespace(ex.prefix, ex.uri);`,
+          `doc.entity(ex.qn("e"));`,
+          `const mmd = new MermaidRenderer().render(doc);`,
+          `if (!mmd.startsWith("flowchart BT") || !mmd.includes("classDef entity fill:#FFFC87")) {`,
+          `  console.error("render-mermaid FAILED:", mmd);`,
+          `  process.exit(1);`,
+          `}`,
+          `console.log("render-mermaid OK");`,
+          ``,
+        ].join("\n"),
+      );
+      const mermaidRun = await $`bun run mermaid.mjs`.cwd(consumer).quiet().nothrow();
+      expect(`mermaid exit ${mermaidRun.exitCode}`).toBe("mermaid exit 0");
+
       // 6. Consumer typecheck under BOTH module resolutions. The consumer only uses
       //    the public types of both packages; each must resolve cleanly.
       await Bun.write(
@@ -168,12 +202,15 @@ test.skipIf(!FULL)(
           `  type Renderer,`,
           `} from "@inflexa-ai/tsprov-render-core";`,
           `import { DotRenderer, type DotRenderOptions } from "@inflexa-ai/tsprov-render-dot";`,
+          `import { MermaidRenderer, type MermaidRenderOptions } from "@inflexa-ai/tsprov-render-mermaid";`,
           `const doc = new ProvDocument();`,
           `const scene: RenderScene = toRenderScene(doc, { useLabels: true });`,
           `const direction: string = PROV_THEME.direction;`,
           `export type StringRenderer = Renderer<string>;`,
           `const opts: DotRenderOptions = { direction: "LR" };`,
           `export const dot: string | Promise<string> = new DotRenderer().render(doc, opts);`,
+          `const mopts: MermaidRenderOptions = { direction: "LR" };`,
+          `export const mermaid: string | Promise<string> = new MermaidRenderer().render(doc, mopts);`,
           `export const nodeCount: number = scene.nodes.length;`,
           `export const dir: string = direction;`,
           `export { doc };`,

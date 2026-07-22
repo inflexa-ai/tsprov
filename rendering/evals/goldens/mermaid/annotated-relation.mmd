@@ -1,0 +1,16 @@
+flowchart BT
+n1(["ex:article"]):::entity
+n2["ex:edit"]:::activity
+b1((" ")):::bnode
+n1 ---|wasGeneratedBy| b1
+b1 --> n2
+ann1["ex:tool = vim"]:::annotation
+ann1 -.- b1
+click n1 href "http://example.org/article" _blank
+click n2 href "http://example.org/edit" _blank
+classDef entity fill:#FFFC87,stroke:#808080
+classDef activity fill:#9FB1FC,stroke:#0000FF
+classDef annotation stroke:gray,color:black
+classDef bnode fill:gray,stroke:gray
+linkStyle 0 stroke:darkgreen,color:darkgreen
+linkStyle 1 stroke:darkgreen,color:darkgreen

@@ -1,0 +1,10 @@
+flowchart BT
+n1(["ex:c"]):::entityInferred
+n2(["ex:e1"]):::entityInferred
+n3(["ex:e2"]):::entityInferred
+n1 -->|hadMember| n2
+n1 -->|hadMember| n3
+click n1 href "http://example.org/c" _blank
+click n2 href "http://example.org/e1" _blank
+click n3 href "http://example.org/e2" _blank
+classDef entityInferred fill:lightgray,stroke:dimgray
