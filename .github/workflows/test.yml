@@ -65,13 +65,20 @@ jobs:
       - name: Fetch the PROV-JSON conformance corpus
         run: bun run bootstrap
 
-      - name: Test
-        run: bun test
-
-      # `bun run build` runs tsc over the whole package, so this is the typecheck as
-      # well as the build. There is deliberately no separate typecheck script.
+      # `bun run build` runs tsc over every workspace package in dependency order, so
+      # this is the typecheck as well as the build. There is deliberately no separate
+      # typecheck script.
+      #
+      # It MUST run before `bun test`: the render and eval suites import their workspace
+      # siblings as bare specifiers (`@inflexa-ai/tsprov`, `@inflexa-ai/tsprov-render-*`)
+      # that resolve through each sibling's `exports` map to `./dist/*.js`. On a fresh
+      # checkout those dists do not exist yet, so a test-first order dies with
+      # "Cannot find module '@inflexa-ai/tsprov'". Building first materializes them.
       - name: Build (this is also the typecheck)
         run: bun run build
+
+      - name: Test
+        run: bun test
 
       - name: Smoke-test the built artifacts
         run: bun run smoke
