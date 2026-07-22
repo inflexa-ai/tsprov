@@ -1,0 +1,7 @@
+flowchart BT
+n1["ex:a2"]:::activityInferred
+n2["ex:a1"]:::activityInferred
+n1 -->|wasInformedBy| n2
+click n1 href "http://example.org/a2" _blank
+click n2 href "http://example.org/a1" _blank
+classDef activityInferred fill:lightgray,stroke:dimgray

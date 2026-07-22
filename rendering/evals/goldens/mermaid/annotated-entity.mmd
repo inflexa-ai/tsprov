@@ -1,0 +1,7 @@
+flowchart BT
+n1(["ex:doc"]):::entity
+ann1["prov:type = ex:Report<br/>ex:author = ex:alice<br/>ex:version = 3"]:::annotation
+ann1 -.- n1
+click n1 href "http://example.org/doc" _blank
+classDef entity fill:#FFFC87,stroke:#808080
+classDef annotation stroke:gray,color:black

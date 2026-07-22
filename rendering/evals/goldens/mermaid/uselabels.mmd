@@ -1,0 +1,14 @@
+flowchart BT
+n1(["Draft Article<br/>ex:article"]):::entity
+ann1["prov:label = Draft Article"]:::annotation
+ann1 -.- n1
+n2["Editing Session<br/>ex:edit"]:::activity
+ann2["prov:label = Editing Session"]:::annotation
+ann2 -.- n2
+n1 -->|wasGeneratedBy| n2
+click n1 href "http://example.org/article" _blank
+click n2 href "http://example.org/edit" _blank
+classDef entity fill:#FFFC87,stroke:#808080
+classDef activity fill:#9FB1FC,stroke:#0000FF
+classDef annotation stroke:gray,color:black
+linkStyle 2 stroke:darkgreen,color:darkgreen

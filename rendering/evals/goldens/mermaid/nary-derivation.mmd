@@ -1,0 +1,24 @@
+flowchart BT
+n1(["ex:e2"]):::entity
+n2(["ex:e1"]):::entity
+n3["ex:a"]:::activity
+n4(["ex:g"]):::unknownInferred
+n5(["ex:u"]):::unknownInferred
+b1((" ")):::bnode
+n1 ---|wasDerivedFrom| b1
+b1 --> n2
+b1 -->|activity| n3
+b1 -->|generation| n4
+b1 -->|usage| n5
+click n1 href "http://example.org/e2" _blank
+click n2 href "http://example.org/e1" _blank
+click n3 href "http://example.org/a" _blank
+click n4 href "http://example.org/g" _blank
+click n5 href "http://example.org/u" _blank
+classDef entity fill:#FFFC87,stroke:#808080
+classDef activity fill:#9FB1FC,stroke:#0000FF
+classDef unknownInferred fill:lightgray,stroke:dimgray
+classDef bnode fill:gray,stroke:gray
+linkStyle 2 stroke:gray,color:dimgray
+linkStyle 3 stroke:gray,color:dimgray
+linkStyle 4 stroke:gray,color:dimgray

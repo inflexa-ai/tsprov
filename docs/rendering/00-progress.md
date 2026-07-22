@@ -15,10 +15,70 @@
 | 0 — workspace restructure | core → `packages/tsprov`, private workspace root | ✅ **done** (2026-07-22) |
 | 1 — `tsprov-render-core` | scene graph + `PROV_THEME` + `Renderer` + eval harness | ✅ **done** (2026-07-22) |
 | 2 — `tsprov-render-dot` | DOT emitter + Python-parity goldens | ✅ **done** (2026-07-22) |
-| 3 — `tsprov-render-mermaid` | Mermaid emitter + goldens | ⬜ not started |
+| 3 — `tsprov-render-mermaid` | Mermaid emitter + goldens | ✅ **done** (2026-07-22) |
 | 4 — `tsprov-render-svg` | dagre layout + string SVG | ⬜ not started |
 | 5 — `tsprov-render-interactive` | self-contained interactive HTML | ⬜ not started |
 | 6 — `tsprov-render-graphviz` (stretch) | WASM engine over stage-2 DOT | ⬜ gated on go-ahead |
+
+---
+
+## 2026-07-22 · entry 4 — stage 3: `tsprov-render-mermaid`
+
+**Build:** bare `bun test` 1209 pass / 1 skip / 0 fail (39 files) · `bun run eval`
+92 pass / 0 fail (~4 s) · dual build + `tsc --noEmit` clean · core, render-core,
+render-dot zero-line diff · branch `feat/rendering-workspaces`.
+
+### The change
+
+OPSX change `rendering-stage3-mermaid-renderer` (archived, untracked). New package
+`rendering/tsprov-render-mermaid` (0.1.0): `MermaidRenderer` emits a deterministic
+flowchart — stadium/rect/hexagon shapes with theme classDefs (referenced-only, so
+Mermaid never sees an undefined class), index-aligned `linkStyle` tints,
+D18-consistent blank-node routing, gray annotation rects on dotted links, subgraph
+bundles, `click … href` node links. Sole dep: render-core. Goldens are
+reviewed-once snapshots (no Python reference exists for Mermaid), backstopped by a
+401-document corpus pass: no-throw, determinism, per-line grammar check (fails
+loudly on unknown forms), and shape/classDef/linkStyle theme conformance.
+**Spot-render gate passed**: the primer golden parses and renders through
+beautiful-mermaid with correct shapes/structure (the stray "click" box in that
+render is a beautiful-mermaid parser gap — `click n1 href … _blank` is documented
+Mermaid interaction syntax).
+
+### Measured sizes
+
+render-mermaid: **1660 B** gzipped+minified (budget 1830). Full text-tier install
+(tsprov + core + dot + mermaid) ≈ **5.3 KB** gz of rendering code, zero third-party
+deps.
+
+### Decisions / deviations
+
+- **D19**: Mermaid shape approximations (hexagon agent — no house shape; circle
+  join node; rect note; subroutine inferred-bundle), anchored to the dot.py shapes
+  they approximate.
+- **Orchestrator override (hard rule 7):** the agent transcribed `red4` (Usage
+  stroke) verbatim → inert in browsers. Fixed via delegation: the emitter owns a
+  documented Graphviz-X11→CSS projection (`toCssColor`, one entry: `red4` →
+  `#8B0000`), the theme stays Graphviz-faithful, the conformance eval compares
+  through the same exported helper, 4 golden lines regenerated. Usage edges are
+  dark-red in browsers again.
+- Accepted judgments: unquoted edge labels (fixed PROV vocabulary only),
+  annotation-row control-char collapse (19 corpus fixtures embed `\r\n\t`),
+  honest-empty `start1` golden (D15 skip → header-only flowchart), no subgraph
+  clicks (unreliable in Mermaid).
+
+### Valuation
+
+A consumer can now paste `new MermaidRenderer().render(doc)` output straight into
+GitHub/GitLab/Obsidian markdown and get the PROV visual language with zero tooling
+— the highest-reach output tier. Cheapest install for it: tsprov + render-core +
+render-mermaid (~3.7 KB gz of rendering code).
+
+### Next
+
+Stage 4: `tsprov-render-svg` — first package with an approved third-party dep
+(`@dagrejs/dagre` for layout), string SVG with `<title>` tooltips and bundle
+rects; budget expectations shift accordingly (dagre is the consumer's cost only in
+this package).
 
 ---
 

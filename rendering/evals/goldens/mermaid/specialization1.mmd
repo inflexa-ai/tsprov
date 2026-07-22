@@ -1,0 +1,7 @@
+flowchart BT
+n1(["ex:e2"]):::entityInferred
+n2(["ex:e1"]):::entityInferred
+n1 -->|specializationOf| n2
+click n1 href "http://example.org/e2" _blank
+click n2 href "http://example.org/e1" _blank
+classDef entityInferred fill:lightgray,stroke:dimgray
