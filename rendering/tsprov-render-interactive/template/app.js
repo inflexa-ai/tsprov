@@ -101,6 +101,22 @@
     return "arrow-" + color.replace(/[^A-Za-z0-9]/g, "");
   }
 
+  /**
+   * Mirror of render-core's safeLinkUri: returns the URI only when its scheme is link-safe
+   * (http/https/mailto, or scheme-less), else undefined. The embedded payload is ALREADY
+   * scheme-filtered at generation (interactive.ts), so this is defense in depth — a
+   * hand-edited payload could smuggle a javascript:/data: URI, and this is the last gate
+   * before it becomes a live href. Whitespace/control chars are stripped first so an
+   * obfuscated "java\nscript:" (which a browser collapses and runs) cannot slip through.
+   */
+  function safeLinkUri(uri) {
+    var normalized = String(uri).replace(/[\u0000-\u0020\u007f]/g, "");
+    var m = /^([a-zA-Z][a-zA-Z0-9+.-]*):/.exec(normalized);
+    if (m === null) return uri;
+    var scheme = m[1].toLowerCase();
+    return scheme === "http" || scheme === "https" || scheme === "mailto" ? uri : undefined;
+  }
+
   function lineHeight(fontSize) {
     return fontSize * LINE_HEIGHT_EM;
   }
@@ -517,7 +533,17 @@
       state.visible.delete(nb);
     });
     applyVisibility();
+    dropSelectionIfHidden();
     fitToVisible(true);
+  }
+
+  /**
+   * Invariant: the panel only ever describes a VISIBLE node. When a collapse or reset hides
+   * nodes, the current selection may vanish from the canvas — if it did, clear it and close the
+   * panel so the panel never lingers describing a node the reader can no longer see.
+   */
+  function dropSelectionIfHidden() {
+    if (state.selected !== null && !state.visible.has(state.selected)) clearSelection();
   }
 
   function showAll() {
@@ -531,6 +557,7 @@
   function reset() {
     state.visible = new Set(disclosure.initialVisibleIds);
     applyVisibility();
+    dropSelectionIfHidden();
     fitToVisible(true);
   }
 
@@ -740,7 +767,14 @@
     panel.appendChild(chip);
 
     if (n.uri) {
-      panel.appendChild(h("a", { class: "panel-uri", href: n.uri, text: n.uri, target: "_blank", rel: "noopener noreferrer" }));
+      // Defense in depth: the payload is scheme-filtered at generation, but re-check before
+      // making a live link. A filtered URI is shown as plain text so the reader still sees it.
+      var safeUri = safeLinkUri(n.uri);
+      panel.appendChild(
+        safeUri
+          ? h("a", { class: "panel-uri", href: safeUri, text: n.uri, target: "_blank", rel: "noopener noreferrer" })
+          : h("span", { class: "panel-uri", text: n.uri }),
+      );
     }
 
     panel.appendChild(h("p", { class: "panel-degree", text: "Degree: " + degreeOf(id) + " · " + adjacency[id].size + " neighbors" }));
@@ -763,8 +797,11 @@
       panel.appendChild(h("p", { class: "attr-empty", text: "No attributes." }));
     } else {
       var rows = n.attributes.map(function (a) {
-        var valueCell = a.valueUri
-          ? h("td", null, h("a", { href: a.valueUri, text: a.value, target: "_blank", rel: "noopener noreferrer" }))
+        // Defense in depth (see safeLinkUri): link the value only when its URI scheme is
+        // allowlisted; otherwise the value renders as plain text, never a hostile-scheme link.
+        var safeValueUri = a.valueUri ? safeLinkUri(a.valueUri) : undefined;
+        var valueCell = safeValueUri
+          ? h("td", null, h("a", { href: safeValueUri, text: a.value, target: "_blank", rel: "noopener noreferrer" }))
           : h("td", { text: a.value });
         return h("tr", null, [h("th", { scope: "row", text: a.name }), valueCell]);
       });

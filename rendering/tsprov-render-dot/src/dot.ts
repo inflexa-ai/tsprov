@@ -28,6 +28,7 @@ import {
   type RenderAttr,
   type RenderBundle,
   toRenderScene,
+  safeLinkUri,
 } from "@inflexa-ai/tsprov-render-core";
 import type { ProvDocument } from "@inflexa-ai/tsprov";
 
@@ -180,14 +181,19 @@ function edgeStyleAttrs(style: EdgeStyle, omitLabel: boolean): string[] {
 /** The HTML-TABLE label for an attribute-annotation note (`ANNOTATION_START/ROW/END`, `dot.py:163-168`). */
 function annotationLabel(attributes: readonly RenderAttr[]): string {
   const rows = attributes.map((attr) => {
-    // The value cell gains an `href` only when the value is itself an identifier
-    // (its `valueUri` is present) — `dot.py:232`. The name cell always links to the
-    // attribute's own URI.
-    const valueHref = attr.valueUri === undefined ? "" : ` href="${attr.valueUri}"`;
+    // These HTML-TABLE `href`s become live links once Graphviz rasterizes the DOT to SVG, so
+    // each is scheme-allowlisted like the node `URL` (a hostile `javascript:`/`data:` name or
+    // value URI would otherwise execute). The name cell normally links to the attribute's own
+    // URI (`dot.py:189`); the value cell only when the value is itself an identifier
+    // (`dot.py:232`). Real corpus URIs are http(s), so allowlisting changes no golden.
+    const nameHref = safeLinkUri(attr.nameUri);
+    const nameHrefAttr = nameHref === undefined ? "" : ` href="${nameHref}"`;
+    const valueHref = attr.valueUri === undefined ? undefined : safeLinkUri(attr.valueUri);
+    const valueHrefAttr = valueHref === undefined ? "" : ` href="${valueHref}"`;
     return (
       "    <TR>\n" +
-      `        <TD align="left" href="${attr.nameUri}">${htmlEscape(attr.name)}</TD>\n` +
-      `        <TD align="left"${valueHref}>${htmlEscape(attr.value)}</TD>\n` +
+      `        <TD align="left"${nameHrefAttr}>${htmlEscape(attr.name)}</TD>\n` +
+      `        <TD align="left"${valueHrefAttr}>${htmlEscape(attr.value)}</TD>\n` +
       "    </TR>"
     );
   });
@@ -284,7 +290,10 @@ function emitNode(
   counters: { bnode: number; annotation: number },
 ): void {
   const attrs = [`label=${nodeLabel(node, useLabels)}`];
-  if (node.uri !== undefined) attrs.push(`URL="${escapeDotString(node.uri)}"`);
+  // `URL` lands in the Graphviz-rendered SVG as a live link, so only an allowlisted scheme is
+  // emitted — a hostile `javascript:`/`data:` identifier URI would otherwise execute on click.
+  const nodeUrl = node.uri === undefined ? undefined : safeLinkUri(node.uri);
+  if (nodeUrl !== undefined) attrs.push(`URL="${escapeDotString(nodeUrl)}"`);
   attrs.push(...nodeStyleAttrs(nodeStyle(node, theme)));
   lines.push(`${node.id} [${attrs.join(", ")}];`);
   emitAnnotation(lines, node.attributes, node.id, theme, counters);
@@ -321,7 +330,9 @@ function emitCluster(
   // (`c1`, `c2`, …) mirrors dot.py's cluster counter, so `cluster_<id>` reproduces
   // the reference's subgraph name (dot.py:251).
   lines.push(`subgraph cluster_${bundle.id} {`);
-  if (bundle.uri !== undefined) lines.push(`URL="${escapeDotString(bundle.uri)}";`);
+  // Same live-link hazard as a node `URL` — allowlist the bundle's identifier scheme.
+  const clusterUrl = bundle.uri === undefined ? undefined : safeLinkUri(bundle.uri);
+  if (clusterUrl !== undefined) lines.push(`URL="${escapeDotString(clusterUrl)}";`);
   lines.push(`label="${escapeDotString(bundle.label)}";`);
   for (const node of scene.nodes) {
     if (node.bundleId === bundle.id) emitNode(lines, node, theme, useLabels, counters);

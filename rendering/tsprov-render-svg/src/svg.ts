@@ -46,6 +46,7 @@ import {
   type RenderAttr,
   type RenderBundle,
   toRenderScene,
+  safeLinkUri,
 } from "@inflexa-ai/tsprov-render-core";
 import type { ProvDocument } from "@inflexa-ai/tsprov";
 
@@ -970,7 +971,12 @@ function emitElement(el: LayoutNode): string {
   const label = centeredText(el.labelLines, box.x, textCy, NODE_FONT_SIZE, "black");
   const inferredClass = el.inferred ? " prov-inferred" : "";
   const group = `<g class="prov-node prov-${el.kind}${inferredClass}">${title}${shape}${label}</g>`;
-  return el.uri === undefined ? group : `<a href="${escapeXml(el.uri)}">${group}</a>`;
+  if (el.uri === undefined) return group;
+  // A hostile-scheme URI (javascript:/data:/…) in this href would execute when the file is
+  // opened from disk, so only an allowlisted scheme earns the anchor; otherwise the glyph is
+  // still drawn, just not clickable. Real PROV URIs are http(s), so this changes no golden.
+  const href = safeLinkUri(el.uri);
+  return href === undefined ? group : `<a href="${escapeXml(href)}">${group}</a>`;
 }
 
 /** The themed glyph element (ellipse/rect/house polygon/folder path) for an element node. */

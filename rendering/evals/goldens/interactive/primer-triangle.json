@@ -68,24 +68,18 @@
   "edges": [
     {
       "id": "e1",
-      "relation": "prov:Generation",
-      "label": "wasGeneratedBy",
       "source": "n1",
       "target": "n2",
       "naryLegs": []
     },
     {
       "id": "e2",
-      "relation": "prov:Association",
-      "label": "wasAssociatedWith",
       "source": "n2",
       "target": "n3",
       "naryLegs": []
     },
     {
       "id": "e3",
-      "relation": "prov:Attribution",
-      "label": "wasAttributedTo",
       "source": "n1",
       "target": "n3",
       "naryLegs": []
@@ -279,19 +273,11 @@
     }
   },
   "meta": {
-    "title": "Provenance graph",
     "counts": {
       "nodes": 3,
       "edges": 3,
       "bundles": 0,
       "skipped": 0
-    },
-    "options": {
-      "useLabels": false,
-      "includeElementAttributes": true,
-      "includeRelationAttributes": true,
-      "showNary": true,
-      "direction": "BT"
     },
     "disclosure": {
       "wholeGraph": true,

@@ -2,23 +2,23 @@
   "packages": {
     "@inflexa-ai/tsprov-render-core": {
       "gzipBudgetBytes": 2240,
-      "measuredSeedBytes": 2031
+      "measuredSeedBytes": 2187
     },
     "@inflexa-ai/tsprov-render-dot": {
       "gzipBudgetBytes": 1760,
-      "measuredSeedBytes": 1591
+      "measuredSeedBytes": 1647
     },
     "@inflexa-ai/tsprov-render-interactive": {
       "gzipBudgetBytes": 17690,
-      "measuredSeedBytes": 16077
+      "measuredSeedBytes": 16743
     },
     "@inflexa-ai/tsprov-render-mermaid": {
       "gzipBudgetBytes": 1890,
-      "measuredSeedBytes": 1718
+      "measuredSeedBytes": 1741
     },
     "@inflexa-ai/tsprov-render-svg": {
       "gzipBudgetBytes": 4290,
-      "measuredSeedBytes": 3897
+      "measuredSeedBytes": 3925
     }
   }
 }
