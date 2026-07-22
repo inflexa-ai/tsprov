@@ -1,0 +1,2408 @@
+{
+  "activity1.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "activity2.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "activity3.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "activity4.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "activity5.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "activity6.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "activity7.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "activity8.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "activity9.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "agent1.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "agent2.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "agent3.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "agent4.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "agent5.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "agent6.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "agent7.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "agent8.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "alternate1.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "association1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "association2.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "association3.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "association4.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "association5.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "association6.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "association7.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "association8.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "association9.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_activity0.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_agent0.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr1.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr10.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr11.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr12.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr13.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr14.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr15.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr16.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr17.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr18.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr19.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr2.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr20.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr21.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr22.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr23.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr24.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr25.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr26.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr27.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr28.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr29.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr3.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr30.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr31.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr32.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr33.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr34.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr35.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr36.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr37.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr38.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr39.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr4.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr40.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr41.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr42.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr43.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr44.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr5.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr6.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr7.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr8.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_association_one_role_attr9.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_attribution0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_communication0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_delegation0.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_derivation0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_end0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity0.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr0.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr1.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr10.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr11.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr12.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr13.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr14.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr15.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr16.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr17.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr18.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr19.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr2.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr20.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr21.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr22.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr23.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr24.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr25.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr26.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr27.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr28.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr29.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr3.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr30.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr31.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr32.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr33.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr34.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr35.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr36.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr37.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr38.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr39.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr4.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr40.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr41.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr42.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr43.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr44.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr5.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr6.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr7.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_attr8.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr0.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr1.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr10.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr11.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr12.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr13.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr14.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr15.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr16.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr17.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr18.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr19.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr2.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr20.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr21.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr22.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr23.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr24.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr25.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr26.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr27.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr28.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr29.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr3.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr30.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr31.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr32.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr33.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr34.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr35.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr36.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr37.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr38.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr39.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr4.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr40.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr41.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr42.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr43.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr44.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr5.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr6.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr7.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr8.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_location_attr9.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr0.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr1.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr10.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr11.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr12.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr13.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr14.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr15.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr16.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr17.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr18.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr19.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr2.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr20.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr21.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr22.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr23.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr24.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr25.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr26.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr27.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr28.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr29.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr3.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr30.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr31.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr32.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr33.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr34.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr35.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr36.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr37.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr38.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr39.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr4.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr40.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr41.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr42.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr43.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr44.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr5.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr6.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr7.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr8.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_other_attr9.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr0.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr1.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr10.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr11.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr12.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr13.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr14.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr15.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr16.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr17.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr18.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr19.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr2.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr20.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr21.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr22.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr23.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr24.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr25.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr26.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr27.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr28.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr29.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr3.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr30.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr31.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr32.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr33.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr34.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr35.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr36.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr37.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr38.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr39.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr4.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr40.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr41.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr42.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr43.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr44.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr5.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr6.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr7.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr8.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_entity_one_value_attr9.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_generation0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_influence0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_invalidation0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_start0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attr_usage0.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attribution1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "attribution2.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "attribution3.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attribution4.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attribution5.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attribution6.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attribution7.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "attribution8.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "bundle1.json": {
+    "nodes": 6,
+    "edges": 2,
+    "bundles": 2,
+    "skipped": 0
+  },
+  "bundle2.json": {
+    "nodes": 6,
+    "edges": 2,
+    "bundles": 2,
+    "skipped": 0
+  },
+  "bundle3.json": {
+    "nodes": 6,
+    "edges": 2,
+    "bundles": 2,
+    "skipped": 0
+  },
+  "bundle4.json": {
+    "nodes": 6,
+    "edges": 2,
+    "bundles": 2,
+    "skipped": 0
+  },
+  "communication1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "communication2.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "communication3.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "communication4.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "communication5.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "communication6.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "communication7.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "delegation1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "delegation2.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "delegation3.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "delegation4.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "delegation5.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "delegation6.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "delegation7.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "delegation8.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "derivation10.json": {
+    "nodes": 5,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation11.json": {
+    "nodes": 5,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation12.json": {
+    "nodes": 5,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation13.json": {
+    "nodes": 5,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation2.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "derivation3.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation4.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation5.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation6.json": {
+    "nodes": 4,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation7.json": {
+    "nodes": 5,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation8.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "derivation9.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "end1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "end10.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "end2.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "end3.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "end4.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "end5.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "end6.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "end7.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "end8.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "end9.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity0.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity1.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity10.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity2.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity3.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity4.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity5.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity6.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity7.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity8.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "entity9.json": {
+    "nodes": 1,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "generation1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "generation2.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "generation3.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "generation4.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "generation5.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "generation6.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "generation7.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "influence1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "influence2.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "influence3.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "influence4.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "influence5.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "influence6.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "influence7.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "invalidation1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "invalidation2.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "invalidation3.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "invalidation4.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "invalidation5.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "invalidation6.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "invalidation7.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "member1.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "member2.json": {
+    "nodes": 3,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "member3.json": {
+    "nodes": 4,
+    "edges": 3,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "mention1.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "mention2.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "real-world/prov-inflexa.2.json": {
+    "nodes": 151,
+    "edges": 487,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "real-world/prov-inflexa.3.json": {
+    "nodes": 86,
+    "edges": 300,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "real-world/prov-inflexa.1.json": {
+    "nodes": 68,
+    "edges": 211,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-end1-M.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-end1-S.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-end2-M.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-end2-S.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-end3-M.json": {
+    "nodes": 5,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-end3-S.json": {
+    "nodes": 4,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-end4-M.json": {
+    "nodes": 6,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-end4-S.json": {
+    "nodes": 6,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-generation1-M.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-generation1-S.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-generation2-M.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-generation2-S.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-invalidation1-M.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-invalidation1-S.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-invalidation2-M.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-invalidation2-S.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-start1-M.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-start1-S.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-start2-M.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-start2-S.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-start3-M.json": {
+    "nodes": 5,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-start3-S.json": {
+    "nodes": 4,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-start4-M.json": {
+    "nodes": 6,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-start4-S.json": {
+    "nodes": 6,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-usage1-M.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-usage1-S.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-usage2-M.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "scruffy-usage2-S.json": {
+    "nodes": 2,
+    "edges": 2,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "specialization1.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "start1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "start10.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "start2.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "start3.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "start4.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "start5.json": {
+    "nodes": 3,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "start6.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "start7.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "start8.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "start9.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "usage1.json": {
+    "nodes": 0,
+    "edges": 0,
+    "bundles": 0,
+    "skipped": 1
+  },
+  "usage2.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "usage3.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "usage4.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "usage5.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "usage6.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  },
+  "usage7.json": {
+    "nodes": 2,
+    "edges": 1,
+    "bundles": 0,
+    "skipped": 0
+  }
+}

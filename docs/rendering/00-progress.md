@@ -13,12 +13,80 @@
 | Stage (ladder order) | Deliverable | State |
 |---|---|---|
 | 0 — workspace restructure | core → `packages/tsprov`, private workspace root | ✅ **done** (2026-07-22) |
-| 1 — `tsprov-render-core` | scene graph + `PROV_THEME` + `Renderer` + eval harness | ⬜ not started |
+| 1 — `tsprov-render-core` | scene graph + `PROV_THEME` + `Renderer` + eval harness | ✅ **done** (2026-07-22) |
 | 2 — `tsprov-render-dot` | DOT emitter + Python-parity goldens | ⬜ not started |
 | 3 — `tsprov-render-mermaid` | Mermaid emitter + goldens | ⬜ not started |
 | 4 — `tsprov-render-svg` | dagre layout + string SVG | ⬜ not started |
 | 5 — `tsprov-render-interactive` | self-contained interactive HTML | ⬜ not started |
 | 6 — `tsprov-render-graphviz` (stretch) | WASM engine over stage-2 DOT | ⬜ gated on go-ahead |
+
+---
+
+## 2026-07-22 · entry 2 — stage 1: `tsprov-render-core` + the eval harness
+
+**Build:** bare `bun test` 1146 pass / 1 skip / 0 fail (32 files; the skip is the
+gated packaging eval, by design) · `bun run eval` 29 pass / 0 fail (~3 s, packaging
+eval installs real tarballs) · core proxy build + render-core dual build green ·
+`tsc --noEmit` clean · branch `feat/rendering-workspaces`.
+
+### The change
+
+OPSX change `rendering-stage1-render-core-and-evals` (archived, untracked per loop
+rules). New packages:
+
+- `rendering/tsprov-render-core` (`@inflexa-ai/tsprov-render-core` 0.1.0): semantic
+  `toRenderScene(doc, opts)` walking the document model with `prov_to_dot`'s
+  semantics (unified-with-fallback, sub-bundles, n-ary legs, inferred endpoints,
+  observable skips, deterministic `n1…`/`e1…` ids); `PROV_THEME` transcribing
+  `dot.py:61-168`; `Renderer` interface. Zero runtime deps; tsprov as peer
+  `>=0.5.1 <2` + `workspace:*` dev link. 18 in-package tests incl. the
+  resolution guard.
+- `rendering/evals` (private): corpus sweep (398 + 3 real-world docs, committed
+  `counts.snapshot.json`, double-projection byte-equality), dependency-policy eval
+  (auto-covers future `rendering/*` members), packaging eval gated on
+  `TSPROV_EVAL_FULL=1` (tarball consumer, single tsprov, cross-boundary
+  `instanceof`, bundler+nodenext typecheck), budget eval. Root `eval` script opens
+  the gate.
+
+New main specs: `render-scene`, `rendering-evals`. DEVIATIONS: **D15** (observable
+skips + no blank nodes vs `dot.py:301-313,354-355` — 30 corpus fixtures affected;
+**stage-2 golden comparison must consult D15**), **D16** (document-model walk, not
+`tsprov/graph` — corrects `rendering.research.md`; `ProvGraph` flattens bundles and
+binarizes relations).
+
+### Measured sizes
+
+render-core: **2047 B** gzipped+minified (budget 2260). Real-world scenes:
+provenance 68n/211e, prov-inflexa.2 151n/487e, prov-inflexa.3 86n/300e — all deterministic,
+zero skips.
+
+### Decisions / deviations
+
+- Post-review tighten (orchestrator finding, Opus fix): `RenderEdge.relation` /
+  `SkippedRelation.relation` are the closed `RelationKind` union, not `string`
+  (CLAUDE.md domain-type rule); the widening `relationStyle` helper deleted as dead
+  tolerance; the one cast carries its closed-registry invariant comment.
+- Accepted implementer judgments: theme carries declared + generic (gray) node-style
+  maps (faithful to `dot.py:61-92`, needed for exact reproduction); scene attribute
+  order is record-insertion order (`sorted_attributes` is presentation — renderers
+  sort); edges carry no `bundleId` (derivable from endpoints); packaging eval uses
+  `os.tmpdir()` (committed tests can't hardcode session paths).
+- `/simplify` outcome: one finding (the typing tighten above), applied via
+  delegation; nothing else — exports all consumed, comments WHY-only.
+
+### Valuation
+
+A consumer can now do `toRenderScene(doc)` → a stable, documented, theme-paired
+scene graph — the entire substrate every renderer consumes. Cheapest install:
+`@inflexa-ai/tsprov` + `@inflexa-ai/tsprov-render-core` (2 KB gz, zero transitive
+deps beyond luxon). The harness now mechanically guards the "never pay twice"
+promise for every future package.
+
+### Next
+
+Stage 2: `tsprov-render-dot` + Python-parity goldens (generation script under
+`rendering/evals/scripts/`, run once by hand via uv; structural comparison, D15-aware
+for the 30 skip-affected fixtures).
 
 ---
 
