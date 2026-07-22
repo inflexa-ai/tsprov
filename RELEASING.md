@@ -130,6 +130,38 @@ for new users.
 
 ---
 
+## Publishing the rendering packages
+
+The five `@inflexa-ai/tsprov-render-*` packages under `rendering/` are **not** wired into
+`release.yml` (which publishes only `packages/tsprov`) — publish them manually, the same way as
+the core's first publish in step 3 above. Each one carries a `prepack` script, so both
+`npm publish` and `bun pm pack` **build `dist/` automatically** from a clean checkout (verified:
+`bun pm pack` runs `prepack` in bun 1.3.14) — there is no separate build step to remember, and a
+stale or gitignored `dist/` can never ship.
+
+Publish **in dependency (topological) order** — each package's sibling dependency must already
+be on the registry when the next one goes up:
+
+1. **`tsprov-render-core`** — the foundation; depends on nothing but the `tsprov` peer.
+2. **`tsprov-render-dot`**, **`tsprov-render-mermaid`**, **`tsprov-render-svg`** — each takes
+   `render-core` as a regular dependency (any order among the three).
+3. **`tsprov-render-interactive`** — **last**, because it depends on `render-svg` (the layout
+   seam) in addition to `render-core`.
+
+```bash
+for pkg in tsprov-render-core \
+           tsprov-render-dot tsprov-render-mermaid tsprov-render-svg \
+           tsprov-render-interactive; do
+  ( cd "rendering/$pkg" && npm publish )   # prepack builds dist/ for you; enter the OTP per package
+done
+```
+
+Each rendering `package.json` already pins `publishConfig` (public registry, `--access public`)
+and ships its own `LICENSE` + `NOTICE`. As with the core, wire up a per-package trusted publisher
+afterward if you want CI to cut their subsequent releases.
+
+---
+
 ## Cutting a release (the recurring part)
 
 1. **Branch** from `main`.

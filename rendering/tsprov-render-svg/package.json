@@ -46,14 +46,16 @@
   "files": [
     "dist",
     "src",
-    "!src/**/*.test.ts"
+    "!src/**/*.test.ts",
+    "NOTICE"
   ],
   "scripts": {
     "clean": "rm -rf dist",
     "build": "bun run clean && bun run build:esm && bun run build:cjs",
     "build:esm": "tsc -p tsconfig.build.json",
     "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
-    "test": "bun test"
+    "test": "bun test",
+    "prepack": "bun run build"
   },
   "dependencies": {
     "@inflexa-ai/tsprov-render-core": "^0.1.0",

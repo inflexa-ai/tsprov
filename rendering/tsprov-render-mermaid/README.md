@@ -117,11 +117,12 @@ This is deviation **D15** (see `DEVIATIONS.md`).
 ## Install
 
 ```sh
-bun add @inflexa-ai/tsprov @inflexa-ai/tsprov-render-core @inflexa-ai/tsprov-render-mermaid
-# or: npm install @inflexa-ai/tsprov @inflexa-ai/tsprov-render-core @inflexa-ai/tsprov-render-mermaid
+bun add @inflexa-ai/tsprov @inflexa-ai/tsprov-render-mermaid
+# or: npm install @inflexa-ai/tsprov @inflexa-ai/tsprov-render-mermaid
 ```
 
-`tsprov` is a peer dependency (`>=0.5.1 <2`); render-core is a regular dependency.
+`tsprov` is a peer dependency (`>=0.5.1 <2`); `@inflexa-ai/tsprov-render-core` comes in
+automatically (it is a regular dependency of this package, not one you install yourself).
 The package ships a dual **ESM + CJS** build with `.d.ts` declarations, consumable
 under both `moduleResolution: bundler` and `nodenext`/`node16`.
 

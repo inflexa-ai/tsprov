@@ -88,6 +88,45 @@ test.skipIf(!FULL)(
         throw new Error(`missing tarballs: ${tarballs.join(", ")}`);
       }
 
+      // 2b. What actually SHIPS in each render tarball. A tarball whose `exports` point at a
+      //     `dist/` that never made it in resolves to ENOENT on install; the `prepack` build
+      //     hook is what keeps that from happening, and this asserts the payload it produces.
+      //     npm prefixes every entry with `package/`. Each render package must ship its two
+      //     community files (LICENSE + NOTICE — Apache-2.0 §4(d)), its README, and BOTH build
+      //     entries (the dual ESM + CJS contract).
+      const renderTarballs: { name: string; tgz: string }[] = [
+        { name: "render-core", tgz: renderTgz },
+        { name: "render-dot", tgz: renderDotTgz },
+        { name: "render-mermaid", tgz: renderMermaidTgz },
+        { name: "render-svg", tgz: renderSvgTgz },
+        { name: "render-interactive", tgz: renderInteractiveTgz },
+      ];
+      for (const { name, tgz } of renderTarballs) {
+        const listed = await $`tar -tzf ${tgz}`.quiet().nothrow();
+        expect(`tar ${name} exit ${listed.exitCode}`).toBe(`tar ${name} exit 0`);
+        const entries = listed.stdout.toString().split("\n");
+        for (const required of [
+          "package/README.md",
+          "package/LICENSE",
+          "package/NOTICE",
+          "package/dist/index.js",
+          "package/dist/cjs/index.js",
+        ]) {
+          expect(`${name} tarball has ${required}: ${entries.includes(required)}`).toBe(
+            `${name} tarball has ${required}: true`,
+          );
+        }
+        // interactive ships the COMPILED client (src/template.generated.ts) only — the raw
+        // template/ authoring sources are `bun run gen` inputs and must never leak into the
+        // published artifact.
+        if (name === "render-interactive") {
+          const templateLeak = entries.filter((e) => e.startsWith("package/template/"));
+          expect(`interactive template/ entries: ${templateLeak.length}`).toBe(
+            "interactive template/ entries: 0",
+          );
+        }
+      }
+
       // 3. A fresh consumer project installs ALL SIX tarballs. The core tarball satisfies
       //    every sibling's tsprov peer; the render-core tarball satisfies render-dot's,
       //    render-mermaid's, render-svg's, AND render-interactive's `^0.1.0` sibling
@@ -260,6 +299,63 @@ test.skipIf(!FULL)(
       );
       const interactiveRun = await $`bun run interactive.mjs`.cwd(consumer).quiet().nothrow();
       expect(`interactive exit ${interactiveRun.exitCode}`).toBe("interactive exit 0");
+
+      // 5f. The CommonJS require() path, run under Node (not Bun — Bun is lenient about ESM,
+      //     Node's CJS resolver is the one a real `require()` consumer hits). Node resolves each
+      //     package's `require` export condition to its `dist/cjs` build; a single `.cjs` script
+      //     requires all five render packages plus tsprov and exercises a DotRenderer render.
+      //     The dual build is only real if BOTH entries run — the ESM smokes above cover import;
+      //     this is their CJS twin, on the same packed install.
+      await Bun.write(
+        join(consumer, "cjs-smoke.cjs"),
+        [
+          `const { ProvDocument, ns } = require("@inflexa-ai/tsprov");`,
+          `const { toRenderScene } = require("@inflexa-ai/tsprov-render-core");`,
+          `const { DotRenderer } = require("@inflexa-ai/tsprov-render-dot");`,
+          `const { MermaidRenderer } = require("@inflexa-ai/tsprov-render-mermaid");`,
+          `const { SvgRenderer } = require("@inflexa-ai/tsprov-render-svg");`,
+          `const { renderInteractiveHtml } = require("@inflexa-ai/tsprov-render-interactive");`,
+          `for (const [n, v] of Object.entries({ toRenderScene, MermaidRenderer, SvgRenderer, renderInteractiveHtml })) {`,
+          `  if (typeof v !== "function") {`,
+          `    console.error("cjs require FAILED: missing named export from require build:", n);`,
+          `    process.exit(1);`,
+          `  }`,
+          `}`,
+          `const ex = ns("ex", "http://example.org/");`,
+          `const doc = new ProvDocument();`,
+          `doc.addNamespace(ex.prefix, ex.uri);`,
+          `doc.entity(ex.qn("e"));`,
+          `const dot = new DotRenderer().render(doc);`,
+          `if (!dot.startsWith("digraph G {") || !dot.includes('fillcolor="#FFFC87"')) {`,
+          `  console.error("cjs require FAILED:", dot);`,
+          `  process.exit(1);`,
+          `}`,
+          `console.log("cjs require OK");`,
+          ``,
+        ].join("\n"),
+      );
+      const cjsRun = await $`node cjs-smoke.cjs`.cwd(consumer).quiet().nothrow();
+      expect(`cjs require exit ${cjsRun.exitCode}\n${cjsRun.stdout}${cjsRun.stderr}`).toBe(
+        "cjs require exit 0\ncjs require OK\n",
+      );
+
+      // 5g. Every package's `require` export condition names a CJS `.d.ts` (`dist/cjs/index.d.ts`).
+      //     A nodenext CJS consumer resolves types through that path, so the file must actually be
+      //     in the installed tree — a resolve-check the type-only smoke below cannot see (it never
+      //     takes the `require` branch).
+      for (const pkg of [
+        "@inflexa-ai/tsprov",
+        "@inflexa-ai/tsprov-render-core",
+        "@inflexa-ai/tsprov-render-dot",
+        "@inflexa-ai/tsprov-render-mermaid",
+        "@inflexa-ai/tsprov-render-svg",
+        "@inflexa-ai/tsprov-render-interactive",
+      ]) {
+        const cjsTypes = join(consumer, "node_modules", pkg, "dist", "cjs", "index.d.ts");
+        expect(`${pkg} require.types exists: ${existsSync(cjsTypes)}`).toBe(
+          `${pkg} require.types exists: true`,
+        );
+      }
 
       // 6. Consumer typecheck under BOTH module resolutions. The consumer only uses
       //    the public types of every package; each must resolve cleanly.

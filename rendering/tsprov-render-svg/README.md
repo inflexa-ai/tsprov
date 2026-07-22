@@ -121,13 +121,13 @@ This is deviation **D15** (see the repository's `DEVIATIONS.md`).
 ## Dependencies and install cost
 
 ```sh
-bun add @inflexa-ai/tsprov @inflexa-ai/tsprov-render-core @inflexa-ai/tsprov-render-svg
-# or: npm install @inflexa-ai/tsprov @inflexa-ai/tsprov-render-core @inflexa-ai/tsprov-render-svg
+bun add @inflexa-ai/tsprov @inflexa-ai/tsprov-render-svg
+# or: npm install @inflexa-ai/tsprov @inflexa-ai/tsprov-render-svg
 ```
 
 Unlike the DOT and Mermaid renderers — which carry **zero third-party weight** because a
 downstream tool does the layout — this package pays for doing layout itself. Its two
-runtime dependencies are the value-semantic sibling
+runtime dependencies (both pulled in automatically, not installed by you) are the value-semantic sibling
 [`@inflexa-ai/tsprov-render-core`](https://www.npmjs.com/package/@inflexa-ai/tsprov-render-core)
 and **[`@dagrejs/dagre`](https://www.npmjs.com/package/@dagrejs/dagre)** (`^3`); `tsprov`
 is a **peer** (installed once, shared by every renderer).
