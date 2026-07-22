@@ -46,7 +46,7 @@ bun run bootstrap   # fetch the PROV-JSON conformance corpus — see below
 bun test
 ```
 
-**About that bootstrap step.** Two suites — `src/serializers/json.test.ts` and `src/graph/graph.test.ts` — read the 398-document corpus from `reference/prov/src/prov/tests/json`. That corpus belongs to the upstream Python project and is deliberately *not* vendored here: a copied oracle is a forked oracle, and one that silently stops matching the reference is worse than none at all. `bun run bootstrap` shallow-clones it into a gitignored `reference/` directory and does nothing if it is already there. Skip it and those two suites fail with `ENOENT` — meaning you are not testing the thing that matters.
+**About that bootstrap step.** Two suites — `packages/tsprov/src/serializers/json.test.ts` and `packages/tsprov/src/graph/graph.test.ts` — read the 398-document corpus from `reference/prov/src/prov/tests/json`. That corpus belongs to the upstream Python project and is deliberately *not* vendored here: a copied oracle is a forked oracle, and one that silently stops matching the reference is worse than none at all. `bun run bootstrap` shallow-clones it into a gitignored `reference/` directory and does nothing if it is already there. Skip it and those two suites fail with `ENOENT` — meaning you are not testing the thing that matters.
 
 `bun run test` runs the bootstrap for you, via `pretest`. A bare `bun test` does not: Bun's test runner bypasses lifecycle scripts.
 
@@ -69,7 +69,7 @@ There is no separate `lint` or `typecheck` script. `bun run build` is the typech
 These are the repo's real conventions — the full set lives in [`CLAUDE.md`](./CLAUDE.md). They are repeated here so you do not have to discover them one review comment at a time:
 
 - **Relative imports carry a `.js` extension** — `from "./identifier.js"`, even though the file on disk is `identifier.ts`. That is what makes the published `.d.ts` consumable under `moduleResolution: nodenext` with no post-build rewrite step. An extensionless import breaks consumers; a `.ts` one breaks the build.
-- **Named exports only.** `src/index.ts` is the single barrel; internal modules import each other directly.
+- **Named exports only.** `packages/tsprov/src/index.ts` is the single barrel; internal modules import each other directly.
 - **Value equality is the load-bearing invariant.** Every value type exposes `equals(other)` and a canonical `key`. Never key a `Map` or `Set` by object identity — JavaScript keys by reference, which would silently break PROV's value semantics.
 - **JSDoc (`/** … */`) on every exported declaration**, never a `//` line comment. JSDoc is what the language server surfaces on hover, which is where the documentation is actually read.
 - **No new runtime dependencies without sign-off.** The core is luxon-only, deliberately: it must stay browser-safe and tree-shakeable.

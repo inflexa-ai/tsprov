@@ -81,10 +81,12 @@ Rulesets → New branch ruleset* targeting `main`:
   ```bash
   npm login                 # authenticates the browser flow
   bun install --frozen-lockfile
-  npm publish               # prepublishOnly runs the build + smoke test for you
+  cd packages/tsprov && npm publish   # prepublishOnly runs the build + smoke test for you
   ```
 
-  `publishConfig` in `package.json` already pins the public registry and `--access public`
+  The publish runs from `packages/tsprov` because the repo root is a private workspace
+  root and only that member is publishable. `publishConfig` in
+  `packages/tsprov/package.json` already pins the public registry and `--access public`
   (scoped packages default to private, which the free org plan would reject).
 - [ ] Verify: `npm view @inflexa-ai/tsprov` shows the version, and
       `npm install @inflexa-ai/tsprov` works in a scratch directory with **no** `.npmrc`.
@@ -131,11 +133,11 @@ for new users.
 ## Cutting a release (the recurring part)
 
 1. **Branch** from `main`.
-2. **Bump `version`** in `package.json` — [semver](https://semver.org/): breaking API change
+2. **Bump `version`** in `packages/tsprov/package.json` — [semver](https://semver.org/): breaking API change
    → major (pre-1.0: minor), new feature → minor, fix → patch.
 3. **Sync the citation metadata**: run `.github/citation/sync.sh` and commit the rewritten
    `CITATION.cff` in the same commit as the bump. The `test` check fails any PR where
-   `CITATION.cff`'s `version` is out of step with `package.json`, and same-commit placement
+   `CITATION.cff`'s `version` is out of step with `packages/tsprov/package.json`, and same-commit placement
    is what keeps the tagged tree correct — Zenodo archives `CITATION.cff` at the tag's ref,
    and `release.yml` deliberately does not sync it (the workflow operates at the released
    commit; syncing there would either tag a stale file or push an unreviewed commit to

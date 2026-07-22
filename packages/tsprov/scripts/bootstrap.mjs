@@ -33,7 +33,10 @@ const REF = process.env.TSPROV_PROV_REF ?? "master";
 // themselves are the place that fails on it.
 const EXPECTED_FIXTURES = 398;
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+// The corpus is a repo-wide, gitignored checkout shared by every workspace member,
+// so it lives at the repository root — three levels above this script
+// (packages/tsprov/scripts) — not inside the package.
+const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const checkout = join(root, "reference", "prov");
 const corpus = join(checkout, "src", "prov", "tests", "json");
 
