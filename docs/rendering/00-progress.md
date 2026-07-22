@@ -22,6 +22,40 @@
 
 ---
 
+## 2026-07-22 · entry 7 — endgame: PR #12 + four review passes
+
+**Build:** bare `bun test` 1297 pass / 1 skip / 0 fail (49 files) · `bun run eval`
+180 pass / 0 fail · branch `feat/rendering-workspaces`, 10 commits, pushed ·
+**PR #12 open, unmerged** (https://github.com/inflexa-ai/tsprov/pull/12).
+
+### The review cycle (fresh-eyes Opus per pass, distinct lenses, fixes delegated)
+
+| Pass | Lens | Survived findings | Fix commit |
+|---|---|---|---|
+| 1 | correctness + conventions | 4 minor (mermaid label escaping, gate-script clutter, cast comments, export symmetry) | `ad5e72f` |
+| 2 | client runtime + security | **1 major** (`javascript:` URIs in every link sink) + 2 minor (orphaned selection, payload fat) | `5255fa5` |
+| 3 | packaging + consumer story | **1 major** (unpublishable-from-clean: gitignored dist, no prepack) + 4 minor (LICENSE/NOTICE, stale root README, eval blind spots, install docs) | `bc26d51` |
+| 4 | the fix commits themselves | **1 major** (DOT `useLabels` label injection forging live URLs past `safeLinkUri`) + 2 minor | `c03c272` |
+
+Security outcome: one shared `safeLinkUri` allowlist in render-core now guards
+every link sink across all four renderers and the interactive client
+(defense-in-depth), with browser-style normalization against obfuscated schemes,
+a hostile-scheme eval deliberately outside the golden set, and the DOT
+`useLabels` label entity-escaped against DOT-grammar forgery (**D21**, extended).
+Packaging outcome: prepack hooks on all five packages (regression-pinned by the
+packaging eval, which no longer pre-builds), LICENSE+NOTICE shipped everywhere,
+tarball-content + CJS-`require()` assertions, topological publish order in
+RELEASING.md, and the root README now presents the rendering family.
+
+### Remaining for the human reviewer
+
+PR #12 as a whole; the named follow-ups from entry 6 (compact hub layout,
+note-box dark contrast); the core `unified()` bundle-namespace divergence from
+entry 3 (separate change); stage 6 (graphviz WASM) gated on explicit go-ahead;
+first npm publish of the rendering family (manual, per RELEASING.md).
+
+---
+
 ## 2026-07-22 · entry 6 — stage 5: `tsprov-render-interactive` (the vision centerpiece)
 
 **Build:** bare `bun test` 1281 pass / 1 skip / 0 fail (47 files) · `bun run eval`
