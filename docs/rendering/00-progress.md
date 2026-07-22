@@ -22,6 +22,35 @@
 
 ---
 
+## 2026-07-22 · entry 8 — refactor: flat `packages/` workspace + fixture rename with history rewrite
+
+**Build:** bare `bun test` 1297 pass / 1 skip / 0 fail · `bun run eval` 180 pass /
+0 fail · `bun run build` + smoke + `--frozen-lockfile` green · branch rewritten
+and force-pushed (`--force-with-lease`); `main` untouched (`ca16c3d`).
+
+### The change (user-directed)
+
+- **One flat workspace:** every `rendering/*` member moved under `packages/`
+  (`packages/tsprov-render-{core,dot,mermaid,svg,interactive}`, `packages/evals`);
+  root workspaces now `["packages/*"]`; the `eval` script re-scoped to the same
+  180-test set; `repository.directory`/homepage fields, eval globs (with explicit
+  core exclusions in dependency-policy and budget evals), packaging-eval paths,
+  README/RELEASING/DEVIATIONS references all repointed. Commit `build: collapse
+  rendering/ into a single flat packages/ workspace`.
+- **Fixture rename with full history rewrite:** the personal-name fixtures became
+  `prov-inflexa.1.json` (was provenance.json), `.2` and `.3`; a scoped
+  `git filter-branch` over the 11 branch commits rewrote file paths, file
+  contents, and commit messages — zero occurrences remain anywhere in
+  `main..HEAD` patches or messages; fixture blobs are byte-identical across the
+  rename; author identities/dates preserved; backup ref
+  `backup/pre-rewrite-feat-rendering-workspaces` retains the old tip locally.
+
+Historical entries below this one keep their original `rendering/` paths — the
+log records what was true then; only the fixture names were purged (that was the
+rewrite's purpose).
+
+---
+
 ## 2026-07-22 · entry 7 — endgame: PR #12 + four review passes
 
 **Build:** bare `bun test` 1297 pass / 1 skip / 0 fail (49 files) · `bun run eval`
