@@ -157,7 +157,44 @@ and `lineagePaths(graph, result, target)` enumerates the connecting paths. See
   a multi-digraph view, composable record `resolve()`, and a directional, bounded `lineage()` walk,
   with no extra dependencies.
 
-PROV-XML, PROV-RDF, DOT (graph-visualisation) rendering, and the CLI are out of scope for now.
+PROV-XML, PROV-RDF, and the CLI are out of scope for now.
+
+## Rendering
+
+Turn a `ProvDocument` into a picture. Rendering lives in a **separate five-package family** —
+deliberately outside the core, which stays luxon-only — so you install only the renderer you
+use and pay for only what you render. Every renderer takes `@inflexa-ai/tsprov` as a **peer**
+(one shared copy across your whole app, so `instanceof` holds across the package boundary) and
+layers on a small, dependency-free scene projection (`@inflexa-ai/tsprov-render-core`, pulled in
+automatically as a regular dependency).
+
+| Package | Output | Size (gzipped) |
+| --- | --- | --- |
+| [`@inflexa-ai/tsprov-render-core`](rendering/tsprov-render-core) | shared scene projection + PROV visual theme (the foundation) | 2.2 KB |
+| [`@inflexa-ai/tsprov-render-dot`](rendering/tsprov-render-dot) | DOT / Graphviz `digraph` string | 1.6 KB |
+| [`@inflexa-ai/tsprov-render-mermaid`](rendering/tsprov-render-mermaid) | Mermaid `flowchart` string | 1.7 KB |
+| [`@inflexa-ai/tsprov-render-svg`](rendering/tsprov-render-svg) | standalone SVG string (dagre layout) | 3.9 KB + dagre ~14 KB |
+| [`@inflexa-ai/tsprov-render-interactive`](rendering/tsprov-render-interactive) | one self-contained, explorable HTML file | 16.7 KB |
+
+DOT and Mermaid carry **zero third-party weight** — a downstream tool draws the picture. SVG
+pays for [dagre](https://github.com/dagrejs/dagre) to lay out a real image on a server with no
+Graphviz, no browser, no WASM; interactive bakes that same layout into a single pan/zoom/search
+HTML file that opens from `file://`.
+
+```ts
+import { ProvDocument } from "@inflexa-ai/tsprov";
+import { DotRenderer } from "@inflexa-ai/tsprov-render-dot";
+
+const doc = new ProvDocument();
+doc.addNamespace("ex", "http://example.org/");
+doc.entity("ex:article").wasGeneratedBy(doc.activity("ex:compile"));
+
+const dot = new DotRenderer().render(doc);   // a DOT digraph string — pipe it to `dot -Tsvg`
+```
+
+Install a peer plus the leaf you want (`bun add @inflexa-ai/tsprov @inflexa-ai/tsprov-render-dot`).
+For each renderer's options, the visual language it draws, and its install cost, see the
+per-package READMEs under [`rendering/*/README.md`](rendering/).
 
 ## Develop
 
