@@ -21,11 +21,11 @@ if (!FULL) {
 
 const REPO_ROOT = `${import.meta.dir}/../..`;
 const CORE_DIR = join(REPO_ROOT, "packages/tsprov");
-const RENDER_CORE_DIR = join(REPO_ROOT, "rendering/tsprov-render-core");
-const RENDER_DOT_DIR = join(REPO_ROOT, "rendering/tsprov-render-dot");
-const RENDER_MERMAID_DIR = join(REPO_ROOT, "rendering/tsprov-render-mermaid");
-const RENDER_SVG_DIR = join(REPO_ROOT, "rendering/tsprov-render-svg");
-const RENDER_INTERACTIVE_DIR = join(REPO_ROOT, "rendering/tsprov-render-interactive");
+const RENDER_CORE_DIR = join(REPO_ROOT, "packages/tsprov-render-core");
+const RENDER_DOT_DIR = join(REPO_ROOT, "packages/tsprov-render-dot");
+const RENDER_MERMAID_DIR = join(REPO_ROOT, "packages/tsprov-render-mermaid");
+const RENDER_SVG_DIR = join(REPO_ROOT, "packages/tsprov-render-svg");
+const RENDER_INTERACTIVE_DIR = join(REPO_ROOT, "packages/tsprov-render-interactive");
 
 /** Recursively counts directories named exactly `@inflexa-ai/tsprov` (not `-render-core`). */
 function countTsprovInstances(root: string): string[] {

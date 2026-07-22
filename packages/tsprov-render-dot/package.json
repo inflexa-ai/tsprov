@@ -1,7 +1,7 @@
 {
-  "name": "@inflexa-ai/tsprov-render-svg",
+  "name": "@inflexa-ai/tsprov-render-dot",
   "version": "0.1.0",
-  "description": "SVG renderer for tsprov provenance documents — a scene-driven SvgRenderer that lays the graph out with dagre and emits a standalone SVG string in the W3C PROV visual language. A real picture on a server, no Graphviz, no browser, no WASM.",
+  "description": "DOT (Graphviz) renderer for tsprov provenance documents — a scene-driven DotRenderer that reproduces Python prov.dot's digraph output. Pipe its string to `dot` for images.",
   "keywords": [
     "prov",
     "provenance",
@@ -9,16 +9,16 @@
     "prov-dm",
     "visualization",
     "render",
-    "svg",
-    "dagre"
+    "graphviz",
+    "dot"
   ],
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/inflexa-ai/tsprov.git",
-    "directory": "rendering/tsprov-render-svg"
+    "directory": "packages/tsprov-render-dot"
   },
-  "homepage": "https://github.com/inflexa-ai/tsprov/tree/main/rendering/tsprov-render-svg#readme",
+  "homepage": "https://github.com/inflexa-ai/tsprov/tree/main/packages/tsprov-render-dot#readme",
   "bugs": {
     "url": "https://github.com/inflexa-ai/tsprov/issues"
   },
@@ -58,8 +58,7 @@
     "prepack": "bun run build"
   },
   "dependencies": {
-    "@inflexa-ai/tsprov-render-core": "^0.1.0",
-    "@dagrejs/dagre": "^3.0.0"
+    "@inflexa-ai/tsprov-render-core": "^0.1.0"
   },
   "peerDependencies": {
     "@inflexa-ai/tsprov": ">=0.5.1 <2"

@@ -5,19 +5,7 @@
     "": {
       "name": "tsprov",
     },
-    "packages/tsprov": {
-      "name": "@inflexa-ai/tsprov",
-      "version": "0.5.1",
-      "dependencies": {
-        "luxon": "^3.7.2",
-      },
-      "devDependencies": {
-        "@types/bun": "latest",
-        "@types/luxon": "^3.7.1",
-        "typescript": "^5 || ^6",
-      },
-    },
-    "rendering/evals": {
+    "packages/evals": {
       "name": "@inflexa-ai/tsprov-rendering-evals",
       "version": "0.0.0",
       "devDependencies": {
@@ -31,7 +19,19 @@
         "typescript": "^5 || ^6",
       },
     },
-    "rendering/tsprov-render-core": {
+    "packages/tsprov": {
+      "name": "@inflexa-ai/tsprov",
+      "version": "0.5.1",
+      "dependencies": {
+        "luxon": "^3.7.2",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@types/luxon": "^3.7.1",
+        "typescript": "^5 || ^6",
+      },
+    },
+    "packages/tsprov-render-core": {
       "name": "@inflexa-ai/tsprov-render-core",
       "version": "0.1.0",
       "devDependencies": {
@@ -43,7 +43,7 @@
         "@inflexa-ai/tsprov": ">=0.5.1 <2",
       },
     },
-    "rendering/tsprov-render-dot": {
+    "packages/tsprov-render-dot": {
       "name": "@inflexa-ai/tsprov-render-dot",
       "version": "0.1.0",
       "dependencies": {
@@ -59,7 +59,7 @@
         "@inflexa-ai/tsprov": ">=0.5.1 <2",
       },
     },
-    "rendering/tsprov-render-interactive": {
+    "packages/tsprov-render-interactive": {
       "name": "@inflexa-ai/tsprov-render-interactive",
       "version": "0.1.0",
       "dependencies": {
@@ -77,7 +77,7 @@
         "@inflexa-ai/tsprov": ">=0.5.1 <2",
       },
     },
-    "rendering/tsprov-render-mermaid": {
+    "packages/tsprov-render-mermaid": {
       "name": "@inflexa-ai/tsprov-render-mermaid",
       "version": "0.1.0",
       "dependencies": {
@@ -93,7 +93,7 @@
         "@inflexa-ai/tsprov": ">=0.5.1 <2",
       },
     },
-    "rendering/tsprov-render-svg": {
+    "packages/tsprov-render-svg": {
       "name": "@inflexa-ai/tsprov-render-svg",
       "version": "0.1.0",
       "dependencies": {
@@ -118,17 +118,17 @@
 
     "@inflexa-ai/tsprov": ["@inflexa-ai/tsprov@workspace:packages/tsprov"],
 
-    "@inflexa-ai/tsprov-render-core": ["@inflexa-ai/tsprov-render-core@workspace:rendering/tsprov-render-core"],
+    "@inflexa-ai/tsprov-render-core": ["@inflexa-ai/tsprov-render-core@workspace:packages/tsprov-render-core"],
 
-    "@inflexa-ai/tsprov-render-dot": ["@inflexa-ai/tsprov-render-dot@workspace:rendering/tsprov-render-dot"],
+    "@inflexa-ai/tsprov-render-dot": ["@inflexa-ai/tsprov-render-dot@workspace:packages/tsprov-render-dot"],
 
-    "@inflexa-ai/tsprov-render-interactive": ["@inflexa-ai/tsprov-render-interactive@workspace:rendering/tsprov-render-interactive"],
+    "@inflexa-ai/tsprov-render-interactive": ["@inflexa-ai/tsprov-render-interactive@workspace:packages/tsprov-render-interactive"],
 
-    "@inflexa-ai/tsprov-render-mermaid": ["@inflexa-ai/tsprov-render-mermaid@workspace:rendering/tsprov-render-mermaid"],
+    "@inflexa-ai/tsprov-render-mermaid": ["@inflexa-ai/tsprov-render-mermaid@workspace:packages/tsprov-render-mermaid"],
 
-    "@inflexa-ai/tsprov-render-svg": ["@inflexa-ai/tsprov-render-svg@workspace:rendering/tsprov-render-svg"],
+    "@inflexa-ai/tsprov-render-svg": ["@inflexa-ai/tsprov-render-svg@workspace:packages/tsprov-render-svg"],
 
-    "@inflexa-ai/tsprov-rendering-evals": ["@inflexa-ai/tsprov-rendering-evals@workspace:rendering/evals"],
+    "@inflexa-ai/tsprov-rendering-evals": ["@inflexa-ai/tsprov-rendering-evals@workspace:packages/evals"],
 
     "@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 

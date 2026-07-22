@@ -2,8 +2,8 @@
 """Generate reference DOT goldens from the vendored Python ``prov`` library.
 
 This is a ONE-TIME, run-by-hand generator: it reads every PROV-JSON fixture in
-``rendering/evals/fixtures/curated/`` and writes the ``prov.dot.prov_to_dot``
-output for each to ``rendering/evals/goldens/python-dot/<name>.gv``. The goldens
+``packages/evals/fixtures/curated/`` and writes the ``prov.dot.prov_to_dot``
+output for each to ``packages/evals/goldens/python-dot/<name>.gv``. The goldens
 are committed; the eval suite never runs Python — it compares the committed
 goldens structurally against ``DotRenderer`` output.
 
@@ -15,7 +15,7 @@ serializer registry eagerly imports the XML and RDF serializers, so ``lxml`` and
     uv run \
         --with pydot --with lxml --with rdflib \
         --with ./reference/prov \
-        python rendering/evals/scripts/generate-python-goldens.py
+        python packages/evals/scripts/generate-python-goldens.py
 
 Versions used when the committed goldens were generated: prov (vendored checkout
 at reference/prov, == 2.1.1.dev), pydot 4.0.1, Python 3.12. If the vendored

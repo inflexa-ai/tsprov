@@ -1,7 +1,7 @@
 {
-  "name": "@inflexa-ai/tsprov-render-dot",
+  "name": "@inflexa-ai/tsprov-render-core",
   "version": "0.1.0",
-  "description": "DOT (Graphviz) renderer for tsprov provenance documents — a scene-driven DotRenderer that reproduces Python prov.dot's digraph output. Pipe its string to `dot` for images.",
+  "description": "Renderer-agnostic scene projection and W3C PROV visual theme for tsprov — the shared foundation every tsprov renderer (dot, mermaid, svg, interactive) builds on.",
   "keywords": [
     "prov",
     "provenance",
@@ -16,9 +16,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/inflexa-ai/tsprov.git",
-    "directory": "rendering/tsprov-render-dot"
+    "directory": "packages/tsprov-render-core"
   },
-  "homepage": "https://github.com/inflexa-ai/tsprov/tree/main/rendering/tsprov-render-dot#readme",
+  "homepage": "https://github.com/inflexa-ai/tsprov/tree/main/packages/tsprov-render-core#readme",
   "bugs": {
     "url": "https://github.com/inflexa-ai/tsprov/issues"
   },
@@ -57,15 +57,11 @@
     "test": "bun test",
     "prepack": "bun run build"
   },
-  "dependencies": {
-    "@inflexa-ai/tsprov-render-core": "^0.1.0"
-  },
   "peerDependencies": {
     "@inflexa-ai/tsprov": ">=0.5.1 <2"
   },
   "devDependencies": {
     "@inflexa-ai/tsprov": "workspace:*",
-    "@inflexa-ai/tsprov-render-core": "workspace:*",
     "@types/bun": "latest",
     "typescript": "^5 || ^6"
   }

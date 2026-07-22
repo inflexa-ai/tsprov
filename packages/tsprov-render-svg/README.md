@@ -143,7 +143,7 @@ dagre is the honest, sanctioned heavy dependency here. Measured at implementatio
 
 That is the "pay only for what you render" tradeoff: you get a real picture with no
 external tool, in exchange for dagre's weight. This renderer's **own** code adds ~3.5 KB
-gzipped on top (the size budget in `rendering/evals/budgets.json` measures our code with
+gzipped on top (the size budget in `packages/evals/budgets.json` measures our code with
 deps external; dagre's cost is documented here, not budgeted, so the ratchet is not gamed).
 
 The package ships a dual **ESM + CJS** build with `.d.ts` declarations, consumable under
