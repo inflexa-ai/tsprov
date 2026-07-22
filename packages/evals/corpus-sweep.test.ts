@@ -2,6 +2,7 @@ import { test, expect } from "bun:test";
 import { readdirSync } from "node:fs";
 import { ProvDocument } from "@inflexa-ai/tsprov";
 import { toRenderScene } from "@inflexa-ai/tsprov-render-core";
+import { shouldRegen } from "./regen-scope.js";
 
 // The corpus sweep: project every PROV-JSON fixture the repo ships (the 398-file
 // upstream corpus + the 3 committed real-world documents) through `toRenderScene`
@@ -47,6 +48,9 @@ async function projectFixture(
 ): Promise<{ counts: Counts; json: string }> {
   const text = await Bun.file(fixture.path).text();
   const doc = ProvDocument.deserialize(text, "json");
+  // Default options are the reference posture (no useLabels, no direction/theme override):
+  // this breadth sweep pins the DEFAULT projection at corpus scale; the option axes are
+  // covered narrowly by the in-package unit tests and the curated golden fixtures.
   const first = toRenderScene(doc);
   const second = toRenderScene(doc);
   const firstJson = JSON.stringify(first);
@@ -81,10 +85,10 @@ test("every corpus + real-world fixture projects without throwing", async () => 
     measured[fixture.key] = counts;
   }
 
-  // Regenerate the committed snapshot on demand (or on first run); otherwise assert
-  // the measured counts match it exactly — both the values and the key set.
+  // Regenerate the committed snapshot on demand (`TSPROV_EVAL_REGEN=counts`, or `=all`) or
+  // on first run; otherwise assert the measured counts match it exactly — values and key set.
   const snapshot = await loadSnapshot();
-  if (snapshot === null || process.env.TSPROV_EVAL_REGEN === "1") {
+  if (snapshot === null || shouldRegen("counts")) {
     const ordered = Object.fromEntries(
       Object.keys(measured)
         .sort()

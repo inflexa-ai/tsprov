@@ -5,5 +5,5 @@
 // modules import each other directly. `@inflexa-ai/tsprov-render-core` is this
 // package's one runtime dependency; `tsprov` is a peer.
 
-export { MermaidRenderer, toCssColor } from "./mermaid.js";
+export { MermaidRenderer } from "./mermaid.js";
 export type { MermaidRenderOptions } from "./mermaid.js";

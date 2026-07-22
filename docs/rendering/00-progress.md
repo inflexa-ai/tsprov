@@ -22,6 +22,46 @@
 
 ---
 
+## 2026-07-22 · entry 9 — /review with three parallel Opus workers (user-requested)
+
+**Build:** bare `bun test` 1298 pass / 1 skip / 0 fail · `bun run test` now runs
+the SAME full workspace suite · `bun run eval` 181 pass / 0 fail · goldens,
+snapshots, and budget values byte-unchanged.
+
+### The review (three fresh-eyes workers, distinct lenses)
+
+- **A — refactor delta**: mechanically clean. Both seeded hazards empirically
+  refuted (bun's path filter provably excludes the core suite; the build chain is
+  a valid topological sort from wiped dists). One minor: entry 7's fix-commit
+  SHAs died in the history rewrite — repointed to the rewritten hashes.
+- **B — eval-suite soundness**: the strong parts held under attack (D15 exclusion
+  accounting is tight; DOT/Mermaid extractors provably fail loudly). Four majors
+  fixed: the size ratchet now REFUSES to raise a committed budget (downward-only,
+  raise = hand-edited reviewed diff); `TSPROV_EVAL_REGEN` must name a family
+  (`counts`/`interactive`/`budgets`/`all` — the old `=1` shotgun now fails with
+  guidance); interactive goldens no longer self-heal (missing golden = red test,
+  count guard reads the goldens dir); all seven client geometry constants are
+  agreement-tested against `measure.ts` values.
+- **C — cold whole-PR read**: core boundary proven byte-identical apart from the
+  three sanctioned stage-0 edits; tsconfig flags hash-identical across all six
+  packages; D15–D21 anchors all resolve against current code. Fixed: the root
+  `test` script ran only the core's 1118 tests (now the full 1298 workspace
+  suite + CONTRIBUTING wording); `toCssColor` deduplicated into render-core
+  (single owner, pure motion, D19 cell updated).
+
+### Recorded follow-ups (accepted, not fixed this round)
+
+SVG edge conformance is set-based (byte-goldens mitigate); `svg-extract` skips
+where DOT/Mermaid extractors throw; no programmatic mermaid/svg golden regen
+path; LR/RL + theme-override + `useLabels` corpus axes rest on unit tests +
+curated fixtures (posture now stated in each sweep); the packaging eval never
+runs in CI (opt-in `bun run eval` — a CI-cost decision for the maintainer); the
+client disclosure engine's only behavioral test is the per-change browser gate;
+evals' corpus loaders are quintuplicated; render-core's budget headroom is now
+~9 bytes (hand-raise when it next grows).
+
+---
+
 ## 2026-07-22 · entry 8 — refactor: flat `packages/` workspace + fixture rename with history rewrite
 
 **Build:** bare `bun test` 1297 pass / 1 skip / 0 fail · `bun run eval` 180 pass /
@@ -61,10 +101,10 @@ rewrite's purpose).
 
 | Pass | Lens | Survived findings | Fix commit |
 |---|---|---|---|
-| 1 | correctness + conventions | 4 minor (mermaid label escaping, gate-script clutter, cast comments, export symmetry) | `ad5e72f` |
-| 2 | client runtime + security | **1 major** (`javascript:` URIs in every link sink) + 2 minor (orphaned selection, payload fat) | `5255fa5` |
-| 3 | packaging + consumer story | **1 major** (unpublishable-from-clean: gitignored dist, no prepack) + 4 minor (LICENSE/NOTICE, stale root README, eval blind spots, install docs) | `bc26d51` |
-| 4 | the fix commits themselves | **1 major** (DOT `useLabels` label injection forging live URLs past `safeLinkUri`) + 2 minor | `c03c272` |
+| 1 | correctness + conventions | 4 minor (mermaid label escaping, gate-script clutter, cast comments, export symmetry) | `1838640` |
+| 2 | client runtime + security | **1 major** (`javascript:` URIs in every link sink) + 2 minor (orphaned selection, payload fat) | `171475f` |
+| 3 | packaging + consumer story | **1 major** (unpublishable-from-clean: gitignored dist, no prepack) + 4 minor (LICENSE/NOTICE, stale root README, eval blind spots, install docs) | `90a33a4` |
+| 4 | the fix commits themselves | **1 major** (DOT `useLabels` label injection forging live URLs past `safeLinkUri`) + 2 minor | `56329de` |
 
 Security outcome: one shared `safeLinkUri` allowlist in render-core now guards
 every link sink across all four renderers and the interactive client

@@ -28,10 +28,10 @@ import {
   type RenderScene,
   type RenderAttr,
   safeLinkUri,
+  toCssColor,
 } from "@inflexa-ai/tsprov-render-core";
 import {
   layoutScene,
-  toCssColor,
   type LayoutScene,
   type LayoutBox,
   type LayoutPoint,

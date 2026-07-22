@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { readdirSync, existsSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { ProvDocument } from "@inflexa-ai/tsprov";
 import type { SceneOptions } from "@inflexa-ai/tsprov-render-core";
 import {
@@ -7,6 +7,7 @@ import {
   buildScenePayload,
   type InteractiveRenderOptions,
 } from "@inflexa-ai/tsprov-render-interactive";
+import { shouldRegen } from "./regen-scope.js";
 
 // The interactive eval has two layers, mirroring the svg eval's golden + corpus split:
 //   1. Payload goldens: for each curated fixture, the embedded positioned scene (the JSON
@@ -27,8 +28,6 @@ const OPTIONS_PATH = `${CURATED_DIR}/render-options.json`;
 const CORPUS_DIR = `${import.meta.dir}/../../reference/prov/src/prov/tests/json`;
 const REAL_WORLD_DIR = `${import.meta.dir}/fixtures/real-world`;
 
-const REGEN = process.env.TSPROV_EVAL_REGEN === "1";
-
 type FixtureOptions = SceneOptions & { readonly direction?: InteractiveRenderOptions["direction"] };
 
 async function loadOptions(): Promise<Record<string, FixtureOptions>> {
@@ -45,6 +44,14 @@ async function loadOptions(): Promise<Record<string, FixtureOptions>> {
 function listCurated(): string[] {
   return readdirSync(CURATED_DIR)
     .filter((name) => name.endsWith(".json") && name !== "render-options.json")
+    .map((name) => name.slice(0, -".json".length))
+    .sort();
+}
+
+/** The committed payload-golden basenames — the `<name>.json` files in GOLDEN_DIR. */
+function listGoldens(): string[] {
+  return readdirSync(GOLDEN_DIR)
+    .filter((name) => name.endsWith(".json"))
     .map((name) => name.slice(0, -".json".length))
     .sort();
 }
@@ -83,8 +90,10 @@ function chromeOf(html: string): string {
 
 // ── Payload goldens ──────────────────────────────────────────────────────────────
 
-test("the curated fixture set matches its committed golden count", () => {
-  expect(listCurated().length).toBe(13);
+test("the committed golden set matches its expected count", () => {
+  // Count the GOLDENS, not the fixtures: a fixture added without its golden (or a deleted
+  // golden) must turn this red, mirroring the svg/mermaid/dot golden-parity count guards.
+  expect(listGoldens().length).toBe(13);
 });
 
 for (const fixture of listCurated()) {
@@ -94,7 +103,9 @@ for (const fixture of listCurated()) {
     const doc = ProvDocument.deserialize(fixtureText, "json");
     const payload = buildScenePayload(doc, options);
     const goldenPath = `${GOLDEN_DIR}/${fixture}.json`;
-    if (REGEN || !existsSync(goldenPath)) {
+    // Only a scoped regen writes the golden. Outside regen a MISSING golden is a red test —
+    // the byte-compare below reads a nonexistent file and throws — never a silent self-heal.
+    if (shouldRegen("interactive")) {
       await Bun.write(goldenPath, payloadGolden(payload));
       return;
     }
@@ -115,7 +126,8 @@ test("full-HTML golden: primer-triangle", async () => {
   );
   const html = renderInteractiveHtml(doc, options);
   const goldenPath = `${GOLDEN_DIR}/primer-triangle.html`;
-  if (REGEN || !existsSync(goldenPath)) {
+  // Only a scoped regen writes the golden; outside regen a missing golden is a red test.
+  if (shouldRegen("interactive")) {
     await Bun.write(goldenPath, html);
     return;
   }
@@ -148,6 +160,9 @@ test("every corpus + real-world fixture renders deterministically, self-containe
     const doc = ProvDocument.deserialize(text, "json");
 
     // 1. No throw + 2. determinism (byte-identical double render).
+    // Default options are the reference posture (no useLabels, direction BT, no theme
+    // override): this breadth sweep pins the DEFAULT render at corpus scale; the option
+    // axes are covered by the in-package unit tests and the curated golden fixtures.
     const first = renderInteractiveHtml(doc);
     const second = renderInteractiveHtml(doc);
     expect(`${fixture.key} deterministic: ${first === second}`).toBe(`${fixture.key} deterministic: true`);

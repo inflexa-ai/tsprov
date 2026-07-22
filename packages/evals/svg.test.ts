@@ -4,11 +4,12 @@ import { ProvDocument } from "@inflexa-ai/tsprov";
 import {
   toRenderScene,
   PROV_THEME,
+  toCssColor,
   type SceneOptions,
   type NodeStyle,
   type NodeKind,
 } from "@inflexa-ai/tsprov-render-core";
-import { SvgRenderer, toCssColor, type SvgRenderOptions } from "@inflexa-ai/tsprov-render-svg";
+import { SvgRenderer, type SvgRenderOptions } from "@inflexa-ai/tsprov-render-svg";
 
 import { parseSvg, checkWellFormed, type SvgGlyph } from "./svg-extract.js";
 
@@ -235,6 +236,9 @@ test("every corpus + real-world fixture renders, is deterministic, well-formed, 
     const doc = ProvDocument.deserialize(text, "json");
 
     // 1. No throw + 2. determinism (byte-identical double render).
+    // Default options are the reference posture (no useLabels, direction BT, no theme
+    // override): this breadth sweep pins the DEFAULT render at corpus scale; the option
+    // axes are covered by the curated golden fixtures and the in-package unit tests.
     const first = renderString(doc);
     const second = renderString(doc);
     expect(`${fixture.key} deterministic: ${first === second}`).toBe(

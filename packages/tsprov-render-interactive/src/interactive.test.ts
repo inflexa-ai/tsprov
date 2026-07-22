@@ -170,6 +170,35 @@ test("the client mirrors EXPAND_CAP verbatim (generator + client agree on the pe
   expect(APP_JS).toContain(`var EXPAND_CAP = ${EXPAND_CAP};`);
 });
 
+test("the client mirrors render-svg's geometry constants (client re-derives glyph silhouettes)", () => {
+  // The payload carries dagre BOX sizes; app.js re-derives each glyph's silhouette from the box
+  // exactly as the SVG emitter does, so its seven geometry constants MUST equal render-svg's
+  // measure.ts values (app.js:37-43, commented "MUST match measure.ts"). Only EXPAND_CAP had a
+  // drift test before; without this one, a measure.ts change could silently desync the picture.
+  //
+  // The expected values are pinned as literals here — NOT imported from measure.ts — for two
+  // reasons: those constants are internal to render-svg (absent from its public barrel, and
+  // LINE_HEIGHT_EM isn't even `export`ed), and reaching across packages into another package's
+  // src/ is forbidden. measure.ts (packages/tsprov-render-svg/src/measure.ts) is the SOLE source
+  // of truth for these numbers; this table is a deliberate third copy whose only job is to be a
+  // drift ALARM — change a value in measure.ts and both app.js and this test go red until each is
+  // brought back into lockstep, which is exactly the coupling we want surfaced.
+  const expected: Record<string, number> = {
+    NODE_FONT_SIZE: 14,
+    LABEL_FONT_SIZE: 10,
+    LINE_HEIGHT_EM: 1.3,
+    NODE_PAD_X: 12,
+    HOUSE_ROOF: 16,
+    FOLDER_TAB: 10,
+    NOTE_FOLD: 12,
+  };
+  for (const [name, value] of Object.entries(expected)) {
+    expect(`${name} declared: ${APP_JS.includes(`var ${name} = ${value};`)}`).toBe(
+      `${name} declared: true`,
+    );
+  }
+});
+
 test("an explicit focus option selects the initial-set center", () => {
   const payload = buildScenePayload(chain(WHOLE_GRAPH_MAX + 20), { focus: "ex:e40" });
   const focusNode = payload.nodes.find((n) => n.id === payload.meta.disclosure.focusId);

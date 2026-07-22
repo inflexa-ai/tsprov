@@ -15,10 +15,13 @@ change touches ONE file, not thirteen:
 
 The eval (`../../interactive.test.ts`) byte-compares current output against these files, so
 any change — a dagre coordinate shift, a theme tweak, a template edit — turns a golden red
-and forces a **reviewed** regeneration:
+and forces a **reviewed** regeneration. `TSPROV_EVAL_REGEN` is **scoped by family** so a
+single command can never re-bless artifacts you did not mean to touch: name `interactive`
+(or `all`) — the bare `1` is rejected. A missing golden is a red test, never a silent
+self-heal; only a scoped regen writes one.
 
 ```sh
-TSPROV_EVAL_REGEN=1 bun test packages/evals/interactive.test.ts
+TSPROV_EVAL_REGEN=interactive bun test packages/evals/interactive.test.ts
 ```
 
 ## These are snapshots, not a Python oracle

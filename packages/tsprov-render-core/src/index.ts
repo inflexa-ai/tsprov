@@ -34,3 +34,5 @@ export type {
 export type { Renderer, RendererOptions } from "./renderer.js";
 
 export { safeLinkUri } from "./uri.js";
+
+export { toCssColor } from "./css-color.js";

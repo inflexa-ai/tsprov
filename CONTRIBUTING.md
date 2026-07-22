@@ -48,7 +48,7 @@ bun test
 
 **About that bootstrap step.** Two suites — `packages/tsprov/src/serializers/json.test.ts` and `packages/tsprov/src/graph/graph.test.ts` — read the 398-document corpus from `reference/prov/src/prov/tests/json`. That corpus belongs to the upstream Python project and is deliberately *not* vendored here: a copied oracle is a forked oracle, and one that silently stops matching the reference is worse than none at all. `bun run bootstrap` shallow-clones it into a gitignored `reference/` directory and does nothing if it is already there. Skip it and those two suites fail with `ENOENT` — meaning you are not testing the thing that matters.
 
-`bun run test` runs the bootstrap for you, via `pretest`. A bare `bun test` does not: Bun's test runner bypasses lifecycle scripts.
+`bun run test` bootstraps the corpus for you and then runs the **full workspace** suite (it is `bun run bootstrap && bun test` — every package's tests, not just the core library's). A bare `bun test` runs the same full workspace suite but skips the bootstrap (Bun's test runner bypasses lifecycle scripts), so reach for it only when the corpus is already in place.
 
 ## Making changes
 
