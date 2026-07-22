@@ -303,15 +303,24 @@ function emitNode(
  * The node's `label` value. Without `useLabels`, or when the label equals the
  * identifier, a plain quoted string (`dot.py:263,275`). With `useLabels` and a
  * distinct label, the two-line HTML form — the label as the main text and the
- * identifier as a smaller subtitle (`dot.py:269-273`). The two-line form interpolates
- * raw (no entity-escaping), exactly as the reference does.
+ * identifier as a smaller subtitle (`dot.py:269-273`).
+ *
+ * The interpolated label/QName text is entity-escaped (via {@link htmlEscape}) so only
+ * the emitter's OWN structural markup — the outer `<…>`, the `<br />`, the `<font …>` —
+ * is live HTML. Both halves are attacker-influenceable document content: an unescaped
+ * `>` in a `prov:label` would close the `<…>` label early and forge arbitrary DOT,
+ * including a `URL="javascript:…"` sink that never passes through the `safeLinkUri`
+ * scheme allowlist. The reference interpolates this label raw (`dot.py:269-273` — its
+ * annotation rows escape via `html.escape` but this label does not); escaping here
+ * hardens the same sink the annotation cells already defend. Real labels/QNames carry
+ * no `&<>`, so the escape is byte-identical for every golden.
  */
 function nodeLabel(node: RenderNode, useLabels: boolean): string {
   if (useLabels && node.label !== node.qualifiedName) {
     return (
-      `<${node.label}<br />` +
+      `<${htmlEscape(node.label)}<br />` +
       `<font color="#333333" point-size="10">` +
-      `${node.qualifiedName}</font>>`
+      `${htmlEscape(node.qualifiedName)}</font>>`
     );
   }
   return `"${escapeDotString(node.label)}"`;

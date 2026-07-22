@@ -54,15 +54,13 @@ test.skipIf(!FULL)(
     await $`mkdir -p ${packDir} ${consumer}`.quiet();
 
     try {
-      // 1. Build every publishable package so its `dist/` is present in the tarballs.
-      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR, RENDER_SVG_DIR, RENDER_INTERACTIVE_DIR]) {
-        const built = await $`bun run build`.cwd(dir).quiet().nothrow();
-        expect(`build ${dir} exit ${built.exitCode}`).toBe(
-          `build ${dir} exit 0`,
-        );
-      }
-
-      // 2. Pack each into a tarball (no registry).
+      // 1. Pack each publishable package into a tarball (no registry). We deliberately do NOT
+      //    pre-build: `bun pm pack` fires each render package's `prepack` hook (verified in bun
+      //    1.3.14), so the pack step itself produces `dist/`. That is what makes the
+      //    tarball-content assertions below a real regression pin for those hooks — a vanished or
+      //    broken `prepack` means missing dist files, which turns the "tarball has package/dist/…"
+      //    assertions red. (`@inflexa-ai/tsprov` builds via `prepublishOnly`, which pack does NOT
+      //    fire; its already-built `dist/` is consumed as-is and is out of scope for this pin.)
       for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR, RENDER_SVG_DIR, RENDER_INTERACTIVE_DIR]) {
         const packed =
           await $`bun pm pack --destination ${packDir}`.cwd(dir).quiet().nothrow();
@@ -88,7 +86,7 @@ test.skipIf(!FULL)(
         throw new Error(`missing tarballs: ${tarballs.join(", ")}`);
       }
 
-      // 2b. What actually SHIPS in each render tarball. A tarball whose `exports` point at a
+      // 2. What actually SHIPS in each render tarball. A tarball whose `exports` point at a
       //     `dist/` that never made it in resolves to ENOENT on install; the `prepack` build
       //     hook is what keeps that from happening, and this asserts the payload it produces.
       //     npm prefixes every entry with `package/`. Each render package must ship its two
