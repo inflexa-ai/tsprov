@@ -24,6 +24,7 @@ const CORE_DIR = join(REPO_ROOT, "packages/tsprov");
 const RENDER_CORE_DIR = join(REPO_ROOT, "rendering/tsprov-render-core");
 const RENDER_DOT_DIR = join(REPO_ROOT, "rendering/tsprov-render-dot");
 const RENDER_MERMAID_DIR = join(REPO_ROOT, "rendering/tsprov-render-mermaid");
+const RENDER_SVG_DIR = join(REPO_ROOT, "rendering/tsprov-render-svg");
 
 /** Recursively counts directories named exactly `@inflexa-ai/tsprov` (not `-render-core`). */
 function countTsprovInstances(root: string): string[] {
@@ -53,7 +54,7 @@ test.skipIf(!FULL)(
 
     try {
       // 1. Build every publishable package so its `dist/` is present in the tarballs.
-      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR]) {
+      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR, RENDER_SVG_DIR]) {
         const built = await $`bun run build`.cwd(dir).quiet().nothrow();
         expect(`build ${dir} exit ${built.exitCode}`).toBe(
           `build ${dir} exit 0`,
@@ -61,7 +62,7 @@ test.skipIf(!FULL)(
       }
 
       // 2. Pack each into a tarball (no registry).
-      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR]) {
+      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR, RENDER_SVG_DIR]) {
         const packed =
           await $`bun pm pack --destination ${packDir}`.cwd(dir).quiet().nothrow();
         expect(`pack ${dir} exit ${packed.exitCode}`).toBe(`pack ${dir} exit 0`);
@@ -73,19 +74,25 @@ test.skipIf(!FULL)(
       const renderTgz = tarballs.find((f) => f.includes("render-core"));
       const renderDotTgz = tarballs.find((f) => f.includes("render-dot"));
       const renderMermaidTgz = tarballs.find((f) => f.includes("render-mermaid"));
+      const renderSvgTgz = tarballs.find((f) => f.includes("render-svg"));
       if (
         coreTgz === undefined ||
         renderTgz === undefined ||
         renderDotTgz === undefined ||
-        renderMermaidTgz === undefined
+        renderMermaidTgz === undefined ||
+        renderSvgTgz === undefined
       ) {
         throw new Error(`missing tarballs: ${tarballs.join(", ")}`);
       }
 
-      // 3. A fresh consumer project installs ALL FOUR tarballs. The core tarball
+      // 3. A fresh consumer project installs ALL FIVE tarballs. The core tarball
       //    satisfies every sibling's tsprov peer, and the render-core tarball satisfies
-      //    both render-dot's and render-mermaid's `^0.1.0` sibling dependency — all
-      //    without any registry lookup.
+      //    render-dot's, render-mermaid's, AND render-svg's `^0.1.0` sibling dependency —
+      //    pinned offline via `overrides`. render-svg's OTHER runtime dependency,
+      //    `@dagrejs/dagre@^3`, is NOT overridden: it is a published package, so it
+      //    resolves from the real npm registry exactly as a downstream consumer's install
+      //    would — this is the one renderer whose install reaches the registry, and that
+      //    is the point (the heavy dep is real and paid for on install).
       await Bun.write(
         join(consumer, "package.json"),
         `${JSON.stringify(
@@ -94,10 +101,6 @@ test.skipIf(!FULL)(
             version: "0.0.0",
             private: true,
             type: "module",
-            // render-dot and render-mermaid each declare `@inflexa-ai/tsprov-render-core:
-            // ^0.1.0`; with no registry, an `overrides` entry pins that resolution to the
-            // render-core tarball so both siblings' dependency resolves offline (exactly
-            // the local-file substitution a monorepo consumer would use pre-publish).
             overrides: { "@inflexa-ai/tsprov-render-core": renderTgz },
           },
           null,
@@ -105,11 +108,19 @@ test.skipIf(!FULL)(
         )}\n`,
       );
       const added =
-        await $`bun add ${coreTgz} ${renderTgz} ${renderDotTgz} ${renderMermaidTgz}`
+        await $`bun add ${coreTgz} ${renderTgz} ${renderDotTgz} ${renderMermaidTgz} ${renderSvgTgz}`
           .cwd(consumer)
           .quiet()
           .nothrow();
       expect(`bun add exit ${added.exitCode}`).toBe("bun add exit 0");
+
+      // 3b. render-svg's dagre dependency resolved from the registry into the tree.
+      const dagreInstalled = existsSync(
+        join(consumer, "node_modules", "@dagrejs", "dagre", "package.json"),
+      );
+      expect(`@dagrejs/dagre resolved from registry: ${dagreInstalled}`).toBe(
+        "@dagrejs/dagre resolved from registry: true",
+      );
 
       // 4. Exactly one @inflexa-ai/tsprov in the consumer tree (neither sibling dragged
       //    in a second copy — the peer resolved to the installed one).
@@ -189,6 +200,30 @@ test.skipIf(!FULL)(
       const mermaidRun = await $`bun run mermaid.mjs`.cwd(consumer).quiet().nothrow();
       expect(`mermaid exit ${mermaidRun.exitCode}`).toBe("mermaid exit 0");
 
+      // 5d. render-svg works end to end from the installed tarballs — and exercises its
+      //    registry-resolved dagre dependency doing real layout: the same consumer-built
+      //    document renders to a standalone SVG with the themed entity ellipse.
+      await Bun.write(
+        join(consumer, "svg.mjs"),
+        [
+          `import { ProvDocument, ns } from "@inflexa-ai/tsprov";`,
+          `import { SvgRenderer } from "@inflexa-ai/tsprov-render-svg";`,
+          `const ex = ns("ex", "http://example.org/");`,
+          `const doc = new ProvDocument();`,
+          `doc.addNamespace(ex.prefix, ex.uri);`,
+          `doc.entity(ex.qn("e"));`,
+          `const svg = new SvgRenderer().render(doc);`,
+          `if (!svg.startsWith("<svg ") || !svg.includes('fill="#FFFC87"') || !svg.includes("viewBox=")) {`,
+          `  console.error("render-svg FAILED:", svg);`,
+          `  process.exit(1);`,
+          `}`,
+          `console.log("render-svg OK");`,
+          ``,
+        ].join("\n"),
+      );
+      const svgRun = await $`bun run svg.mjs`.cwd(consumer).quiet().nothrow();
+      expect(`svg exit ${svgRun.exitCode}`).toBe("svg exit 0");
+
       // 6. Consumer typecheck under BOTH module resolutions. The consumer only uses
       //    the public types of both packages; each must resolve cleanly.
       await Bun.write(
@@ -203,6 +238,7 @@ test.skipIf(!FULL)(
           `} from "@inflexa-ai/tsprov-render-core";`,
           `import { DotRenderer, type DotRenderOptions } from "@inflexa-ai/tsprov-render-dot";`,
           `import { MermaidRenderer, type MermaidRenderOptions } from "@inflexa-ai/tsprov-render-mermaid";`,
+          `import { SvgRenderer, type SvgRenderOptions } from "@inflexa-ai/tsprov-render-svg";`,
           `const doc = new ProvDocument();`,
           `const scene: RenderScene = toRenderScene(doc, { useLabels: true });`,
           `const direction: string = PROV_THEME.direction;`,
@@ -211,6 +247,8 @@ test.skipIf(!FULL)(
           `export const dot: string | Promise<string> = new DotRenderer().render(doc, opts);`,
           `const mopts: MermaidRenderOptions = { direction: "LR" };`,
           `export const mermaid: string | Promise<string> = new MermaidRenderer().render(doc, mopts);`,
+          `const sopts: SvgRenderOptions = { direction: "LR" };`,
+          `export const svg: string | Promise<string> = new SvgRenderer().render(doc, sopts);`,
           `export const nodeCount: number = scene.nodes.length;`,
           `export const dir: string = direction;`,
           `export { doc };`,

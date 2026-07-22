@@ -16,9 +16,64 @@
 | 1 — `tsprov-render-core` | scene graph + `PROV_THEME` + `Renderer` + eval harness | ✅ **done** (2026-07-22) |
 | 2 — `tsprov-render-dot` | DOT emitter + Python-parity goldens | ✅ **done** (2026-07-22) |
 | 3 — `tsprov-render-mermaid` | Mermaid emitter + goldens | ✅ **done** (2026-07-22) |
-| 4 — `tsprov-render-svg` | dagre layout + string SVG | ⬜ not started |
+| 4 — `tsprov-render-svg` | dagre layout + string SVG | ✅ **done** (2026-07-22) |
 | 5 — `tsprov-render-interactive` | self-contained interactive HTML | ⬜ not started |
 | 6 — `tsprov-render-graphviz` (stretch) | WASM engine over stage-2 DOT | ⬜ gated on go-ahead |
+
+---
+
+## 2026-07-22 · entry 5 — stage 4: `tsprov-render-svg`
+
+**Build:** bare `bun test` 1241 pass / 1 skip / 0 fail (42 files) · `bun run eval`
+124 pass / 0 fail (~5.7 s) · dual build + `tsc --noEmit` clean · all four sibling
+packages zero-line diff · branch `feat/rendering-workspaces`.
+
+### The change
+
+OPSX change `rendering-stage4-svg-renderer` (archived, untracked). New package
+`rendering/tsprov-render-svg` (0.1.0): `SvgRenderer` — sync dagre layered layout
+(node boxes from a documented over-approximating text-metric estimator; no DOM)
+into pure string SVG with the REAL reference glyphs (ellipse/rect/**house
+polygon**/folded-corner note/point circle — SVG restores what Mermaid could not),
+theme fills+strokes, deduped per-color arrowhead markers, D18-consistent routing,
+`<title>` tooltips, `<a href>` links, post-hoc bundle bbox rects, finite viewBox,
+2-decimal rounding. First sanctioned third-party dep: `@dagrejs/dagre@^3`,
+confined to this package; consumer cost measured and documented (~14.1 KB min+gz).
+Packaging eval now proves the real consumer story: dagre from the live registry,
+unpublished sibling override-pinned, one tsprov, dual typecheck.
+
+### Measured sizes
+
+render-svg (our code): **3511 B** gz (budget 3870). Full family so far ≈ 8.8 KB gz
+of our code; the picture tier adds dagre's ~14.1 KB only for those who install it.
+
+### Decisions / deviations
+
+- **D20**: coordinates are dagre's, not Graphviz `dot`'s (pixel parity is the
+  stretch stage); bundle rects are post-hoc member bboxes (dagre has no clusters —
+  `TODO(extend)` for compound mode).
+- Golden-review protocol caught a real emitter bug (nodeless graph →
+  `-Infinity` viewBox), fixed in the emitter with a clamp — never in the golden.
+- Accepted: fill-only agent/bundle glyphs (faithful — dot.py sets no `color` for
+  those kinds); minor edge-label overlap in dense fixtures (layout quality is
+  eyeball-scoped by design); 7 DEVIATIONS-register pointers in comments (each with
+  inline rationale — DEVIATIONS.md is the permanent CLAUDE.md-mandated register,
+  distinct from ephemeral spec citations, and the siblings share the idiom).
+
+### Valuation
+
+A consumer can now get a real, styled, tooltipped, hyperlinked PROV picture from a
+server or script with **no external tool** — `new SvgRenderer().render(doc)` into
+an `<img>`, a data-URI, or a file. Cheapest install for a picture: tsprov + core +
+svg ≈ 5.6 KB of our code + dagre's 14.1 KB — and text-tier users still pay none of
+it.
+
+### Next
+
+Stage 5: `tsprov-render-interactive` — the self-contained animated HTML
+visualization (progressive disclosure, pan/zoom, attribute panel, search, bundle
+grouping; scale target prov-inflexa.2). One browser pass gate per the loop file. This is
+the stage the vision statement singled out.
 
 ---
 

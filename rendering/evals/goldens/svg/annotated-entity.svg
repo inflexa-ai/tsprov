@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190.2 172.59" class="prov-graph" font-family="&#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif">
+<defs></defs>
+<g class="prov-edge"><path d="M 95.1 105.59 L 95.1 83.59 L 95.1 61.59" fill="none" stroke="gray" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3"/></g>
+<g class="prov-annotation"><path d="M 12 105.59 L 166.2 105.59 L 178.2 117.59 L 178.2 160.59 L 12 160.59 Z M 166.2 105.59 L 166.2 117.59 L 178.2 117.59" fill="#ffffff" stroke="gray"/><text x="24" y="133.09" text-anchor="start" dominant-baseline="central" font-size="10" fill="black"><tspan x="24" dy="-13">prov:type = ex:Report</tspan><tspan x="24" dy="13">ex:author = ex:alice</tspan><tspan x="24" dy="13">ex:version = 3</tspan></text></g>
+<a href="http://example.org/doc"><g class="prov-node prov-entity"><title>ex:doc
+prov:type = ex:Report
+ex:author = ex:alice
+ex:version = 3</title><ellipse cx="95.1" cy="36.8" rx="55.16" ry="24.8" fill="#FFFC87" stroke="#808080"/><text x="95.1" y="36.8" text-anchor="middle" dominant-baseline="central" font-size="14" fill="black"><tspan x="95.1" dy="0">ex:doc</tspan></text></g></a>
+</svg>
