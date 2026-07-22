@@ -1,82 +1,14 @@
 {
-  "name": "@inflexa-ai/tsprov",
-  "version": "0.5.1",
-  "description": "An idiomatic TypeScript implementation of the W3C PROV Data Model (a port of Python prov): author provenance documents and round-trip them through PROV-JSON and PROV-N.",
-  "keywords": [
-    "prov",
-    "provenance",
-    "w3c",
-    "prov-dm",
-    "prov-json",
-    "prov-n",
-    "lineage",
-    "metadata"
-  ],
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/inflexa-ai/tsprov.git"
-  },
-  "homepage": "https://github.com/inflexa-ai/tsprov#readme",
-  "bugs": {
-    "url": "https://github.com/inflexa-ai/tsprov/issues"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org",
-    "access": "public"
-  },
-  "type": "module",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": {
-        "types": "./dist/cjs/index.d.ts",
-        "default": "./dist/cjs/index.js"
-      },
-      "default": "./dist/index.js"
-    },
-    "./graph": {
-      "import": {
-        "types": "./dist/graph/index.d.ts",
-        "default": "./dist/graph/index.js"
-      },
-      "require": {
-        "types": "./dist/cjs/graph/index.d.ts",
-        "default": "./dist/cjs/graph/index.js"
-      },
-      "default": "./dist/graph/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "src",
-    "!src/**/*.test.ts",
-    "NOTICE",
-    "CHANGELOG.md"
+  "name": "tsprov",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "rendering/*"
   ],
   "scripts": {
-    "bootstrap": "node scripts/bootstrap.mjs",
-    "clean": "rm -rf dist",
-    "build": "bun run clean && bun run build:esm && bun run build:cjs",
-    "build:esm": "tsc -p tsconfig.build.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
-    "smoke": "node scripts/smoke.mjs",
-    "pretest": "node scripts/bootstrap.mjs",
-    "test": "bun test",
-    "prepublishOnly": "bun run build && bun run smoke"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@types/luxon": "^3.7.1",
-    "typescript": "^5 || ^6"
-  },
-  "dependencies": {
-    "luxon": "^3.7.2"
+    "bootstrap": "bun run --cwd packages/tsprov bootstrap",
+    "test": "bun run --cwd packages/tsprov test",
+    "build": "bun run --cwd packages/tsprov build",
+    "smoke": "bun run --cwd packages/tsprov smoke"
   }
 }

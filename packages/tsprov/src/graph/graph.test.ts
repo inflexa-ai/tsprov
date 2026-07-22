@@ -268,7 +268,10 @@ describe("graph layer isolation", () => {
 // Python's model.py:1681), `provToGraph` must throw equivalently.
 const CORPUS_DIR = join(
   import.meta.dir,
-  "../../reference/prov/src/prov/tests/json",
+  // The corpus is checked out at the repo root, four levels above this file
+  // (packages/tsprov/src/graph) — it is a shared, gitignored checkout, not
+  // vendored into the package.
+  "../../../../reference/prov/src/prov/tests/json",
 );
 const corpusFiles = readdirSync(CORPUS_DIR)
   .filter((f) => f.endsWith(".json"))

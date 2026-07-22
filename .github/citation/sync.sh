@@ -15,7 +15,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-manifest="$root/package.json"
+manifest="$root/packages/tsprov/package.json"
 citation="$root/CITATION.cff"
 
 check_only=false

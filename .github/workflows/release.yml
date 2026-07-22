@@ -80,8 +80,8 @@ jobs:
       - name: Resolve package version
         id: pkg
         run: |
-          echo "name=$(node -p "require('./package.json').name")" >> "$GITHUB_OUTPUT"
-          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+          echo "name=$(node -p "require('./packages/tsprov/package.json').name")" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p "require('./packages/tsprov/package.json').version")" >> "$GITHUB_OUTPUT"
 
       # The version-gate. `npm view` needs no auth against the public registry; it also
       # exits non-zero when the package has never been published at all, which is
@@ -120,6 +120,7 @@ jobs:
       # and it keeps local (first-time) publishes honest too.
       - name: Publish to npm
         if: steps.npm-check.outputs.published == 'false'
+        working-directory: packages/tsprov
         run: npm publish
 
       # A release may be missing even when the npm version exists (e.g. a previous run

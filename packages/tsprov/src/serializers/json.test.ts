@@ -36,7 +36,10 @@ describe("PROV-JSON serializer basics", () => {
 // regenerates fixtures): parse golden → serialize → parse → assert `.equals()`.
 const CORPUS_DIR = join(
   import.meta.dir,
-  "../../reference/prov/src/prov/tests/json",
+  // The corpus is checked out at the repo root, four levels above this file
+  // (packages/tsprov/src/serializers) — it is a shared, gitignored checkout, not
+  // vendored into the package.
+  "../../../../reference/prov/src/prov/tests/json",
 );
 const corpusFiles = readdirSync(CORPUS_DIR)
   .filter((f) => f.endsWith(".json"))
