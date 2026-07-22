@@ -238,3 +238,34 @@ test("a node whose label equals its identifier stays single-line even under useL
   expect(dot).toContain('label="ex:plain"');
   expect(dot).not.toContain("<br />");
 });
+
+test("useLabels entity-escapes a hostile prov:label so it cannot forge DOT", () => {
+  const doc = newDoc();
+  // A label crafted to close the `<…>` HTML-like label early and inject a live URL sink
+  // that would bypass safeLinkUri — the exact escape the reference's raw interpolation misses.
+  const payload = 'x>]; forged [URL="javascript:alert(1)"';
+  doc.entity(ex.qn("article"), [[PROV_LABEL, payload]]);
+
+  const dot = render(doc, { useLabels: true });
+
+  // The payload's `>` and `"` are entity-escaped, so it stays inert label text: the `<…>`
+  // label is not terminated early and no forged `URL=` attribute (hence no javascript: sink).
+  expect(dot).toContain(
+    '<x&gt;]; forged [URL=&quot;javascript:alert(1)&quot;<br /><font color="#333333" point-size="10">ex:article</font>>',
+  );
+  expect(dot).not.toContain('URL="javascript:alert(1)"');
+  // The emitter's OWN structural markup stays live (not escaped).
+  expect(dot).toContain("<br />");
+  expect(dot).toContain('<font color="#333333" point-size="10">');
+});
+
+test("a normal two-line useLabels label keeps its literal <br /> and <font> structure", () => {
+  const doc = newDoc();
+  doc.entity(ex.qn("article"), [[PROV_LABEL, "Draft Article"]]);
+
+  const dot = render(doc, { useLabels: true });
+  // Plain-text labels have no `&<>`, so escaping is a no-op and the structural markup is verbatim.
+  expect(dot).toContain(
+    '<Draft Article<br /><font color="#333333" point-size="10">ex:article</font>>',
+  );
+});

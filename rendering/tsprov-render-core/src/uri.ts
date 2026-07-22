@@ -30,10 +30,16 @@ const ALLOWED_SCHEMES: ReadonlySet<string> = new Set(["http", "https", "mailto"]
 const SCHEME_RE = /^([a-zA-Z][a-zA-Z0-9+.-]*):/;
 
 /**
- * The characters a browser's URL parser discards before it navigates: every ASCII control
- * (U+0000–U+001F), space (U+0020), and DEL (U+007F). Stripping these before scheme detection
- * is what defeats obfuscation like `java\nscript:` — a browser collapses that to `javascript:`
- * and would run it, so we must classify the collapsed form rather than the raw bytes.
+ * The characters stripped from a candidate URI before scheme detection. This set is
+ * DELIBERATELY broader than any browser's: a real browser removes only tab/CR/LF from
+ * anywhere in the URL plus leading/trailing C0-control/space, whereas this strips every
+ * ASCII control (U+0000–U+001F), space (U+0020), and DEL (U+007F) wherever it occurs.
+ * Over-stripping is safe because normalization here only CLASSIFIES (never rewrites the
+ * link — see {@link safeLinkUri}): deleting an extra character can at most reveal a scheme
+ * that was hidden behind it, which can only make the gate BLOCK more, never let a hostile
+ * scheme through. The aggression is what defeats obfuscation like `java\nscript:` — which a
+ * browser collapses to a live `javascript:` — by classifying the collapsed form instead of
+ * the raw bytes.
  */
 const URL_IGNORED_CHARS = /[\u0000-\u0020\u007f]/g;
 
@@ -46,9 +52,9 @@ const URL_IGNORED_CHARS = /[\u0000-\u0020\u007f]/g;
  * scheme — `javascript:`, `data:`, `vbscript:`, `file:`, and anything unrecognized — returns
  * `undefined` so the caller omits the link and shows the URI as inert text instead.
  *
- * Scheme detection first **normalizes** the input the way a browser's URL parser does before
- * it decides how to navigate: ASCII whitespace and control characters are stripped (see
- * {@link URL_IGNORED_CHARS}), so an obfuscated `java\nscript:` — which a browser collapses to
+ * Scheme detection first **normalizes** the input at least as aggressively as a browser's URL
+ * parser does before it decides how to navigate: ASCII whitespace and control characters are
+ * stripped (see {@link URL_IGNORED_CHARS}), so an obfuscated `java\nscript:` — which a browser collapses to
  * `javascript:` and *would* run — cannot slip past a naive parser that sees `java` followed
  * by a non-scheme byte and wrongly concludes "no scheme". The scheme is matched
  * case-insensitively (`JavaScript:` is blocked). Normalization is used only to CLASSIFY; the
