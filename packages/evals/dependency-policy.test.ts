@@ -4,8 +4,9 @@ import { readdirSync, existsSync, statSync } from "node:fs";
 // The dependency-policy eval mechanically enforces the loop's packaging rules on every
 // workspace package's manifest, so a smuggled or misplaced dependency turns a test red the
 // moment it lands — and future renderer packages are covered automatically (we glob
-// `rendering/*`, we do not enumerate a fixed list) while the packages that exist TODAY also
-// carry an exact, pinned expected dependency set.
+// `packages/*` and skip only the core `@inflexa-ai/tsprov`, which lives under the opposite
+// dependency regime and is validated separately; we do not enumerate a fixed renderer list)
+// while the packages that exist TODAY also carry an exact, pinned expected dependency set.
 //
 // The rules (from the loop / design):
 //  1. `@inflexa-ai/tsprov` is NEVER a runtime `dependency`; a renderer takes it as a
@@ -22,7 +23,7 @@ const TSPROV = "@inflexa-ai/tsprov";
 const RENDER_CORE = "@inflexa-ai/tsprov-render-core";
 const RENDER_SVG = "@inflexa-ai/tsprov-render-svg";
 const DAGRE = "@dagrejs/dagre";
-const RENDERING_DIR = `${import.meta.dir}/..`;
+const PACKAGES_DIR = `${import.meta.dir}/..`;
 const CORE_PKG_PATH = `${import.meta.dir}/../../packages/tsprov/package.json`;
 
 // The EXACT regular-`dependencies` key set each existing rendering package may declare —
@@ -65,13 +66,20 @@ async function readManifest(path: string): Promise<Manifest> {
 
 async function loadRenderingPackages(): Promise<Package[]> {
   const packages: Package[] = [];
-  for (const entry of readdirSync(RENDERING_DIR).sort()) {
-    const dir = `${RENDERING_DIR}/${entry}`;
+  for (const entry of readdirSync(PACKAGES_DIR).sort()) {
+    const dir = `${PACKAGES_DIR}/${entry}`;
     const pkgPath = `${dir}/package.json`;
     if (!statSync(dir).isDirectory() || !existsSync(pkgPath)) continue;
+    const manifest = await readManifest(pkgPath);
+    // The core `@inflexa-ai/tsprov` now shares the packages/ root with the render family, but
+    // it answers to the OPPOSITE dependency regime (it legitimately carries luxon, a
+    // non-sibling runtime dep) and is validated on its own by the "core depends on luxon only"
+    // test via CORE_PKG_PATH. Sweeping it in here would trip the sibling/heavy-dep assertions,
+    // so exclude it — the glob still auto-covers every future renderer package.
+    if (manifest.name === TSPROV) continue;
     packages.push({
-      label: `rendering/${entry}`,
-      manifest: await readManifest(pkgPath),
+      label: `packages/${entry}`,
+      manifest,
     });
   }
   return packages;

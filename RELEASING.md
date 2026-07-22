@@ -132,7 +132,7 @@ for new users.
 
 ## Publishing the rendering packages
 
-The five `@inflexa-ai/tsprov-render-*` packages under `rendering/` are **not** wired into
+The five `@inflexa-ai/tsprov-render-*` packages under `packages/` are **not** wired into
 `release.yml` (which publishes only `packages/tsprov`) — publish them manually, the same way as
 the core's first publish in step 3 above. Each one carries a `prepack` script, so both
 `npm publish` and `bun pm pack` **build `dist/` automatically** from a clean checkout (verified:
@@ -152,7 +152,7 @@ be on the registry when the next one goes up:
 for pkg in tsprov-render-core \
            tsprov-render-dot tsprov-render-mermaid tsprov-render-svg \
            tsprov-render-interactive; do
-  ( cd "rendering/$pkg" && npm publish )   # prepack builds dist/ for you; enter the OTP per package
+  ( cd "packages/$pkg" && npm publish )   # prepack builds dist/ for you; enter the OTP per package
 done
 ```
 

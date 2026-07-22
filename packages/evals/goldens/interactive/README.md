@@ -18,7 +18,7 @@ any change — a dagre coordinate shift, a theme tweak, a template edit — turn
 and forces a **reviewed** regeneration:
 
 ```sh
-TSPROV_EVAL_REGEN=1 bun test rendering/evals/interactive.test.ts
+TSPROV_EVAL_REGEN=1 bun test packages/evals/interactive.test.ts
 ```
 
 ## These are snapshots, not a Python oracle

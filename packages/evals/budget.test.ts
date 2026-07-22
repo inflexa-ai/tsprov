@@ -7,7 +7,8 @@ import { readdirSync, existsSync, statSync } from "node:fs";
 // growth is fine but a surprise weight gain (a heavy import, a mis-externalized dep)
 // turns the test red with the measured-vs-budgeted numbers.
 
-const RENDERING_DIR = `${import.meta.dir}/..`;
+const TSPROV = "@inflexa-ai/tsprov";
+const PACKAGES_DIR = `${import.meta.dir}/..`;
 const BUDGETS_PATH = `${import.meta.dir}/budgets.json`;
 
 /** A publishable rendering package with a build entry point. */
@@ -23,14 +24,17 @@ type Budgets = {
 
 function loadBuildables(): Buildable[] {
   const buildables: Buildable[] = [];
-  for (const entry of readdirSync(RENDERING_DIR).sort()) {
-    const dir = `${RENDERING_DIR}/${entry}`;
+  for (const entry of readdirSync(PACKAGES_DIR).sort()) {
+    const dir = `${PACKAGES_DIR}/${entry}`;
     const pkgPath = `${dir}/package.json`;
     const entryPath = `${dir}/src/index.ts`;
     if (!statSync(dir).isDirectory() || !existsSync(pkgPath)) continue;
     // Our own committed manifest, read as data.
     const manifest = require(pkgPath) as { name?: string; private?: boolean };
-    // Private packages (the eval harness) ship nothing — no budget applies.
+    // The core `@inflexa-ai/tsprov` now shares the packages/ root but carries no render
+    // size budget (it answers to the core's own weight regime); skip it so the sweep stays
+    // scoped to the render family. Private packages (the eval harness) ship nothing either.
+    if (manifest.name === TSPROV) continue;
     if (manifest.private === true || manifest.name === undefined) continue;
     if (!existsSync(entryPath)) continue;
     buildables.push({ name: manifest.name, entry: entryPath });

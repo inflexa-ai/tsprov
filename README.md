@@ -170,11 +170,11 @@ automatically as a regular dependency).
 
 | Package | Output | Size (gzipped) |
 | --- | --- | --- |
-| [`@inflexa-ai/tsprov-render-core`](rendering/tsprov-render-core) | shared scene projection + PROV visual theme (the foundation) | 2.2 KB |
-| [`@inflexa-ai/tsprov-render-dot`](rendering/tsprov-render-dot) | DOT / Graphviz `digraph` string | 1.6 KB |
-| [`@inflexa-ai/tsprov-render-mermaid`](rendering/tsprov-render-mermaid) | Mermaid `flowchart` string | 1.7 KB |
-| [`@inflexa-ai/tsprov-render-svg`](rendering/tsprov-render-svg) | standalone SVG string (dagre layout) | 3.9 KB + dagre ~14 KB |
-| [`@inflexa-ai/tsprov-render-interactive`](rendering/tsprov-render-interactive) | one self-contained, explorable HTML file | 16.7 KB |
+| [`@inflexa-ai/tsprov-render-core`](packages/tsprov-render-core) | shared scene projection + PROV visual theme (the foundation) | 2.2 KB |
+| [`@inflexa-ai/tsprov-render-dot`](packages/tsprov-render-dot) | DOT / Graphviz `digraph` string | 1.6 KB |
+| [`@inflexa-ai/tsprov-render-mermaid`](packages/tsprov-render-mermaid) | Mermaid `flowchart` string | 1.7 KB |
+| [`@inflexa-ai/tsprov-render-svg`](packages/tsprov-render-svg) | standalone SVG string (dagre layout) | 3.9 KB + dagre ~14 KB |
+| [`@inflexa-ai/tsprov-render-interactive`](packages/tsprov-render-interactive) | one self-contained, explorable HTML file | 16.7 KB |
 
 DOT and Mermaid carry **zero third-party weight** — a downstream tool draws the picture. SVG
 pays for [dagre](https://github.com/dagrejs/dagre) to lay out a real image on a server with no
@@ -194,7 +194,7 @@ const dot = new DotRenderer().render(doc);   // a DOT digraph string — pipe it
 
 Install a peer plus the leaf you want (`bun add @inflexa-ai/tsprov @inflexa-ai/tsprov-render-dot`).
 For each renderer's options, the visual language it draws, and its install cost, see the
-per-package READMEs under [`rendering/*/README.md`](rendering/).
+per-package READMEs under [`packages/tsprov-render-*/README.md`](packages/).
 
 ## Develop
 

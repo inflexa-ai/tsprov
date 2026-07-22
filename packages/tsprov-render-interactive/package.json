@@ -1,7 +1,7 @@
 {
-  "name": "@inflexa-ai/tsprov-render-mermaid",
+  "name": "@inflexa-ai/tsprov-render-interactive",
   "version": "0.1.0",
-  "description": "Mermaid renderer for tsprov provenance documents — a scene-driven MermaidRenderer that emits a flowchart in the W3C PROV visual language. Paste its string into GitHub, GitLab, or any Mermaid-aware Markdown.",
+  "description": "Interactive HTML renderer for tsprov provenance documents — renderInteractiveHtml(doc) emits ONE self-contained, animated, explorable HTML file (inline CSS/JS, the dagre-positioned scene baked in as JSON) that opens from file:// with nothing installed. Pan/zoom, progressive disclosure, an attribute panel, and search over the W3C PROV visual language.",
   "keywords": [
     "prov",
     "provenance",
@@ -9,16 +9,16 @@
     "prov-dm",
     "visualization",
     "render",
-    "mermaid",
-    "flowchart"
+    "interactive",
+    "html"
   ],
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/inflexa-ai/tsprov.git",
-    "directory": "rendering/tsprov-render-mermaid"
+    "directory": "packages/tsprov-render-interactive"
   },
-  "homepage": "https://github.com/inflexa-ai/tsprov/tree/main/rendering/tsprov-render-mermaid#readme",
+  "homepage": "https://github.com/inflexa-ai/tsprov/tree/main/packages/tsprov-render-interactive#readme",
   "bugs": {
     "url": "https://github.com/inflexa-ai/tsprov/issues"
   },
@@ -54,11 +54,13 @@
     "build": "bun run clean && bun run build:esm && bun run build:cjs",
     "build:esm": "tsc -p tsconfig.build.json",
     "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
+    "gen": "bun scripts/generate-template.mjs",
     "test": "bun test",
     "prepack": "bun run build"
   },
   "dependencies": {
-    "@inflexa-ai/tsprov-render-core": "^0.1.0"
+    "@inflexa-ai/tsprov-render-core": "^0.1.0",
+    "@inflexa-ai/tsprov-render-svg": "^0.1.0"
   },
   "peerDependencies": {
     "@inflexa-ai/tsprov": ">=0.5.1 <2"
@@ -66,6 +68,7 @@
   "devDependencies": {
     "@inflexa-ai/tsprov": "workspace:*",
     "@inflexa-ai/tsprov-render-core": "workspace:*",
+    "@inflexa-ai/tsprov-render-svg": "workspace:*",
     "@types/bun": "latest",
     "typescript": "^5 || ^6"
   }
