@@ -5,5 +5,17 @@
 // modules import each other directly. `@inflexa-ai/tsprov-render-core` and
 // `@dagrejs/dagre` are this package's two runtime dependencies; `tsprov` is a peer.
 
-export { SvgRenderer, toCssColor } from "./svg.js";
-export type { SvgRenderOptions } from "./svg.js";
+export { SvgRenderer, toCssColor, layoutScene } from "./svg.js";
+export type {
+  SvgRenderOptions,
+  LayoutOptions,
+  LayoutScene,
+  LayoutNode,
+  LayoutBlank,
+  LayoutNote,
+  LayoutSegment,
+  LayoutBundle,
+  LayoutBox,
+  LayoutPoint,
+  NodeGlyph,
+} from "./svg.js";

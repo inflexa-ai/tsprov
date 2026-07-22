@@ -1,0 +1,204 @@
+{
+  "width": 104.6,
+  "height": 146.4,
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "activity",
+      "inferred": true,
+      "glyph": "rect",
+      "fill": "lightgray",
+      "qualifiedName": "ex:a2",
+      "label": "ex:a2",
+      "labelLines": [
+        "ex:a2"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 52.3,
+        "y": 117.3,
+        "width": 67.4,
+        "height": 34.2
+      },
+      "stroke": "dimgray",
+      "uri": "http://example.org/a2"
+    },
+    {
+      "id": "n2",
+      "kind": "activity",
+      "inferred": true,
+      "glyph": "rect",
+      "fill": "lightgray",
+      "qualifiedName": "ex:a1",
+      "label": "ex:a1",
+      "labelLines": [
+        "ex:a1"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 52.3,
+        "y": 29.1,
+        "width": 67.4,
+        "height": 34.2
+      },
+      "stroke": "dimgray",
+      "uri": "http://example.org/a1"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "relation": "prov:Communication",
+      "label": "wasInformedBy",
+      "source": "n1",
+      "target": "n2",
+      "naryLegs": []
+    }
+  ],
+  "segments": [
+    {
+      "stroke": "black",
+      "arrow": true,
+      "dashed": false,
+      "labelFill": "black",
+      "points": [
+        {
+          "x": 52.3,
+          "y": 100.2
+        },
+        {
+          "x": 52.3,
+          "y": 73.2
+        },
+        {
+          "x": 52.3,
+          "y": 46.2
+        }
+      ],
+      "gates": [
+        "n1",
+        "n2"
+      ],
+      "label": "wasInformedBy",
+      "labelPos": {
+        "x": 52.3,
+        "y": 73.2
+      }
+    }
+  ],
+  "blanks": [],
+  "notes": [],
+  "bundles": [],
+  "markerColors": [
+    "black"
+  ],
+  "theme": {
+    "nodes": {
+      "entity": {
+        "fill": "#FFFC87",
+        "stroke": "#808080"
+      },
+      "activity": {
+        "fill": "#9FB1FC",
+        "stroke": "#0000FF"
+      },
+      "agent": {
+        "fill": "#FED37F"
+      },
+      "bundle": {
+        "fill": "aliceblue"
+      }
+    },
+    "generic": {
+      "entity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "activity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "agent": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "bundle": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "unknown": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      }
+    },
+    "relations": {
+      "prov:Generation": {
+        "color": "darkgreen",
+        "fontcolor": "darkgreen"
+      },
+      "prov:Usage": {
+        "color": "#8B0000",
+        "fontcolor": "red"
+      },
+      "prov:Communication": {},
+      "prov:Start": {},
+      "prov:End": {},
+      "prov:Invalidation": {},
+      "prov:Derivation": {},
+      "prov:Attribution": {
+        "color": "#FED37F"
+      },
+      "prov:Association": {
+        "color": "#FED37F"
+      },
+      "prov:Delegation": {
+        "color": "#FED37F"
+      },
+      "prov:Influence": {
+        "color": "grey"
+      },
+      "prov:Alternate": {},
+      "prov:Specialization": {},
+      "prov:Mention": {},
+      "prov:Membership": {}
+    },
+    "annotation": {
+      "color": "gray",
+      "fontcolor": "black"
+    },
+    "annotationLink": {
+      "color": "gray"
+    },
+    "decor": {
+      "bundleFill": "aliceblue",
+      "bundleStroke": "#9aa7b4",
+      "bundleLabelFill": "#333333"
+    }
+  },
+  "meta": {
+    "title": "Provenance graph",
+    "counts": {
+      "nodes": 2,
+      "edges": 1,
+      "bundles": 0,
+      "skipped": 0
+    },
+    "options": {
+      "useLabels": false,
+      "includeElementAttributes": true,
+      "includeRelationAttributes": true,
+      "showNary": true,
+      "direction": "BT"
+    },
+    "disclosure": {
+      "wholeGraph": true,
+      "focusId": "n1",
+      "initialVisibleIds": [
+        "n1",
+        "n2"
+      ],
+      "hops": 2,
+      "wholeGraphMax": 50
+    }
+  }
+}

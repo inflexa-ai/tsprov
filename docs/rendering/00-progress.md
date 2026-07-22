@@ -17,8 +17,73 @@
 | 2 — `tsprov-render-dot` | DOT emitter + Python-parity goldens | ✅ **done** (2026-07-22) |
 | 3 — `tsprov-render-mermaid` | Mermaid emitter + goldens | ✅ **done** (2026-07-22) |
 | 4 — `tsprov-render-svg` | dagre layout + string SVG | ✅ **done** (2026-07-22) |
-| 5 — `tsprov-render-interactive` | self-contained interactive HTML | ⬜ not started |
+| 5 — `tsprov-render-interactive` | self-contained interactive HTML | ✅ **done** (2026-07-22) |
 | 6 — `tsprov-render-graphviz` (stretch) | WASM engine over stage-2 DOT | ⬜ gated on go-ahead |
+
+---
+
+## 2026-07-22 · entry 6 — stage 5: `tsprov-render-interactive` (the vision centerpiece)
+
+**Build:** bare `bun test` 1281 pass / 1 skip / 0 fail (47 files) · `bun run eval`
+164 pass / 0 fail (~8 s) · dual build + `tsc --noEmit` clean · svg goldens
+byte-unchanged through the seam carve-out · branch `feat/rendering-workspaces`.
+
+### The change
+
+OPSX change `rendering-stage5-interactive-html` (archived, untracked).
+`renderInteractiveHtml(doc, opts): string` (+ `InteractiveRenderer`, format
+"html"): ONE self-contained HTML file — inline CSS + ~860-line vanilla JS client,
+dagre-positioned scene embedded as `</script>`-escaped JSON, zero external
+resource loads, works from `file://`. Features: pan/zoom (rAF-eased viewBox),
+capped animated progressive disclosure (`INITIAL_CAP=40` nearest-hop-first,
+`EXPAND_CAP=20` per badge click, whole graph ≤50 nodes), attribute panel, search/
+filter with dimming, bundle rects, keyboard access, prefers-color-scheme chrome
+over fixed PROV glyph colors. Template authored as real files + committed codegen
+with a drift test. Layout comes from render-svg's new `layoutScene` seam
+(behavior-neutral by byte-identical svg goldens) — one dagre owner, one layout
+implementation. Deps: {render-core, render-svg}; dependency-policy eval now pins
+exact per-package sets.
+
+### The verify pass earned its keep (two real fixes)
+
+- **Capped disclosure was a spec correction forced by evidence**: the original
+  "focus + 2-hop" rule met prov-inflexa.2's 141-degree super-hub and revealed 145/151
+  nodes — the gate's numbers passed while the screenshots showed an illegible
+  smear. Spec amended, caps implemented (TS + client mirror with an agreement
+  test), gate re-run: 40 initial, +20 per expand, 0 console errors.
+- **Dark-mode label bug**: in-glyph labels followed chrome `--fg` → light text on
+  fixed light-pastel fills. Now fixed dark ink with the WHY in style.css.
+
+### Measured sizes
+
+interactive: **15,421 B** gz (budget 16,970; template included). render-svg
+3,511→3,897 B (seam). prov-inflexa.2 output ≈ 505 KB (~70 KB gz). Browser-gate
+evidence: `scratchpad/interactive-gate/gate-0{5,6,7}*.png`.
+
+### Known limitations (named follow-ups, in priority order)
+
+1. **Opening view is still a wide band at hub scale**: the baked full-graph dagre
+   layout spreads even the capped 40-node set across the hub's rank span (nearest
+   visible neighbor ~5.4k units from focus). Fix requires a layout-level change —
+   per-state compact layout with morph animation, or a radial hub layout — a
+   change-sized follow-up, not a patch (svg goldens byte-lock the shared layout).
+2. Note-box text follows `--fg` over white note fill in dark mode (low contrast).
+3. Browser gate ran over `http://localhost` serving the byte-identical file
+   (Playwright MCP blocks `file://`); self-containment is separately proven by
+   the corpus eval (zero network requests).
+
+### Valuation
+
+A consumer can now emit one HTML file — email it, attach it to a pipeline run,
+open it anywhere offline — and get an animated, searchable, inspectable PROV
+explorer. Cheapest install: tsprov + core + svg + interactive (≈ 21 KB gz of our
+code + dagre's 14 KB); text-tier consumers still pay none of it.
+
+### Next
+
+**The ladder (stages 0–5) is COMPLETE.** Endgame per loop.rendering.md: create
+the PR and run `/review` 3–4 times, delegate fixes to Opus 4.8, verify, push.
+Stage 6 (graphviz WASM) stays gated on explicit go-ahead.
 
 ---
 

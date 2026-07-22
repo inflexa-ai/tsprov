@@ -1,0 +1,117 @@
+{
+  "width": 0,
+  "height": 0,
+  "nodes": [],
+  "edges": [],
+  "segments": [],
+  "blanks": [],
+  "notes": [],
+  "bundles": [],
+  "markerColors": [],
+  "theme": {
+    "nodes": {
+      "entity": {
+        "fill": "#FFFC87",
+        "stroke": "#808080"
+      },
+      "activity": {
+        "fill": "#9FB1FC",
+        "stroke": "#0000FF"
+      },
+      "agent": {
+        "fill": "#FED37F"
+      },
+      "bundle": {
+        "fill": "aliceblue"
+      }
+    },
+    "generic": {
+      "entity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "activity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "agent": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "bundle": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "unknown": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      }
+    },
+    "relations": {
+      "prov:Generation": {
+        "color": "darkgreen",
+        "fontcolor": "darkgreen"
+      },
+      "prov:Usage": {
+        "color": "#8B0000",
+        "fontcolor": "red"
+      },
+      "prov:Communication": {},
+      "prov:Start": {},
+      "prov:End": {},
+      "prov:Invalidation": {},
+      "prov:Derivation": {},
+      "prov:Attribution": {
+        "color": "#FED37F"
+      },
+      "prov:Association": {
+        "color": "#FED37F"
+      },
+      "prov:Delegation": {
+        "color": "#FED37F"
+      },
+      "prov:Influence": {
+        "color": "grey"
+      },
+      "prov:Alternate": {},
+      "prov:Specialization": {},
+      "prov:Mention": {},
+      "prov:Membership": {}
+    },
+    "annotation": {
+      "color": "gray",
+      "fontcolor": "black"
+    },
+    "annotationLink": {
+      "color": "gray"
+    },
+    "decor": {
+      "bundleFill": "aliceblue",
+      "bundleStroke": "#9aa7b4",
+      "bundleLabelFill": "#333333"
+    }
+  },
+  "meta": {
+    "title": "Provenance graph",
+    "counts": {
+      "nodes": 0,
+      "edges": 0,
+      "bundles": 0,
+      "skipped": 1
+    },
+    "options": {
+      "useLabels": false,
+      "includeElementAttributes": true,
+      "includeRelationAttributes": true,
+      "showNary": true,
+      "direction": "BT"
+    },
+    "disclosure": {
+      "wholeGraph": true,
+      "focusId": null,
+      "initialVisibleIds": [],
+      "hops": 2,
+      "wholeGraphMax": 50
+    }
+  }
+}

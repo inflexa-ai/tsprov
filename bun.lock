@@ -24,6 +24,7 @@
         "@inflexa-ai/tsprov": "workspace:*",
         "@inflexa-ai/tsprov-render-core": "workspace:*",
         "@inflexa-ai/tsprov-render-dot": "workspace:*",
+        "@inflexa-ai/tsprov-render-interactive": "workspace:*",
         "@inflexa-ai/tsprov-render-mermaid": "workspace:*",
         "@inflexa-ai/tsprov-render-svg": "workspace:*",
         "@types/bun": "latest",
@@ -51,6 +52,24 @@
       "devDependencies": {
         "@inflexa-ai/tsprov": "workspace:*",
         "@inflexa-ai/tsprov-render-core": "workspace:*",
+        "@types/bun": "latest",
+        "typescript": "^5 || ^6",
+      },
+      "peerDependencies": {
+        "@inflexa-ai/tsprov": ">=0.5.1 <2",
+      },
+    },
+    "rendering/tsprov-render-interactive": {
+      "name": "@inflexa-ai/tsprov-render-interactive",
+      "version": "0.1.0",
+      "dependencies": {
+        "@inflexa-ai/tsprov-render-core": "^0.1.0",
+        "@inflexa-ai/tsprov-render-svg": "^0.1.0",
+      },
+      "devDependencies": {
+        "@inflexa-ai/tsprov": "workspace:*",
+        "@inflexa-ai/tsprov-render-core": "workspace:*",
+        "@inflexa-ai/tsprov-render-svg": "workspace:*",
         "@types/bun": "latest",
         "typescript": "^5 || ^6",
       },
@@ -102,6 +121,8 @@
     "@inflexa-ai/tsprov-render-core": ["@inflexa-ai/tsprov-render-core@workspace:rendering/tsprov-render-core"],
 
     "@inflexa-ai/tsprov-render-dot": ["@inflexa-ai/tsprov-render-dot@workspace:rendering/tsprov-render-dot"],
+
+    "@inflexa-ai/tsprov-render-interactive": ["@inflexa-ai/tsprov-render-interactive@workspace:rendering/tsprov-render-interactive"],
 
     "@inflexa-ai/tsprov-render-mermaid": ["@inflexa-ai/tsprov-render-mermaid@workspace:rendering/tsprov-render-mermaid"],
 

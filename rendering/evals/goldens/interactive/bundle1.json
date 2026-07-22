@@ -1,0 +1,445 @@
+{
+  "width": 670.28,
+  "height": 161.79,
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "entity",
+      "inferred": false,
+      "glyph": "ellipse",
+      "fill": "#FFFC87",
+      "qualifiedName": "ex:bundle1",
+      "label": "ex:bundle1",
+      "labelLines": [
+        "ex:bundle1"
+      ],
+      "attributes": [
+        {
+          "name": "prov:type",
+          "nameUri": "http://www.w3.org/ns/prov#type",
+          "value": "prov:Bundle",
+          "valueUri": "http://www.w3.org/ns/prov#Bundle"
+        }
+      ],
+      "box": {
+        "x": 360.38,
+        "y": 36.8,
+        "width": 160.66,
+        "height": 49.59
+      },
+      "stroke": "#808080",
+      "uri": "http://example.org/bundle1"
+    },
+    {
+      "id": "n2",
+      "kind": "entity",
+      "inferred": false,
+      "glyph": "ellipse",
+      "fill": "#FFFC87",
+      "qualifiedName": "ex:bundle2",
+      "label": "ex:bundle2",
+      "labelLines": [
+        "ex:bundle2"
+      ],
+      "attributes": [
+        {
+          "name": "prov:type",
+          "nameUri": "http://www.w3.org/ns/prov#type",
+          "value": "prov:Bundle",
+          "valueUri": "http://www.w3.org/ns/prov#Bundle"
+        }
+      ],
+      "box": {
+        "x": 568.98,
+        "y": 36.8,
+        "width": 160.66,
+        "height": 49.59
+      },
+      "stroke": "#808080",
+      "uri": "http://example.org/bundle2"
+    },
+    {
+      "id": "n3",
+      "kind": "entity",
+      "inferred": false,
+      "glyph": "ellipse",
+      "fill": "#FFFC87",
+      "qualifiedName": "ex:e1",
+      "label": "ex:e1",
+      "labelLines": [
+        "ex:e1"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 60.87,
+        "y": 36.8,
+        "width": 97.73,
+        "height": 49.59
+      },
+      "stroke": "#808080",
+      "uri": "http://example.org/e1",
+      "bundleId": "c1"
+    },
+    {
+      "id": "n4",
+      "kind": "activity",
+      "inferred": false,
+      "glyph": "rect",
+      "fill": "#9FB1FC",
+      "qualifiedName": "ex:a1",
+      "label": "ex:a1",
+      "labelLines": [
+        "ex:a1"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 60.87,
+        "y": 132.69,
+        "width": 67.4,
+        "height": 34.2
+      },
+      "stroke": "#0000FF",
+      "uri": "http://example.org/a1",
+      "bundleId": "c1"
+    },
+    {
+      "id": "n5",
+      "kind": "entity",
+      "inferred": false,
+      "glyph": "ellipse",
+      "fill": "#FFFC87",
+      "qualifiedName": "ex:ee1",
+      "label": "ex:ee1",
+      "labelLines": [
+        "ex:ee1"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 194.89,
+        "y": 36.8,
+        "width": 110.32,
+        "height": 49.59
+      },
+      "stroke": "#808080",
+      "uri": "http://example.org/ee1",
+      "bundleId": "c2"
+    },
+    {
+      "id": "n6",
+      "kind": "activity",
+      "inferred": false,
+      "glyph": "rect",
+      "fill": "#9FB1FC",
+      "qualifiedName": "ex:aa1",
+      "label": "ex:aa1",
+      "labelLines": [
+        "ex:aa1"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 194.89,
+        "y": 132.69,
+        "width": 76.08,
+        "height": 34.2
+      },
+      "stroke": "#0000FF",
+      "uri": "http://example.org/aa1",
+      "bundleId": "c2"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "relation": "prov:Usage",
+      "label": "used",
+      "source": "n4",
+      "target": "n3",
+      "naryLegs": []
+    },
+    {
+      "id": "e2",
+      "relation": "prov:Usage",
+      "label": "used",
+      "source": "n6",
+      "target": "n5",
+      "naryLegs": []
+    }
+  ],
+  "segments": [
+    {
+      "stroke": "#8B0000",
+      "arrow": true,
+      "dashed": false,
+      "labelFill": "red",
+      "points": [
+        {
+          "x": 60.87,
+          "y": 115.59
+        },
+        {
+          "x": 60.87,
+          "y": 88.59
+        },
+        {
+          "x": 60.87,
+          "y": 61.59
+        }
+      ],
+      "gates": [
+        "n4",
+        "n3"
+      ],
+      "label": "used",
+      "labelPos": {
+        "x": 60.87,
+        "y": 88.59
+      }
+    },
+    {
+      "stroke": "#8B0000",
+      "arrow": true,
+      "dashed": false,
+      "labelFill": "red",
+      "points": [
+        {
+          "x": 194.89,
+          "y": 115.59
+        },
+        {
+          "x": 194.89,
+          "y": 88.59
+        },
+        {
+          "x": 194.89,
+          "y": 61.59
+        }
+      ],
+      "gates": [
+        "n6",
+        "n5"
+      ],
+      "label": "used",
+      "labelPos": {
+        "x": 194.89,
+        "y": 88.59
+      }
+    },
+    {
+      "stroke": "gray",
+      "arrow": false,
+      "dashed": true,
+      "labelFill": "black",
+      "points": [
+        {
+          "x": 360.38,
+          "y": 118.19
+        },
+        {
+          "x": 360.38,
+          "y": 88.59
+        },
+        {
+          "x": 360.38,
+          "y": 61.59
+        }
+      ],
+      "gates": [
+        "n1"
+      ]
+    },
+    {
+      "stroke": "gray",
+      "arrow": false,
+      "dashed": true,
+      "labelFill": "black",
+      "points": [
+        {
+          "x": 568.98,
+          "y": 118.19
+        },
+        {
+          "x": 568.98,
+          "y": 88.59
+        },
+        {
+          "x": 568.98,
+          "y": 61.59
+        }
+      ],
+      "gates": [
+        "n2"
+      ]
+    }
+  ],
+  "blanks": [],
+  "notes": [
+    {
+      "rows": [
+        "prov:type = prov:Bundle"
+      ],
+      "box": {
+        "x": 360.38,
+        "y": 132.69,
+        "width": 178.6,
+        "height": 29
+      },
+      "gates": [
+        "n1"
+      ]
+    },
+    {
+      "rows": [
+        "prov:type = prov:Bundle"
+      ],
+      "box": {
+        "x": 568.98,
+        "y": 132.69,
+        "width": 178.6,
+        "height": 29
+      },
+      "gates": [
+        "n2"
+      ]
+    }
+  ],
+  "bundles": [
+    {
+      "id": "c1",
+      "label": "ex:bundle1",
+      "rect": {
+        "x": -2,
+        "y": -2,
+        "width": 125.73,
+        "height": 165.79
+      },
+      "uri": "http://example.org/bundle1"
+    },
+    {
+      "id": "c2",
+      "label": "ex:bundle2",
+      "rect": {
+        "x": 125.73,
+        "y": -2,
+        "width": 138.32,
+        "height": 165.79
+      },
+      "uri": "http://example.org/bundle2"
+    }
+  ],
+  "markerColors": [
+    "#8B0000"
+  ],
+  "theme": {
+    "nodes": {
+      "entity": {
+        "fill": "#FFFC87",
+        "stroke": "#808080"
+      },
+      "activity": {
+        "fill": "#9FB1FC",
+        "stroke": "#0000FF"
+      },
+      "agent": {
+        "fill": "#FED37F"
+      },
+      "bundle": {
+        "fill": "aliceblue"
+      }
+    },
+    "generic": {
+      "entity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "activity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "agent": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "bundle": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "unknown": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      }
+    },
+    "relations": {
+      "prov:Generation": {
+        "color": "darkgreen",
+        "fontcolor": "darkgreen"
+      },
+      "prov:Usage": {
+        "color": "#8B0000",
+        "fontcolor": "red"
+      },
+      "prov:Communication": {},
+      "prov:Start": {},
+      "prov:End": {},
+      "prov:Invalidation": {},
+      "prov:Derivation": {},
+      "prov:Attribution": {
+        "color": "#FED37F"
+      },
+      "prov:Association": {
+        "color": "#FED37F"
+      },
+      "prov:Delegation": {
+        "color": "#FED37F"
+      },
+      "prov:Influence": {
+        "color": "grey"
+      },
+      "prov:Alternate": {},
+      "prov:Specialization": {},
+      "prov:Mention": {},
+      "prov:Membership": {}
+    },
+    "annotation": {
+      "color": "gray",
+      "fontcolor": "black"
+    },
+    "annotationLink": {
+      "color": "gray"
+    },
+    "decor": {
+      "bundleFill": "aliceblue",
+      "bundleStroke": "#9aa7b4",
+      "bundleLabelFill": "#333333"
+    }
+  },
+  "meta": {
+    "title": "Provenance graph",
+    "counts": {
+      "nodes": 6,
+      "edges": 2,
+      "bundles": 2,
+      "skipped": 0
+    },
+    "options": {
+      "useLabels": false,
+      "includeElementAttributes": true,
+      "includeRelationAttributes": true,
+      "showNary": true,
+      "direction": "BT"
+    },
+    "disclosure": {
+      "wholeGraph": true,
+      "focusId": "n3",
+      "initialVisibleIds": [
+        "n1",
+        "n2",
+        "n3",
+        "n4",
+        "n5",
+        "n6"
+      ],
+      "hops": 2,
+      "wholeGraphMax": 50
+    }
+  }
+}
