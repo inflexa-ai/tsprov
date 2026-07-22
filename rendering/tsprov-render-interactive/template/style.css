@@ -1,0 +1,489 @@
+/*
+ * Chrome styling for the interactive PROV viewer.
+ *
+ * Two colour worlds live here and must never mix:
+ *   1. The PAGE CHROME (background, header, panel, controls, dimming) adapts to
+ *      prefers-color-scheme via the custom properties below — dark by media query,
+ *      overridable by a data-theme attribute if a host ever wants to force one.
+ *   2. The PROV VISUAL LANGUAGE (node fills/strokes, edge tints) is NOT styled here.
+ *      Those colours are written as inline `fill`/`stroke` attributes by the client
+ *      straight from the embedded, toCssColor-projected theme, so they are identical in
+ *      light and dark. Styling them in CSS would let the scheme repaint the language,
+ *      which is exactly what must not happen. CSS here only animates opacity/transform
+ *      and draws selection/search affordances that do not touch fill.
+ */
+
+:root {
+  color-scheme: light dark;
+  --bg: #f7f8fa;
+  --stage-bg: #ffffff;
+  --fg: #1a1d23;
+  --fg-muted: #5b6472;
+  --border: #d8dce3;
+  --header-bg: #ffffff;
+  --panel-bg: #ffffff;
+  --control-bg: #ffffff;
+  --control-fg: #1a1d23;
+  --control-border: #cbd2db;
+  --accent: #2563c9;
+  --accent-fg: #ffffff;
+  --shadow: 0 1px 3px rgba(20, 24, 33, 0.12), 0 6px 20px rgba(20, 24, 33, 0.08);
+  --dim-opacity: 0.14;
+  /* The stroke halo used for selection/search highlight — a CSS drop-shadow, so it never
+     overwrites a glyph's themed fill. */
+  --select-glow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171c;
+    --stage-bg: #0d0f13;
+    --fg: #e6e9ee;
+    --fg-muted: #9aa4b2;
+    --border: #2a2f38;
+    --header-bg: #1a1e25;
+    --panel-bg: #1a1e25;
+    --control-bg: #232833;
+    --control-fg: #e6e9ee;
+    --control-border: #39404c;
+    --accent: #5b9bff;
+    --accent-fg: #0d0f13;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 8px 28px rgba(0, 0, 0, 0.45);
+    --dim-opacity: 0.12;
+  }
+}
+
+/* The viewer's theme toggle (if a host adds one) stamps data-theme on <html>; it must win
+   over the media query in both directions. */
+:root[data-theme="light"] {
+  --bg: #f7f8fa;
+  --stage-bg: #ffffff;
+  --fg: #1a1d23;
+  --fg-muted: #5b6472;
+  --border: #d8dce3;
+  --header-bg: #ffffff;
+  --panel-bg: #ffffff;
+  --control-bg: #ffffff;
+  --control-fg: #1a1d23;
+  --control-border: #cbd2db;
+  --accent: #2563c9;
+  --accent-fg: #ffffff;
+}
+:root[data-theme="dark"] {
+  --bg: #14171c;
+  --stage-bg: #0d0f13;
+  --fg: #e6e9ee;
+  --fg-muted: #9aa4b2;
+  --border: #2a2f38;
+  --header-bg: #1a1e25;
+  --panel-bg: #1a1e25;
+  --control-bg: #232833;
+  --control-fg: #e6e9ee;
+  --control-border: #39404c;
+  --accent: #5b9bff;
+  --accent-fg: #0d0f13;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+#prov-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* ── Header + controls ─────────────────────────────────────────────────────── */
+
+#prov-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 3;
+}
+
+.masthead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+
+#prov-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.counts {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-box input {
+  width: 220px;
+  max-width: 46vw;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--control-fg);
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: 7px;
+}
+.search-box input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.kind-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.kind-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--fg-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.kind-filter input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+.kind-filter .swatch {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  display: inline-block;
+}
+
+.buttons {
+  display: flex;
+  gap: 6px;
+}
+
+button {
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 12px;
+  color: var(--control-fg);
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: 7px;
+  cursor: pointer;
+}
+button:hover {
+  border-color: var(--accent);
+}
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ── Stage: the canvas + the detail panel ──────────────────────────────────── */
+
+#prov-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+
+#prov-canvas {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--stage-bg);
+  overflow: hidden;
+  /* The graph is one big SVG; panning happens by animating its viewBox, not by scrolling,
+     so the canvas itself never scrolls. */
+  touch-action: none;
+  outline: none;
+}
+
+svg.prov-scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+svg.prov-scene.is-panning {
+  cursor: grabbing;
+}
+
+/* ── The PROV primitives: animation + interaction states only (never fill) ──── */
+
+.prov-node,
+.prov-edge,
+.prov-blank,
+.prov-annotation,
+.prov-bundle {
+  /* viewBox is not CSS-transitionable, so the client animates it by hand; but per-element
+     reveal/hide IS animated here — opacity + a subtle scale so nodes ease in on disclosure
+     rather than popping. */
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.prov-node {
+  cursor: pointer;
+}
+
+/* Hidden by progressive disclosure: faded fully out and inert (no pointer, no tab stop —
+   the client also drops tabindex). Left in the DOM so revealing is a class flip, not a
+   rebuild, and positions never jump. */
+.is-hidden {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+.prov-node.is-hidden {
+  /* Grow in from slightly small — the reveal animation. transform-box/origin keep the
+     scale centred on the glyph rather than the SVG origin. */
+  transform: scale(0.85);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Search dimming: a non-match under an active query fades toward the background but stays
+   interactive so it can still be clicked. */
+.is-dimmed {
+  opacity: var(--dim-opacity);
+}
+
+/* A search match / the selected node: a coloured glow that does NOT touch fill. */
+.prov-node.is-match > .glyph {
+  filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 6px var(--accent));
+}
+.prov-node.is-selected > .glyph {
+  filter: drop-shadow(0 0 0 2px var(--accent)) drop-shadow(0 0 7px var(--accent));
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+
+.prov-node text {
+  /* PROV element glyph fills are FIXED light pastels — entity #FFFC87, activity #9FB1FC,
+     agent #FED37F — identical in light and dark (the visual language never repaints). The
+     in-glyph label therefore MUST be a fixed dark ink in BOTH schemes: were it to follow the
+     chrome --fg it would paint light-on-light — illegible — the moment the page goes dark.
+     This is the one text sitting on a themed fill, so the one that cannot track --fg. */
+  fill: #1a1d23;
+  pointer-events: none;
+}
+
+.prov-annotation text,
+.prov-bundle text {
+  /* Note/bundle labels are chrome decoration, not glyph fills, so they track the
+     foreground and stay legible against the panel/stage in either scheme. */
+  fill: var(--fg);
+  pointer-events: none;
+}
+
+/* ── Disclosure badges ─────────────────────────────────────────────────────── */
+
+.prov-badge {
+  cursor: pointer;
+}
+.prov-badge circle {
+  fill: var(--accent);
+  stroke: var(--stage-bg);
+  stroke-width: 1.5;
+}
+.prov-badge text {
+  fill: var(--accent-fg);
+  font-size: 10px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* ── Detail panel ──────────────────────────────────────────────────────────── */
+
+.panel {
+  flex: 0 0 320px;
+  max-width: 82vw;
+  background: var(--panel-bg);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow-y: auto;
+  padding: 16px;
+  z-index: 2;
+}
+.panel[hidden] {
+  display: none;
+}
+
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.panel-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  word-break: break-word;
+}
+.panel-close {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  line-height: 1.2;
+}
+
+.kind-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1d23;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.panel-uri {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  word-break: break-all;
+  color: var(--accent);
+}
+
+.panel-degree {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+
+.panel-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.attr-table {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.attr-table caption {
+  text-align: left;
+  font-weight: 650;
+  color: var(--fg-muted);
+  padding-bottom: 4px;
+}
+.attr-table th,
+.attr-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 4px 6px;
+  border-top: 1px solid var(--border);
+  word-break: break-word;
+}
+.attr-table th {
+  font-weight: 600;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+.attr-table a {
+  color: var(--accent);
+}
+.attr-empty {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--fg-muted);
+  font-style: italic;
+}
+
+/* ── Footer hint ───────────────────────────────────────────────────────────── */
+
+.hint {
+  padding: 6px 16px;
+  font-size: 11.5px;
+  color: var(--fg-muted);
+  background: var(--header-bg);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.hint-badge {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 700;
+  font-size: 10px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 720px) {
+  .panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-basis: 300px;
+  }
+  .search-box input {
+    width: 150px;
+  }
+}

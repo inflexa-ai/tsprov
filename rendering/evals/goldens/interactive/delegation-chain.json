@@ -1,0 +1,442 @@
+{
+  "width": 218.33,
+  "height": 398.6,
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "agent",
+      "inferred": false,
+      "glyph": "house",
+      "fill": "#FED37F",
+      "qualifiedName": "ex:ag1",
+      "label": "ex:ag1",
+      "labelLines": [
+        "ex:ag1"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 108.24,
+        "y": 361.5,
+        "width": 76.08,
+        "height": 50.2
+      },
+      "uri": "http://example.org/ag1"
+    },
+    {
+      "id": "n2",
+      "kind": "agent",
+      "inferred": false,
+      "glyph": "house",
+      "fill": "#FED37F",
+      "qualifiedName": "ex:ag2",
+      "label": "ex:ag2",
+      "labelLines": [
+        "ex:ag2"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 149.89,
+        "y": 204.3,
+        "width": 76.08,
+        "height": 50.2
+      },
+      "uri": "http://example.org/ag2"
+    },
+    {
+      "id": "n3",
+      "kind": "agent",
+      "inferred": false,
+      "glyph": "house",
+      "fill": "#FED37F",
+      "qualifiedName": "ex:ag3",
+      "label": "ex:ag3",
+      "labelLines": [
+        "ex:ag3"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 168.29,
+        "y": 37.1,
+        "width": 76.08,
+        "height": 50.2
+      },
+      "uri": "http://example.org/ag3"
+    },
+    {
+      "id": "n4",
+      "kind": "activity",
+      "inferred": false,
+      "glyph": "rect",
+      "fill": "#9FB1FC",
+      "qualifiedName": "ex:act",
+      "label": "ex:act",
+      "labelLines": [
+        "ex:act"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 55.2,
+        "y": 37.1,
+        "width": 76.08,
+        "height": 34.2
+      },
+      "stroke": "#0000FF",
+      "uri": "http://example.org/act"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "relation": "prov:Delegation",
+      "label": "actedOnBehalfOf",
+      "source": "n1",
+      "target": "n2",
+      "naryLegs": [
+        {
+          "role": "activity",
+          "target": "n4"
+        }
+      ]
+    },
+    {
+      "id": "e2",
+      "relation": "prov:Delegation",
+      "label": "actedOnBehalfOf",
+      "source": "n2",
+      "target": "n3",
+      "naryLegs": [
+        {
+          "role": "activity",
+          "target": "n4"
+        }
+      ]
+    }
+  ],
+  "segments": [
+    {
+      "stroke": "#FED37F",
+      "arrow": false,
+      "dashed": false,
+      "labelFill": "#FED37F",
+      "points": [
+        {
+          "x": 108.24,
+          "y": 336.4
+        },
+        {
+          "x": 108.24,
+          "y": 309.4
+        },
+        {
+          "x": 108.24,
+          "y": 282.4
+        }
+      ],
+      "gates": [
+        "n1",
+        "n2"
+      ],
+      "label": "actedOnBehalfOf",
+      "labelPos": {
+        "x": 108.24,
+        "y": 309.4
+      }
+    },
+    {
+      "stroke": "#FED37F",
+      "arrow": true,
+      "dashed": false,
+      "labelFill": "#FED37F",
+      "points": [
+        {
+          "x": 112.74,
+          "y": 275.04
+        },
+        {
+          "x": 149.89,
+          "y": 251.4
+        },
+        {
+          "x": 149.89,
+          "y": 229.4
+        }
+      ],
+      "gates": [
+        "n1",
+        "n2"
+      ]
+    },
+    {
+      "stroke": "gray",
+      "arrow": true,
+      "dashed": false,
+      "labelFill": "dimgray",
+      "points": [
+        {
+          "x": 103.74,
+          "y": 276.23
+        },
+        {
+          "x": 36.8,
+          "y": 251.4
+        },
+        {
+          "x": 36.8,
+          "y": 204.3
+        },
+        {
+          "x": 36.8,
+          "y": 152.2
+        },
+        {
+          "x": 36.8,
+          "y": 120.7
+        },
+        {
+          "x": 36.8,
+          "y": 89.2
+        },
+        {
+          "x": 49.16,
+          "y": 54.2
+        }
+      ],
+      "gates": [
+        "n1",
+        "n2",
+        "n4"
+      ],
+      "label": "activity",
+      "labelPos": {
+        "x": 36.8,
+        "y": 152.2
+      }
+    },
+    {
+      "stroke": "#FED37F",
+      "arrow": false,
+      "dashed": false,
+      "labelFill": "#FED37F",
+      "points": [
+        {
+          "x": 149.89,
+          "y": 179.2
+        },
+        {
+          "x": 149.89,
+          "y": 152.2
+        },
+        {
+          "x": 149.89,
+          "y": 125.2
+        }
+      ],
+      "gates": [
+        "n2",
+        "n3"
+      ],
+      "label": "actedOnBehalfOf",
+      "labelPos": {
+        "x": 149.89,
+        "y": 152.2
+      }
+    },
+    {
+      "stroke": "#FED37F",
+      "arrow": true,
+      "dashed": false,
+      "labelFill": "#FED37F",
+      "points": [
+        {
+          "x": 152.52,
+          "y": 116.2
+        },
+        {
+          "x": 168.29,
+          "y": 89.2
+        },
+        {
+          "x": 168.29,
+          "y": 62.2
+        }
+      ],
+      "gates": [
+        "n2",
+        "n3"
+      ]
+    },
+    {
+      "stroke": "gray",
+      "arrow": true,
+      "dashed": false,
+      "labelFill": "dimgray",
+      "points": [
+        {
+          "x": 145.39,
+          "y": 118.03
+        },
+        {
+          "x": 96.85,
+          "y": 89.2
+        },
+        {
+          "x": 68.87,
+          "y": 54.2
+        }
+      ],
+      "gates": [
+        "n2",
+        "n3",
+        "n4"
+      ],
+      "label": "activity",
+      "labelPos": {
+        "x": 96.85,
+        "y": 89.2
+      }
+    }
+  ],
+  "blanks": [
+    {
+      "box": {
+        "x": 108.24,
+        "y": 277.9,
+        "width": 9,
+        "height": 9
+      },
+      "gates": [
+        "n1",
+        "n2"
+      ]
+    },
+    {
+      "box": {
+        "x": 149.89,
+        "y": 120.7,
+        "width": 9,
+        "height": 9
+      },
+      "gates": [
+        "n2",
+        "n3"
+      ]
+    }
+  ],
+  "notes": [],
+  "bundles": [],
+  "markerColors": [
+    "#FED37F",
+    "gray"
+  ],
+  "theme": {
+    "nodes": {
+      "entity": {
+        "fill": "#FFFC87",
+        "stroke": "#808080"
+      },
+      "activity": {
+        "fill": "#9FB1FC",
+        "stroke": "#0000FF"
+      },
+      "agent": {
+        "fill": "#FED37F"
+      },
+      "bundle": {
+        "fill": "aliceblue"
+      }
+    },
+    "generic": {
+      "entity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "activity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "agent": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "bundle": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "unknown": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      }
+    },
+    "relations": {
+      "prov:Generation": {
+        "color": "darkgreen",
+        "fontcolor": "darkgreen"
+      },
+      "prov:Usage": {
+        "color": "#8B0000",
+        "fontcolor": "red"
+      },
+      "prov:Communication": {},
+      "prov:Start": {},
+      "prov:End": {},
+      "prov:Invalidation": {},
+      "prov:Derivation": {},
+      "prov:Attribution": {
+        "color": "#FED37F"
+      },
+      "prov:Association": {
+        "color": "#FED37F"
+      },
+      "prov:Delegation": {
+        "color": "#FED37F"
+      },
+      "prov:Influence": {
+        "color": "grey"
+      },
+      "prov:Alternate": {},
+      "prov:Specialization": {},
+      "prov:Mention": {},
+      "prov:Membership": {}
+    },
+    "annotation": {
+      "color": "gray",
+      "fontcolor": "black"
+    },
+    "annotationLink": {
+      "color": "gray"
+    },
+    "decor": {
+      "bundleFill": "aliceblue",
+      "bundleStroke": "#9aa7b4",
+      "bundleLabelFill": "#333333"
+    }
+  },
+  "meta": {
+    "title": "Provenance graph",
+    "counts": {
+      "nodes": 4,
+      "edges": 2,
+      "bundles": 0,
+      "skipped": 0
+    },
+    "options": {
+      "useLabels": false,
+      "includeElementAttributes": true,
+      "includeRelationAttributes": true,
+      "showNary": true,
+      "direction": "BT"
+    },
+    "disclosure": {
+      "wholeGraph": true,
+      "focusId": "n2",
+      "initialVisibleIds": [
+        "n1",
+        "n2",
+        "n3",
+        "n4"
+      ],
+      "hops": 2,
+      "wholeGraphMax": 50
+    }
+  }
+}

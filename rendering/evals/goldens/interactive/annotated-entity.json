@@ -1,0 +1,200 @@
+{
+  "width": 190.2,
+  "height": 172.59,
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "entity",
+      "inferred": false,
+      "glyph": "ellipse",
+      "fill": "#FFFC87",
+      "qualifiedName": "ex:doc",
+      "label": "ex:doc",
+      "labelLines": [
+        "ex:doc"
+      ],
+      "attributes": [
+        {
+          "name": "prov:type",
+          "nameUri": "http://www.w3.org/ns/prov#type",
+          "value": "ex:Report",
+          "valueUri": "http://example.org/Report"
+        },
+        {
+          "name": "ex:author",
+          "nameUri": "http://example.org/author",
+          "value": "ex:alice",
+          "valueUri": "http://example.org/alice"
+        },
+        {
+          "name": "ex:version",
+          "nameUri": "http://example.org/version",
+          "value": "3"
+        }
+      ],
+      "box": {
+        "x": 95.1,
+        "y": 36.8,
+        "width": 110.32,
+        "height": 49.59
+      },
+      "stroke": "#808080",
+      "uri": "http://example.org/doc"
+    }
+  ],
+  "edges": [],
+  "segments": [
+    {
+      "stroke": "gray",
+      "arrow": false,
+      "dashed": true,
+      "labelFill": "black",
+      "points": [
+        {
+          "x": 95.1,
+          "y": 105.59
+        },
+        {
+          "x": 95.1,
+          "y": 83.59
+        },
+        {
+          "x": 95.1,
+          "y": 61.59
+        }
+      ],
+      "gates": [
+        "n1"
+      ]
+    }
+  ],
+  "blanks": [],
+  "notes": [
+    {
+      "rows": [
+        "prov:type = ex:Report",
+        "ex:author = ex:alice",
+        "ex:version = 3"
+      ],
+      "box": {
+        "x": 95.1,
+        "y": 133.09,
+        "width": 166.2,
+        "height": 55
+      },
+      "gates": [
+        "n1"
+      ]
+    }
+  ],
+  "bundles": [],
+  "markerColors": [],
+  "theme": {
+    "nodes": {
+      "entity": {
+        "fill": "#FFFC87",
+        "stroke": "#808080"
+      },
+      "activity": {
+        "fill": "#9FB1FC",
+        "stroke": "#0000FF"
+      },
+      "agent": {
+        "fill": "#FED37F"
+      },
+      "bundle": {
+        "fill": "aliceblue"
+      }
+    },
+    "generic": {
+      "entity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "activity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "agent": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "bundle": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "unknown": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      }
+    },
+    "relations": {
+      "prov:Generation": {
+        "color": "darkgreen",
+        "fontcolor": "darkgreen"
+      },
+      "prov:Usage": {
+        "color": "#8B0000",
+        "fontcolor": "red"
+      },
+      "prov:Communication": {},
+      "prov:Start": {},
+      "prov:End": {},
+      "prov:Invalidation": {},
+      "prov:Derivation": {},
+      "prov:Attribution": {
+        "color": "#FED37F"
+      },
+      "prov:Association": {
+        "color": "#FED37F"
+      },
+      "prov:Delegation": {
+        "color": "#FED37F"
+      },
+      "prov:Influence": {
+        "color": "grey"
+      },
+      "prov:Alternate": {},
+      "prov:Specialization": {},
+      "prov:Mention": {},
+      "prov:Membership": {}
+    },
+    "annotation": {
+      "color": "gray",
+      "fontcolor": "black"
+    },
+    "annotationLink": {
+      "color": "gray"
+    },
+    "decor": {
+      "bundleFill": "aliceblue",
+      "bundleStroke": "#9aa7b4",
+      "bundleLabelFill": "#333333"
+    }
+  },
+  "meta": {
+    "title": "Provenance graph",
+    "counts": {
+      "nodes": 1,
+      "edges": 0,
+      "bundles": 0,
+      "skipped": 0
+    },
+    "options": {
+      "useLabels": false,
+      "includeElementAttributes": true,
+      "includeRelationAttributes": true,
+      "showNary": true,
+      "direction": "BT"
+    },
+    "disclosure": {
+      "wholeGraph": true,
+      "focusId": "n1",
+      "initialVisibleIds": [
+        "n1"
+      ],
+      "hops": 2,
+      "wholeGraphMax": 50
+    }
+  }
+}

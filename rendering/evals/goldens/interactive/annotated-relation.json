@@ -1,0 +1,281 @@
+{
+  "width": 331.26,
+  "height": 214.79,
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "entity",
+      "inferred": false,
+      "glyph": "ellipse",
+      "fill": "#FFFC87",
+      "qualifiedName": "ex:article",
+      "label": "ex:article",
+      "labelLines": [
+        "ex:article"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 238.93,
+        "y": 178,
+        "width": 160.66,
+        "height": 49.59
+      },
+      "stroke": "#808080",
+      "uri": "http://example.org/article"
+    },
+    {
+      "id": "n2",
+      "kind": "activity",
+      "inferred": false,
+      "glyph": "rect",
+      "fill": "#9FB1FC",
+      "qualifiedName": "ex:edit",
+      "label": "ex:edit",
+      "labelLines": [
+        "ex:edit"
+      ],
+      "attributes": [],
+      "box": {
+        "x": 154.62,
+        "y": 29.1,
+        "width": 84.76,
+        "height": 34.2
+      },
+      "stroke": "#0000FF",
+      "uri": "http://example.org/edit"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "relation": "prov:Generation",
+      "label": "wasGeneratedBy",
+      "source": "n1",
+      "target": "n2",
+      "naryLegs": []
+    }
+  ],
+  "segments": [
+    {
+      "stroke": "darkgreen",
+      "arrow": false,
+      "dashed": false,
+      "labelFill": "darkgreen",
+      "points": [
+        {
+          "x": 238.93,
+          "y": 153.2
+        },
+        {
+          "x": 238.93,
+          "y": 126.2
+        },
+        {
+          "x": 159.12,
+          "y": 96.38
+        }
+      ],
+      "gates": [
+        "n1",
+        "n2"
+      ],
+      "label": "wasGeneratedBy",
+      "labelPos": {
+        "x": 238.93,
+        "y": 126.2
+      }
+    },
+    {
+      "stroke": "darkgreen",
+      "arrow": true,
+      "dashed": false,
+      "labelFill": "darkgreen",
+      "points": [
+        {
+          "x": 154.62,
+          "y": 90.2
+        },
+        {
+          "x": 154.62,
+          "y": 68.2
+        },
+        {
+          "x": 154.62,
+          "y": 46.2
+        }
+      ],
+      "gates": [
+        "n1",
+        "n2"
+      ]
+    },
+    {
+      "stroke": "gray",
+      "arrow": false,
+      "dashed": true,
+      "labelFill": "black",
+      "points": [
+        {
+          "x": 70.3,
+          "y": 163.5
+        },
+        {
+          "x": 70.3,
+          "y": 126.2
+        },
+        {
+          "x": 150.12,
+          "y": 96.38
+        }
+      ],
+      "gates": [
+        "n1",
+        "n2"
+      ]
+    }
+  ],
+  "blanks": [
+    {
+      "box": {
+        "x": 154.62,
+        "y": 94.7,
+        "width": 9,
+        "height": 9
+      },
+      "gates": [
+        "n1",
+        "n2"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "rows": [
+        "ex:tool = vim"
+      ],
+      "box": {
+        "x": 70.3,
+        "y": 178,
+        "width": 116.6,
+        "height": 29
+      },
+      "gates": [
+        "n1",
+        "n2"
+      ]
+    }
+  ],
+  "bundles": [],
+  "markerColors": [
+    "darkgreen"
+  ],
+  "theme": {
+    "nodes": {
+      "entity": {
+        "fill": "#FFFC87",
+        "stroke": "#808080"
+      },
+      "activity": {
+        "fill": "#9FB1FC",
+        "stroke": "#0000FF"
+      },
+      "agent": {
+        "fill": "#FED37F"
+      },
+      "bundle": {
+        "fill": "aliceblue"
+      }
+    },
+    "generic": {
+      "entity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "activity": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "agent": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "bundle": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      },
+      "unknown": {
+        "fill": "lightgray",
+        "stroke": "dimgray"
+      }
+    },
+    "relations": {
+      "prov:Generation": {
+        "color": "darkgreen",
+        "fontcolor": "darkgreen"
+      },
+      "prov:Usage": {
+        "color": "#8B0000",
+        "fontcolor": "red"
+      },
+      "prov:Communication": {},
+      "prov:Start": {},
+      "prov:End": {},
+      "prov:Invalidation": {},
+      "prov:Derivation": {},
+      "prov:Attribution": {
+        "color": "#FED37F"
+      },
+      "prov:Association": {
+        "color": "#FED37F"
+      },
+      "prov:Delegation": {
+        "color": "#FED37F"
+      },
+      "prov:Influence": {
+        "color": "grey"
+      },
+      "prov:Alternate": {},
+      "prov:Specialization": {},
+      "prov:Mention": {},
+      "prov:Membership": {}
+    },
+    "annotation": {
+      "color": "gray",
+      "fontcolor": "black"
+    },
+    "annotationLink": {
+      "color": "gray"
+    },
+    "decor": {
+      "bundleFill": "aliceblue",
+      "bundleStroke": "#9aa7b4",
+      "bundleLabelFill": "#333333"
+    }
+  },
+  "meta": {
+    "title": "Provenance graph",
+    "counts": {
+      "nodes": 2,
+      "edges": 1,
+      "bundles": 0,
+      "skipped": 0
+    },
+    "options": {
+      "useLabels": false,
+      "includeElementAttributes": true,
+      "includeRelationAttributes": true,
+      "showNary": true,
+      "direction": "BT"
+    },
+    "disclosure": {
+      "wholeGraph": true,
+      "focusId": "n1",
+      "initialVisibleIds": [
+        "n1",
+        "n2"
+      ],
+      "hops": 2,
+      "wholeGraphMax": 50
+    }
+  }
+}

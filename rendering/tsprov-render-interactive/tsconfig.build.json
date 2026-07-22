@@ -1,0 +1,22 @@
+{
+  // The ESM build: emits per-module runtime `.js` (+ source maps) AND the `.d.ts`
+  // declarations for the published package. Mirrors the sibling renderer packages so this
+  // one ships the same dual-format, nodenext-consumable layout — the `.js`-extension
+  // import specifiers are left verbatim by `module: "Preserve"`, so `dist/*.d.ts` is
+  // consumable under node16/nodenext with no post-build rewrite. `template.generated.ts`
+  // is a committed source module, so it compiles like any other src file.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "allowImportingTsExtensions": false,
+    "allowJs": false,
+    "stripInternal": true
+  },
+  "include": ["src"],
+  "exclude": ["dist", "node_modules", "src/**/*.test.ts"]
+}

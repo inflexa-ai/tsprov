@@ -1,0 +1,19 @@
+{
+  // The CommonJS build: a second `tsc` pass emitting per-module CJS to `dist/cjs/` for
+  // `require` consumers. Extends the ESM build config and overrides only what CJS emit
+  // needs (mirrored from the sibling renderer packages): `module: "commonjs"` forces CJS
+  // output regardless of the package-root `"type": "module"`; `moduleResolution: "node"`
+  // because `commonjs` is incompatible with `bundler` resolution; `verbatimModuleSyntax:
+  // false` to let `tsc` rewrite ESM syntax into CJS. A `dist/cjs/package.json` with
+  // `{"type":"commonjs"}` (written by the `build:cjs` script) tells Node to load these
+  // `.js` as CJS. This package's only runtime imports are the ESM+CJS sibling renderers
+  // (render-core, render-svg) via named exports, so both builds interop cleanly.
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "verbatimModuleSyntax": false,
+    "declarationMap": false,
+    "outDir": "dist/cjs"
+  }
+}

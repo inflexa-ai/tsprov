@@ -25,6 +25,7 @@ const RENDER_CORE_DIR = join(REPO_ROOT, "rendering/tsprov-render-core");
 const RENDER_DOT_DIR = join(REPO_ROOT, "rendering/tsprov-render-dot");
 const RENDER_MERMAID_DIR = join(REPO_ROOT, "rendering/tsprov-render-mermaid");
 const RENDER_SVG_DIR = join(REPO_ROOT, "rendering/tsprov-render-svg");
+const RENDER_INTERACTIVE_DIR = join(REPO_ROOT, "rendering/tsprov-render-interactive");
 
 /** Recursively counts directories named exactly `@inflexa-ai/tsprov` (not `-render-core`). */
 function countTsprovInstances(root: string): string[] {
@@ -54,7 +55,7 @@ test.skipIf(!FULL)(
 
     try {
       // 1. Build every publishable package so its `dist/` is present in the tarballs.
-      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR, RENDER_SVG_DIR]) {
+      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR, RENDER_SVG_DIR, RENDER_INTERACTIVE_DIR]) {
         const built = await $`bun run build`.cwd(dir).quiet().nothrow();
         expect(`build ${dir} exit ${built.exitCode}`).toBe(
           `build ${dir} exit 0`,
@@ -62,7 +63,7 @@ test.skipIf(!FULL)(
       }
 
       // 2. Pack each into a tarball (no registry).
-      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR, RENDER_SVG_DIR]) {
+      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR, RENDER_MERMAID_DIR, RENDER_SVG_DIR, RENDER_INTERACTIVE_DIR]) {
         const packed =
           await $`bun pm pack --destination ${packDir}`.cwd(dir).quiet().nothrow();
         expect(`pack ${dir} exit ${packed.exitCode}`).toBe(`pack ${dir} exit 0`);
@@ -75,24 +76,27 @@ test.skipIf(!FULL)(
       const renderDotTgz = tarballs.find((f) => f.includes("render-dot"));
       const renderMermaidTgz = tarballs.find((f) => f.includes("render-mermaid"));
       const renderSvgTgz = tarballs.find((f) => f.includes("render-svg"));
+      const renderInteractiveTgz = tarballs.find((f) => f.includes("render-interactive"));
       if (
         coreTgz === undefined ||
         renderTgz === undefined ||
         renderDotTgz === undefined ||
         renderMermaidTgz === undefined ||
-        renderSvgTgz === undefined
+        renderSvgTgz === undefined ||
+        renderInteractiveTgz === undefined
       ) {
         throw new Error(`missing tarballs: ${tarballs.join(", ")}`);
       }
 
-      // 3. A fresh consumer project installs ALL FIVE tarballs. The core tarball
-      //    satisfies every sibling's tsprov peer, and the render-core tarball satisfies
-      //    render-dot's, render-mermaid's, AND render-svg's `^0.1.0` sibling dependency —
-      //    pinned offline via `overrides`. render-svg's OTHER runtime dependency,
-      //    `@dagrejs/dagre@^3`, is NOT overridden: it is a published package, so it
-      //    resolves from the real npm registry exactly as a downstream consumer's install
-      //    would — this is the one renderer whose install reaches the registry, and that
-      //    is the point (the heavy dep is real and paid for on install).
+      // 3. A fresh consumer project installs ALL SIX tarballs. The core tarball satisfies
+      //    every sibling's tsprov peer; the render-core tarball satisfies render-dot's,
+      //    render-mermaid's, render-svg's, AND render-interactive's `^0.1.0` sibling
+      //    dependency; and the render-svg tarball satisfies render-interactive's `^0.1.0`
+      //    render-svg dependency — both pinned offline via `overrides`. render-svg's OTHER
+      //    runtime dependency, `@dagrejs/dagre@^3`, is NOT overridden: it is a published
+      //    package, so it resolves from the real npm registry exactly as a downstream
+      //    consumer's install would — the heavy dep is real and paid for on install, and it
+      //    reaches interactive transitively through the render-svg it depends on.
       await Bun.write(
         join(consumer, "package.json"),
         `${JSON.stringify(
@@ -101,14 +105,17 @@ test.skipIf(!FULL)(
             version: "0.0.0",
             private: true,
             type: "module",
-            overrides: { "@inflexa-ai/tsprov-render-core": renderTgz },
+            overrides: {
+              "@inflexa-ai/tsprov-render-core": renderTgz,
+              "@inflexa-ai/tsprov-render-svg": renderSvgTgz,
+            },
           },
           null,
           2,
         )}\n`,
       );
       const added =
-        await $`bun add ${coreTgz} ${renderTgz} ${renderDotTgz} ${renderMermaidTgz} ${renderSvgTgz}`
+        await $`bun add ${coreTgz} ${renderTgz} ${renderDotTgz} ${renderMermaidTgz} ${renderSvgTgz} ${renderInteractiveTgz}`
           .cwd(consumer)
           .quiet()
           .nothrow();
@@ -224,8 +231,38 @@ test.skipIf(!FULL)(
       const svgRun = await $`bun run svg.mjs`.cwd(consumer).quiet().nothrow();
       expect(`svg exit ${svgRun.exitCode}`).toBe("svg exit 0");
 
+      // 5e. render-interactive works end to end from the installed tarballs — its two
+      //     sibling runtime deps (render-core + render-svg, the layout seam) resolve from the
+      //     pinned tarballs, dagre from the registry through render-svg — and it emits ONE
+      //     self-contained HTML page: a full document with the payload script and NO external
+      //     resource load (the self-containment contract, proven on a real packed install).
+      await Bun.write(
+        join(consumer, "interactive.mjs"),
+        [
+          `import { ProvDocument, ns } from "@inflexa-ai/tsprov";`,
+          `import { renderInteractiveHtml } from "@inflexa-ai/tsprov-render-interactive";`,
+          `const ex = ns("ex", "http://example.org/");`,
+          `const doc = new ProvDocument();`,
+          `doc.addNamespace(ex.prefix, ex.uri);`,
+          `const e = doc.entity(ex.qn("e"));`,
+          `const a = doc.activity(ex.qn("a"));`,
+          `doc.wasGeneratedBy(e, a);`,
+          `const html = renderInteractiveHtml(doc);`,
+          `const chrome = html.replace(/<script type="application\\/json"[\\s\\S]*?<\\/script>/, "");`,
+          `const externalRefs = /\\ssrc\\s*=|<link\\b|@import\\b|url\\(\\s*['"]?https?:|\\bfetch\\s*\\(|\\bXMLHttpRequest\\b|\\bWebSocket\\b/.test(chrome);`,
+          `if (!html.startsWith("<!doctype html>") || !html.includes('id="prov-scene"') || externalRefs) {`,
+          `  console.error("render-interactive FAILED (self-contained?", !externalRefs, ")");`,
+          `  process.exit(1);`,
+          `}`,
+          `console.log("render-interactive OK");`,
+          ``,
+        ].join("\n"),
+      );
+      const interactiveRun = await $`bun run interactive.mjs`.cwd(consumer).quiet().nothrow();
+      expect(`interactive exit ${interactiveRun.exitCode}`).toBe("interactive exit 0");
+
       // 6. Consumer typecheck under BOTH module resolutions. The consumer only uses
-      //    the public types of both packages; each must resolve cleanly.
+      //    the public types of every package; each must resolve cleanly.
       await Bun.write(
         join(consumer, "consumer.ts"),
         [
@@ -239,6 +276,7 @@ test.skipIf(!FULL)(
           `import { DotRenderer, type DotRenderOptions } from "@inflexa-ai/tsprov-render-dot";`,
           `import { MermaidRenderer, type MermaidRenderOptions } from "@inflexa-ai/tsprov-render-mermaid";`,
           `import { SvgRenderer, type SvgRenderOptions } from "@inflexa-ai/tsprov-render-svg";`,
+          `import { InteractiveRenderer, renderInteractiveHtml, type InteractiveRenderOptions } from "@inflexa-ai/tsprov-render-interactive";`,
           `const doc = new ProvDocument();`,
           `const scene: RenderScene = toRenderScene(doc, { useLabels: true });`,
           `const direction: string = PROV_THEME.direction;`,
@@ -249,6 +287,9 @@ test.skipIf(!FULL)(
           `export const mermaid: string | Promise<string> = new MermaidRenderer().render(doc, mopts);`,
           `const sopts: SvgRenderOptions = { direction: "LR" };`,
           `export const svg: string | Promise<string> = new SvgRenderer().render(doc, sopts);`,
+          `const iopts: InteractiveRenderOptions = { direction: "LR", focus: "ex:e", title: "Demo" };`,
+          `export const html1: string = new InteractiveRenderer().render(doc, iopts) as string;`,
+          `export const html2: string = renderInteractiveHtml(doc, iopts);`,
           `export const nodeCount: number = scene.nodes.length;`,
           `export const dir: string = direction;`,
           `export { doc };`,
