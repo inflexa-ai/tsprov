@@ -1,0 +1,70 @@
+{
+  "name": "@inflexa-ai/tsprov-render-dot",
+  "version": "0.1.0",
+  "description": "DOT (Graphviz) renderer for tsprov provenance documents — a scene-driven DotRenderer that reproduces Python prov.dot's digraph output. Pipe its string to `dot` for images.",
+  "keywords": [
+    "prov",
+    "provenance",
+    "w3c",
+    "prov-dm",
+    "visualization",
+    "render",
+    "graphviz",
+    "dot"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inflexa-ai/tsprov.git",
+    "directory": "rendering/tsprov-render-dot"
+  },
+  "homepage": "https://github.com/inflexa-ai/tsprov/tree/main/rendering/tsprov-render-dot#readme",
+  "bugs": {
+    "url": "https://github.com/inflexa-ai/tsprov/issues"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "bun run clean && bun run build:esm && bun run build:cjs",
+    "build:esm": "tsc -p tsconfig.build.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@inflexa-ai/tsprov-render-core": "^0.1.0"
+  },
+  "peerDependencies": {
+    "@inflexa-ai/tsprov": ">=0.5.1 <2"
+  },
+  "devDependencies": {
+    "@inflexa-ai/tsprov": "workspace:*",
+    "@inflexa-ai/tsprov-render-core": "workspace:*",
+    "@types/bun": "latest",
+    "typescript": "^5 || ^6"
+  }
+}

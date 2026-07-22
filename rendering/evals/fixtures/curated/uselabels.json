@@ -1,0 +1,8 @@
+{
+  "prefix": { "ex": "http://example.org/" },
+  "entity": { "ex:article": { "prov:label": "Draft Article" } },
+  "activity": { "ex:edit": { "prov:label": "Editing Session" } },
+  "wasGeneratedBy": {
+    "ex:gen": { "prov:entity": "ex:article", "prov:activity": "ex:edit" }
+  }
+}

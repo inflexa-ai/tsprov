@@ -10,6 +10,7 @@
   "devDependencies": {
     "@inflexa-ai/tsprov": "workspace:*",
     "@inflexa-ai/tsprov-render-core": "workspace:*",
+    "@inflexa-ai/tsprov-render-dot": "workspace:*",
     "@types/bun": "latest",
     "typescript": "^5 || ^6"
   }

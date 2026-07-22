@@ -1,0 +1,15 @@
+digraph G {
+rankdir=BT;
+charset="utf-8";
+n1 [label="ex:e2", URL="http://example.org/e2", shape=oval, style=filled, fillcolor="#FFFC87", color="#808080"];
+n2 [label="ex:e1", URL="http://example.org/e1", shape=oval, style=filled, fillcolor="#FFFC87", color="#808080"];
+n3 [label="ex:a", URL="http://example.org/a", shape=box, style=filled, fillcolor="#9FB1FC", color="#0000FF"];
+b1 [label="", shape=point, color=gray];
+n1 -> b1 [arrowhead=none, label=wasDerivedFrom, fontsize=10.0];
+b1 -> n2 [fontsize=10.0];
+b1 -> n3 [fontsize=10.0, color=gray, fontcolor=dimgray, label=activity];
+n4 [label="ex:g", URL="http://example.org/g", shape=oval, style=filled, fillcolor=lightgray, color=dimgray];
+b1 -> n4 [fontsize=10.0, color=gray, fontcolor=dimgray, label=generation];
+n5 [label="ex:u", URL="http://example.org/u", shape=oval, style=filled, fillcolor=lightgray, color=dimgray];
+b1 -> n5 [fontsize=10.0, color=gray, fontcolor=dimgray, label=usage];
+}

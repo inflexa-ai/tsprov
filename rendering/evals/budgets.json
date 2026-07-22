@@ -3,6 +3,10 @@
     "@inflexa-ai/tsprov-render-core": {
       "gzipBudgetBytes": 2260,
       "measuredSeedBytes": 2047
+    },
+    "@inflexa-ai/tsprov-render-dot": {
+      "gzipBudgetBytes": 1760,
+      "measuredSeedBytes": 1591
     }
   }
 }

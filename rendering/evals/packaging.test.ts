@@ -22,6 +22,7 @@ if (!FULL) {
 const REPO_ROOT = `${import.meta.dir}/../..`;
 const CORE_DIR = join(REPO_ROOT, "packages/tsprov");
 const RENDER_CORE_DIR = join(REPO_ROOT, "rendering/tsprov-render-core");
+const RENDER_DOT_DIR = join(REPO_ROOT, "rendering/tsprov-render-dot");
 
 /** Recursively counts directories named exactly `@inflexa-ai/tsprov` (not `-render-core`). */
 function countTsprovInstances(root: string): string[] {
@@ -50,16 +51,16 @@ test.skipIf(!FULL)(
     await $`mkdir -p ${packDir} ${consumer}`.quiet();
 
     try {
-      // 1. Build both packages so their `dist/` is present in the tarballs.
-      for (const dir of [CORE_DIR, RENDER_CORE_DIR]) {
+      // 1. Build every publishable package so its `dist/` is present in the tarballs.
+      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR]) {
         const built = await $`bun run build`.cwd(dir).quiet().nothrow();
         expect(`build ${dir} exit ${built.exitCode}`).toBe(
           `build ${dir} exit 0`,
         );
       }
 
-      // 2. Pack both into tarballs (no registry).
-      for (const dir of [CORE_DIR, RENDER_CORE_DIR]) {
+      // 2. Pack each into a tarball (no registry).
+      for (const dir of [CORE_DIR, RENDER_CORE_DIR, RENDER_DOT_DIR]) {
         const packed =
           await $`bun pm pack --destination ${packDir}`.cwd(dir).quiet().nothrow();
         expect(`pack ${dir} exit ${packed.exitCode}`).toBe(`pack ${dir} exit 0`);
@@ -69,26 +70,38 @@ test.skipIf(!FULL)(
         .map((f) => join(packDir, f));
       const coreTgz = tarballs.find((f) => f.includes("tsprov-0."));
       const renderTgz = tarballs.find((f) => f.includes("render-core"));
-      if (coreTgz === undefined || renderTgz === undefined) {
+      const renderDotTgz = tarballs.find((f) => f.includes("render-dot"));
+      if (coreTgz === undefined || renderTgz === undefined || renderDotTgz === undefined) {
         throw new Error(`missing tarballs: ${tarballs.join(", ")}`);
       }
 
-      // 3. A fresh consumer project installs BOTH tarballs. The core tarball
-      //    satisfies render-core's tsprov peer without any registry lookup.
+      // 3. A fresh consumer project installs ALL THREE tarballs. The core tarball
+      //    satisfies both siblings' tsprov peer, and the render-core tarball satisfies
+      //    render-dot's `^0.1.0` sibling dependency — all without any registry lookup.
       await Bun.write(
         join(consumer, "package.json"),
         `${JSON.stringify(
-          { name: "consumer", version: "0.0.0", private: true, type: "module" },
+          {
+            name: "consumer",
+            version: "0.0.0",
+            private: true,
+            type: "module",
+            // render-dot's tarball declares `@inflexa-ai/tsprov-render-core: ^0.1.0`;
+            // with no registry, an `overrides` entry pins that resolution to the
+            // render-core tarball so the sibling dependency resolves offline (exactly
+            // the local-file substitution a monorepo consumer would use pre-publish).
+            overrides: { "@inflexa-ai/tsprov-render-core": renderTgz },
+          },
           null,
           2,
         )}\n`,
       );
       const added =
-        await $`bun add ${coreTgz} ${renderTgz}`.cwd(consumer).quiet().nothrow();
+        await $`bun add ${coreTgz} ${renderTgz} ${renderDotTgz}`.cwd(consumer).quiet().nothrow();
       expect(`bun add exit ${added.exitCode}`).toBe("bun add exit 0");
 
-      // 4. Exactly one @inflexa-ai/tsprov in the consumer tree (render-core did not
-      //    drag in a second copy — the peer resolved to the installed one).
+      // 4. Exactly one @inflexa-ai/tsprov in the consumer tree (neither sibling dragged
+      //    in a second copy — the peer resolved to the installed one).
       const instances = countTsprovInstances(join(consumer, "node_modules"));
       expect(`tsprov instances: ${instances.length}`).toBe("tsprov instances: 1");
 
@@ -119,6 +132,29 @@ test.skipIf(!FULL)(
         await $`bun run identity.mjs`.cwd(consumer).quiet().nothrow();
       expect(`identity exit ${identity.exitCode}`).toBe("identity exit 0");
 
+      // 5b. render-dot works end to end from the installed tarballs: a document built
+      //    with the consumer's tsprov renders to a DOT digraph with the themed entity.
+      await Bun.write(
+        join(consumer, "dot.mjs"),
+        [
+          `import { ProvDocument, ns } from "@inflexa-ai/tsprov";`,
+          `import { DotRenderer } from "@inflexa-ai/tsprov-render-dot";`,
+          `const ex = ns("ex", "http://example.org/");`,
+          `const doc = new ProvDocument();`,
+          `doc.addNamespace(ex.prefix, ex.uri);`,
+          `doc.entity(ex.qn("e"));`,
+          `const dot = new DotRenderer().render(doc);`,
+          `if (!dot.startsWith("digraph G {") || !dot.includes('fillcolor="#FFFC87"')) {`,
+          `  console.error("render-dot FAILED:", dot);`,
+          `  process.exit(1);`,
+          `}`,
+          `console.log("render-dot OK");`,
+          ``,
+        ].join("\n"),
+      );
+      const dotRun = await $`bun run dot.mjs`.cwd(consumer).quiet().nothrow();
+      expect(`dot exit ${dotRun.exitCode}`).toBe("dot exit 0");
+
       // 6. Consumer typecheck under BOTH module resolutions. The consumer only uses
       //    the public types of both packages; each must resolve cleanly.
       await Bun.write(
@@ -131,10 +167,13 @@ test.skipIf(!FULL)(
           `  type RenderScene,`,
           `  type Renderer,`,
           `} from "@inflexa-ai/tsprov-render-core";`,
+          `import { DotRenderer, type DotRenderOptions } from "@inflexa-ai/tsprov-render-dot";`,
           `const doc = new ProvDocument();`,
           `const scene: RenderScene = toRenderScene(doc, { useLabels: true });`,
           `const direction: string = PROV_THEME.direction;`,
           `export type StringRenderer = Renderer<string>;`,
+          `const opts: DotRenderOptions = { direction: "LR" };`,
+          `export const dot: string | Promise<string> = new DotRenderer().render(doc, opts);`,
           `export const nodeCount: number = scene.nodes.length;`,
           `export const dir: string = direction;`,
           `export { doc };`,

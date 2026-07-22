@@ -1,0 +1,9 @@
+digraph G {
+rankdir=BT;
+charset="utf-8";
+b1 [label="", shape=point, color=gray];
+b2 [label="", shape=point, color=gray];
+b2 -> b1 [arrowhead=none, label=wasStartedBy, fontsize=10.0];
+n1 [label="ex:e1", URL="http://example.org/e1", shape=oval, style=filled, fillcolor=lightgray, color=dimgray];
+b1 -> n1 [fontsize=10.0];
+}

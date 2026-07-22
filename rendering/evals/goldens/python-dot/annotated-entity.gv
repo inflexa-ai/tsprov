@@ -1,0 +1,20 @@
+digraph G {
+rankdir=BT;
+charset="utf-8";
+n1 [label="ex:doc", URL="http://example.org/doc", shape=oval, style=filled, fillcolor="#FFFC87", color="#808080"];
+ann1 [label=<<TABLE cellpadding="0" border="0">
+    <TR>
+        <TD align="left" href="http://www.w3.org/ns/prov#type">prov:type</TD>
+        <TD align="left" href="http://example.org/Report">ex:Report</TD>
+    </TR>
+    <TR>
+        <TD align="left" href="http://example.org/author">ex:author</TD>
+        <TD align="left" href="http://example.org/alice">ex:alice</TD>
+    </TR>
+    <TR>
+        <TD align="left" href="http://example.org/version">ex:version</TD>
+        <TD align="left">3</TD>
+    </TR>
+    </TABLE>>, shape=note, color=gray, fontcolor=black, fontsize=10];
+ann1 -> n1 [arrowhead=none, style=dashed, color=gray];
+}

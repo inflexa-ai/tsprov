@@ -1,0 +1,7 @@
+digraph G {
+rankdir=BT;
+charset="utf-8";
+n1 [label="ex:a2", URL="http://example.org/a2", shape=box, style=filled, fillcolor=lightgray, color=dimgray];
+n2 [label="ex:a1", URL="http://example.org/a1", shape=box, style=filled, fillcolor=lightgray, color=dimgray];
+n1 -> n2 [label=wasInformedBy, fontsize=10.0];
+}

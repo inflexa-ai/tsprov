@@ -1,0 +1,16 @@
+digraph G {
+rankdir=BT;
+charset="utf-8";
+n1 [label="ex:article", URL="http://example.org/article", shape=oval, style=filled, fillcolor="#FFFC87", color="#808080"];
+n2 [label="ex:edit", URL="http://example.org/edit", shape=box, style=filled, fillcolor="#9FB1FC", color="#0000FF"];
+b1 [label="", shape=point, color=gray];
+n1 -> b1 [arrowhead=none, label=wasGeneratedBy, fontsize=10.0, color=darkgreen, fontcolor=darkgreen];
+b1 -> n2 [fontsize=10.0, color=darkgreen, fontcolor=darkgreen];
+ann1 [label=<<TABLE cellpadding="0" border="0">
+    <TR>
+        <TD align="left" href="http://example.org/tool">ex:tool</TD>
+        <TD align="left">vim</TD>
+    </TR>
+    </TABLE>>, shape=note, color=gray, fontcolor=black, fontsize=10];
+ann1 -> b1 [arrowhead=none, style=dashed, color=gray];
+}

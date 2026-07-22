@@ -1,0 +1,16 @@
+digraph G {
+rankdir=BT;
+charset="utf-8";
+n1 [label="ex:ag1", URL="http://example.org/ag1", shape=house, style=filled, fillcolor="#FED37F"];
+n2 [label="ex:ag2", URL="http://example.org/ag2", shape=house, style=filled, fillcolor="#FED37F"];
+n3 [label="ex:ag3", URL="http://example.org/ag3", shape=house, style=filled, fillcolor="#FED37F"];
+n4 [label="ex:act", URL="http://example.org/act", shape=box, style=filled, fillcolor="#9FB1FC", color="#0000FF"];
+b1 [label="", shape=point, color=gray];
+n1 -> b1 [arrowhead=none, label=actedOnBehalfOf, fontsize=10.0, color="#FED37F"];
+b1 -> n2 [fontsize=10.0, color="#FED37F"];
+b1 -> n4 [fontsize=10.0, color=gray, fontcolor=dimgray, label=activity];
+b2 [label="", shape=point, color=gray];
+n2 -> b2 [arrowhead=none, label=actedOnBehalfOf, fontsize=10.0, color="#FED37F"];
+b2 -> n3 [fontsize=10.0, color="#FED37F"];
+b2 -> n4 [fontsize=10.0, color=gray, fontcolor=dimgray, label=activity];
+}
