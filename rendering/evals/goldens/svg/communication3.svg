@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104.6 146.4" class="prov-graph" font-family="&#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif">
+<defs><marker id="arrow-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="black"/></marker></defs>
+<g class="prov-edge"><path d="M 52.3 100.2 L 52.3 73.2 L 52.3 46.2" fill="none" stroke="black" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-black)"/><text x="52.3" y="73.2" text-anchor="middle" dominant-baseline="central" font-size="10" fill="black">wasInformedBy</text></g>
+<a href="http://example.org/a2"><g class="prov-node prov-activity prov-inferred"><title>ex:a2</title><rect x="18.6" y="100.2" width="67.4" height="34.2" fill="lightgray" stroke="dimgray"/><text x="52.3" y="117.3" text-anchor="middle" dominant-baseline="central" font-size="14" fill="black"><tspan x="52.3" dy="0">ex:a2</tspan></text></g></a>
+<a href="http://example.org/a1"><g class="prov-node prov-activity prov-inferred"><title>ex:a1</title><rect x="18.6" y="12" width="67.4" height="34.2" fill="lightgray" stroke="dimgray"/><text x="52.3" y="29.1" text-anchor="middle" dominant-baseline="central" font-size="14" fill="black"><tspan x="52.3" dy="0">ex:a1</tspan></text></g></a>
+</svg>

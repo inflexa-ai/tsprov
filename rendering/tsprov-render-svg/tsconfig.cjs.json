@@ -1,0 +1,23 @@
+{
+  // The CommonJS build: a second `tsc` pass emitting per-module CJS to `dist/cjs/`
+  // for `require` consumers. Extends the ESM build config and overrides only what CJS
+  // emit needs (see `packages/tsprov/tsconfig.cjs.json` for the rationale, mirrored
+  // verbatim): `module: "commonjs"` forces CJS output regardless of the package-root
+  // `"type": "module"`; `moduleResolution: "node"` because `commonjs` is incompatible
+  // with `bundler` resolution; `verbatimModuleSyntax: false` to let `tsc` rewrite ESM
+  // syntax into CJS. A `dist/cjs/package.json` with `{"type":"commonjs"}` (written by
+  // the `build:cjs` script) tells Node to load these `.js` as CJS.
+  //
+  // dagre is a CJS package with a default export; the `import dagre from
+  // "@dagrejs/dagre"` in `svg.ts` compiles here to a `require("@dagrejs/dagre")`
+  // interop call that reads `.default ?? module.exports`, so the same source works in
+  // both builds without an interop shim.
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "verbatimModuleSyntax": false,
+    "declarationMap": false,
+    "outDir": "dist/cjs"
+  }
+}

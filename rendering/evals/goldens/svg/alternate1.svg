@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 121.73 177.18" class="prov-graph" font-family="&#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif">
+<defs><marker id="arrow-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="black"/></marker></defs>
+<g class="prov-edge"><path d="M 60.87 115.59 L 60.87 88.59 L 60.87 61.59" fill="none" stroke="black" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-black)"/><text x="60.87" y="88.59" text-anchor="middle" dominant-baseline="central" font-size="10" fill="black">alternateOf</text></g>
+<a href="http://example.org/e1"><g class="prov-node prov-entity prov-inferred"><title>ex:e1</title><ellipse cx="60.87" cy="140.39" rx="48.87" ry="24.8" fill="lightgray" stroke="dimgray"/><text x="60.87" y="140.39" text-anchor="middle" dominant-baseline="central" font-size="14" fill="black"><tspan x="60.87" dy="0">ex:e1</tspan></text></g></a>
+<a href="http://example.org/e2"><g class="prov-node prov-entity prov-inferred"><title>ex:e2</title><ellipse cx="60.87" cy="36.8" rx="48.87" ry="24.8" fill="lightgray" stroke="dimgray"/><text x="60.87" y="36.8" text-anchor="middle" dominant-baseline="central" font-size="14" fill="black"><tspan x="60.87" dy="0">ex:e2</tspan></text></g></a>
+</svg>
