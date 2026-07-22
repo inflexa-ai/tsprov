@@ -47,6 +47,7 @@ import {
   type RenderBundle,
   toRenderScene,
   safeLinkUri,
+  toCssColor,
 } from "@inflexa-ai/tsprov-render-core";
 import type { ProvDocument } from "@inflexa-ai/tsprov";
 
@@ -122,29 +123,6 @@ export function escapeXml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-// Graphviz X11 color names that are NOT valid CSS/SVG colors, mapped to the hex the X11
-// palette assigns them — the same projection the Mermaid emitter owns, for the same
-// reason: `PROV_THEME` stays Graphviz-faithful as the single source of visual truth, so
-// the projection to a browser-legal color lives at the emission boundary. An SVG
-// renderer (a browser, `resvg`, Inkscape) drops an unknown color word, which would leave
-// a themed stroke at its default and defeat the visual language; projecting the name to
-// its hex keeps the intended color visible. X11 `red4` (the `prov:Usage` stroke) is the
-// darkest of the `red1..red4` ramp = `#8B0000`; it is currently the only Graphviz-only
-// name any theme color uses. Every other theme color (`darkgreen`, `red`, `gray`,
-// `grey`, `dimgray`, `aliceblue`, hex literals) is already valid CSS and passes through.
-const GRAPHVIZ_ONLY_CSS: ReadonlyMap<string, string> = new Map([["red4", "#8B0000"]]);
-
-/**
- * Projects a `PROV_THEME` color token to a browser-legal CSS/SVG color: a Graphviz-only
- * X11 name (see {@link GRAPHVIZ_ONLY_CSS}) becomes its hex; any already-legal token
- * passes through unchanged. Total: an unmapped token is returned as-is. Exported so the
- * conformance eval can hold the emitter to the SAME projection when it checks emitted
- * fills/strokes/tints against the theme.
- */
-export function toCssColor(color: string): string {
-  return GRAPHVIZ_ONLY_CSS.get(color) ?? color;
 }
 
 /**
