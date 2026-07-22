@@ -486,6 +486,10 @@ function projectStyle(style: NodeStyle): ProjectedNodeStyle {
 }
 
 function projectRelations(theme: ProvTheme): Record<RelationKind, { color?: string; fontcolor?: string }> {
+  // `out` is asserted complete up front and then filled for every key of
+  // `theme.relations`, which is itself a closed `Record<RelationKind, …>`; the loop
+  // therefore writes exactly the RelationKind set the type promises. `Object.keys` only
+  // widens to `string[]` because TS cannot prove the record carries no extra keys.
   const out = {} as Record<RelationKind, { color?: string; fontcolor?: string }>;
   for (const key of Object.keys(theme.relations) as RelationKind[]) {
     const style = theme.relations[key];
@@ -522,6 +526,9 @@ function mergeStyleRecord<K extends string, S extends object>(
 ): Record<K, S> {
   const merged: Record<K, S> = { ...base };
   if (override === undefined) return merged;
+  // `override` is typed `Record<K, S>`, so its own keys are exactly `K`; `Object.keys`
+  // only widens to `string[]` because TS cannot prove a plain record carries no extra
+  // keys. The cast restores the key type the parameter already guarantees.
   for (const key of Object.keys(override) as K[]) {
     merged[key] = { ...base[key], ...override[key] };
   }

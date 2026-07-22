@@ -229,6 +229,28 @@ test("node labels escape embedded quotes via #quot;", () => {
   expect(withLabels).toContain('n1(["The #quot;Best#quot; Draft<br/>ex:article"]):::entity');
 });
 
+test("node labels entity-escape < > & so injected markup is inert; the two-line <br/> survives", () => {
+  const doc = newDoc();
+  // A prov:label carrying an HTML-injection payload plus a raw ampersand and quotes:
+  // under useLabels this flows into a label span Mermaid renders as HTML, so every one of
+  // these characters must land as an inert entity, not live markup.
+  doc.entity(ex.qn("article"), [[PROV_LABEL, '<img src=x onerror=alert(1)> a & b "q"']]);
+
+  const withLabels = render(doc, { useLabels: true });
+  // The distinct label + identifier form the two-line label; the `<br/>` between them is
+  // the caller's structural separator, inserted AFTER escaping each line, so it stays a
+  // literal `<br/>` while the payload's own `<`/`>`/`&`/`"` are all entity-escaped.
+  expect(withLabels).toContain(
+    'n1(["&lt;img src=x onerror=alert(1)&gt; a &amp; b #quot;q#quot;<br/>ex:article"]):::entity',
+  );
+  const nodeLine = lines(withLabels).find((l) => l.startsWith("n1("));
+  expect(nodeLine).toBeDefined();
+  // No live markup: the only `<`/`>` left in the node line are the escaped entities and
+  // the structural `<br/>` — the raw `<img …>` tag never survives.
+  expect(nodeLine).not.toContain("<img");
+  expect(nodeLine).not.toContain("onerror=alert(1)>");
+});
+
 test("useLabels emits the two-line label only when label and identifier differ", () => {
   const doc = newDoc();
   doc.entity(ex.qn("article"), [[PROV_LABEL, "Draft Article"]]);
