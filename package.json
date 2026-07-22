@@ -7,7 +7,7 @@
   "scripts": {
     "bootstrap": "bun run --cwd packages/tsprov bootstrap",
     "test": "bun run --cwd packages/tsprov test",
-    "build": "bun run --cwd packages/tsprov build",
+    "build": "bun run --cwd packages/tsprov build && bun run --cwd packages/tsprov-render-core build && bun run --cwd packages/tsprov-render-svg build && bun run --cwd packages/tsprov-render-dot build && bun run --cwd packages/tsprov-render-mermaid build && bun run --cwd packages/tsprov-render-interactive build",
     "smoke": "bun run --cwd packages/tsprov smoke",
     "eval": "TSPROV_EVAL_FULL=1 bun test packages/evals packages/tsprov-render"
   }
