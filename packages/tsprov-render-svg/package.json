@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "@inflexa-ai/tsprov-render-core": "^0.1.0",
-    "@dagrejs/dagre": "^3.0.0"
+    "@dagrejs/dagre": "^3.1.0"
   },
   "peerDependencies": {
     "@inflexa-ai/tsprov": ">=0.5.1 <2"
