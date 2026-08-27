@@ -5,6 +5,15 @@ All notable changes to `tsprov` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Not yet included
+
+PROV-XML, PROV-RDF, DOT (graph-visualisation) rendering, and the CLI. See `docs/migration/` for
+the roadmap and `DEVIATIONS.md` for intentional divergences from the Python reference. Note the
+`@inflexa-ai/tsprov/graph` layer (multi-digraph + lineage queries) *did* ship in `0.5.0`; only
+DOT/image rendering of that graph remains out of scope.
+
+## [0.6.0] — 2026-08-27
+
 ### Added
 
 - **A prebuilt browser bundle ships in the dist**: `dist/browser/tsprov.min.js` (with
@@ -28,13 +37,6 @@ All notable changes to `tsprov` are documented here. The format is based on
   `CITATION.cff` — Zenodo mints it only after the tag is published, so a value written into the
   file could only ever name the previous release; the concept DOI (which always resolves to the
   latest release) remains.
-
-### Not yet included
-
-PROV-XML, PROV-RDF, DOT (graph-visualisation) rendering, and the CLI. See `docs/migration/` for
-the roadmap and `DEVIATIONS.md` for intentional divergences from the Python reference. Note the
-`@inflexa-ai/tsprov/graph` layer (multi-digraph + lineage queries) *did* ship in `0.5.0`; only
-DOT/image rendering of that graph remains out of scope.
 
 ## [0.5.1] — 2026-07-11
 

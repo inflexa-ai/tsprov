@@ -27,8 +27,8 @@ authors:
     orcid: "https://orcid.org/0009-0007-2817-4589"
   - name: "Inflexa, Inc."
 
-version: 0.5.1
-date-released: "2026-07-14"
+version: 0.6.0
+date-released: "2026-08-27"
 repository-code: "https://github.com/inflexa-ai/tsprov"
 url: "https://github.com/inflexa-ai/tsprov#readme"
 
