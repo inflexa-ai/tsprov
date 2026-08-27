@@ -85,6 +85,15 @@ function graphSmoke(ProvDocument, graph, label) {
  */
 function browserSmoke(bundlePath) {
   const source = readFileSync(bundlePath, "utf8");
+
+  // The linked source map is part of the published contract; assert it here so a
+  // bundler-flag regression (the `--outfile`+`--sourcemap` combination already
+  // misbehaves on Bun 1.3.14) cannot ship a map-less or dangling-link artifact.
+  if (!source.includes("//# sourceMappingURL=tsprov.min.js.map")) {
+    throw new Error("browser bundle: missing sourceMappingURL link to tsprov.min.js.map");
+  }
+  readFileSync(`${bundlePath}.map`); // throws if the linked map is absent
+
   const sandbox = {};
   vm.createContext(sandbox);
   new vm.Script(source, { filename: "tsprov.min.js" }).runInContext(sandbox);
