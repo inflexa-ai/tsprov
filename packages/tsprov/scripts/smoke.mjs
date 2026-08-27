@@ -15,12 +15,16 @@
 import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join } from "node:path";
+// node:fs (not Bun.file) on purpose: this script runs under `node` (see above).
+import { readFileSync } from "node:fs";
+import vm from "node:vm";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const distEsm = join(here, "..", "dist", "index.js");
 const distCjs = join(here, "..", "dist", "cjs", "index.js");
 const distGraphEsm = join(here, "..", "dist", "graph", "index.js");
 const distGraphCjs = join(here, "..", "dist", "cjs", "graph", "index.js");
+const distBrowser = join(here, "..", "dist", "browser", "tsprov.min.js");
 
 /**
  * Drive a full author → serialize(both formats) → deserialize → equals cycle.
@@ -69,6 +73,66 @@ function graphSmoke(ProvDocument, graph, label) {
   console.log(`  ok  ${label}  (nodes=${g.nodes.length}, edges=${g.edges.length}, round-trip equal)`);
 }
 
+/**
+ * Drive the browser artifact under its consumer's actual constraint: a classic
+ * `<script src>` on a `file://` page — no module system, no `require`, no Node
+ * globals. A bare `vm` context is the closest Node approximation: `new vm.Script`
+ * parses classic-script source (an `import`/`export` statement is a SyntaxError
+ * there, so execution alone proves the bundle is a classic script), and an empty
+ * contextified sandbox proves the bundle resolves nothing at load time and leaks
+ * exactly the one intended global. The surface assertions pin the flat core+graph
+ * merge — they also go red if a future graph export ever shadows a core name.
+ */
+function browserSmoke(bundlePath) {
+  const source = readFileSync(bundlePath, "utf8");
+  const sandbox = {};
+  vm.createContext(sandbox);
+  new vm.Script(source, { filename: "tsprov.min.js" }).runInContext(sandbox);
+
+  const globals = Object.keys(sandbox);
+  if (globals.length !== 1 || globals[0] !== "tsprov") {
+    throw new Error(
+      `browser bundle: expected exactly one new global "tsprov", got [${globals.join(", ")}]`,
+    );
+  }
+  const t = sandbox.tsprov;
+  const walkSurface = ["read", "ProvGraph", "provToGraph", "resolve", "resolveUnique", "lineage"];
+  for (const name of walkSurface) {
+    if (typeof t[name] !== "function") {
+      throw new Error(`browser bundle: walk-surface export "${name}" missing or not a function`);
+    }
+  }
+
+  // Same author → serialize → read cycle as `roundtrip`, but through the global:
+  // it lives or dies on the serializers' import-time registration surviving the
+  // bundler's minified IIFE output.
+  const doc = new t.ProvDocument();
+  doc.addNamespace("ex", "http://example.org/");
+  doc.entity("ex:e1");
+  doc.activity("ex:a1");
+  doc.wasGeneratedBy("ex:e1", "ex:a1");
+  const json = doc.serialize("json");
+  const provn = doc.serialize("provn");
+  if (!json.length || !provn.length) {
+    throw new Error(`browser bundle: empty serialization (json=${json.length} provn=${provn.length})`);
+  }
+  const back = t.read(json, "json");
+  if (!back.equals(doc)) throw new Error("browser bundle: read → equals round-trip failed");
+
+  // The consumer's walk: document → graph → lineage from the entity.
+  const g = t.provToGraph(doc);
+  if (g.nodes.length !== 2 || g.edges.length !== 1) {
+    throw new Error(`browser bundle: expected 2 nodes / 1 edge, got ${g.nodes.length}/${g.edges.length}`);
+  }
+  const lin = t.lineage(g, "ex:e1");
+  if (lin.nodes.length !== 2) {
+    throw new Error(`browser bundle: lineage from ex:e1 expected 2 nodes, got ${lin.nodes.length}`);
+  }
+  console.log(
+    `  ok  IIFE dist/browser/tsprov.min.js  (global=tsprov, round-trip equal, lineage nodes=${lin.nodes.length})`,
+  );
+}
+
 try {
   console.log("smoke: validating published artifacts under node…");
 
@@ -102,7 +166,10 @@ try {
   }
   graphSmoke(cjs.ProvDocument, cjsGraph, "CJS  dist/cjs/graph/index.js");
 
-  console.log("smoke: OK — both entry points (root + graph) load and round-trip.");
+  // The browser artifact — classic-script semantics, no module system at all.
+  browserSmoke(distBrowser);
+
+  console.log("smoke: OK — all entry points (root + graph + browser IIFE) load and round-trip.");
 } catch (err) {
   console.error("smoke: FAILED —", err?.stack ?? err);
   process.exit(1);

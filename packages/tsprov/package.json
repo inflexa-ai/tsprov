@@ -63,9 +63,10 @@
   "scripts": {
     "bootstrap": "node scripts/bootstrap.mjs",
     "clean": "rm -rf dist",
-    "build": "bun run clean && bun run build:esm && bun run build:cjs",
+    "build": "bun run clean && bun run build:esm && bun run build:cjs && bun run build:browser",
     "build:esm": "tsc -p tsconfig.build.json",
     "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
+    "build:browser": "bun build scripts/browser-entry.ts --format=iife --minify --sourcemap=linked --target=browser --outdir=dist/browser --entry-naming \"tsprov.min.[ext]\" --banner \"/*! @inflexa-ai/tsprov | Apache-2.0 | https://github.com/inflexa-ai/tsprov */\"",
     "smoke": "node scripts/smoke.mjs",
     "pretest": "node scripts/bootstrap.mjs",
     "test": "bun test",

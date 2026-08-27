@@ -22,7 +22,9 @@ with a fully-typed fluent API, and round-trip them through PROV-JSON and PROV-N.
   with the camelCase PROV vocabulary as the primary API.
 - **Dependency-light core.** Only [luxon](https://moment.github.io/luxon/) (datetime fidelity). Browser-
   safe and tree-shakeable.
-- **Dual ESM + CJS** with `.d.ts` declarations — works in Node, Bun, and bundlers.
+- **Dual ESM + CJS** with `.d.ts` declarations — works in Node, Bun, and bundlers. Plus a
+  prebuilt classic-script bundle (`dist/browser/tsprov.min.js`, global `tsprov`) for pages
+  that can't load modules — for example on `file://`.
 
 ## Install
 
@@ -165,7 +167,7 @@ PROV-XML, PROV-RDF, DOT (graph-visualisation) rendering, and the CLI are out of 
 bun install
 bun run bootstrap   # fetch the 398-file PROV-JSON conformance corpus into reference/
 bun test            # run the test suite (incl. the corpus oracle)
-bun run build       # emit dist/ (ESM + CJS + .d.ts)
+bun run build       # emit dist/ (ESM + CJS + .d.ts + browser IIFE)
 ```
 
 The corpus is the Python reference implementation's, and is deliberately not vendored — see
