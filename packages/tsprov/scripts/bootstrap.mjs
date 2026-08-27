@@ -15,9 +15,9 @@
 // `bun run test` works on a clean checkout. Note that a *bare* `bun test` bypasses
 // lifecycle scripts, so CONTRIBUTING.md tells contributors to run this once by hand.
 //
-// It tracks upstream `master` on purpose. For a port whose entire value is fidelity
-// to the reference, a corpus change upstream SHOULD surface as a failing test rather
-// than as silent drift. Pin it when a run has to be reproducible:
+// It tracks the upstream default branch on purpose. For a port whose entire value is
+// fidelity to the reference, a corpus change upstream SHOULD surface as a failing test
+// rather than as silent drift. Pin it when a run has to be reproducible:
 //
 //   TSPROV_PROV_REF=2.3.0 bun run bootstrap
 import { spawnSync } from "node:child_process";
@@ -26,7 +26,11 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const REPO = "https://github.com/trungdong/prov.git";
-const REF = process.env.TSPROV_PROV_REF ?? "master";
+// undefined = clone the upstream default branch. Naming a branch here instead would
+// couple the fetch to upstream's branch naming — a rename (trungdong/prov has already
+// retired `master` for `main` once) breaks every clean checkout and CI run at once,
+// for zero fidelity gain: "track upstream" means the default branch, whatever its name.
+const REF = process.env.TSPROV_PROV_REF;
 
 // The fixture count the oracle suites are written against. Used only to warn: an
 // upstream corpus that has grown or shrunk is news, not an error, and the tests
@@ -67,8 +71,9 @@ if (existsSync(checkout)) {
   rmSync(checkout, { recursive: true, force: true });
 }
 
-console.log(`bootstrap: cloning ${REPO} @ ${REF} → reference/prov …`);
-const clone = spawnSync("git", ["clone", "--depth", "1", "--branch", REF, REPO, checkout], {
+console.log(`bootstrap: cloning ${REPO} @ ${REF ?? "default branch"} → reference/prov …`);
+const cloneArgs = ["clone", "--depth", "1", ...(REF ? ["--branch", REF] : []), REPO, checkout];
+const clone = spawnSync("git", cloneArgs, {
   stdio: "inherit",
 });
 
