@@ -5,6 +5,16 @@ All notable changes to `tsprov` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- **A prebuilt browser bundle ships in the dist**: `dist/browser/tsprov.min.js` (with
+  `tsprov.min.js.map`) is a minified classic script (IIFE) that registers a single global,
+  `tsprov`, exposing the flat union of the root and `/graph` entry points — including `read`,
+  `ProvGraph`, `provToGraph`, `resolve`, `resolveUnique`, and `lineage` — with `luxon` inlined.
+  Stage the file into page assets and load it with a relative `<script src>` (it works on
+  `file://` pages, where ES modules refuse to load). The publish-gating smoke test executes the
+  bundle under classic-script semantics. ([#21](https://github.com/inflexa-ai/tsprov/issues/21))
+
 ### Changed
 
 - **tsprov is now published to the public [npm registry](https://www.npmjs.com/package/@inflexa-ai/tsprov)**
