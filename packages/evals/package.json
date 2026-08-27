@@ -15,6 +15,6 @@
     "@inflexa-ai/tsprov-render-svg": "workspace:*",
     "@inflexa-ai/tsprov-render-interactive": "workspace:*",
     "@types/bun": "latest",
-    "typescript": "^5 || ^6"
+    "typescript": "^7"
   }
 }
