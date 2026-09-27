@@ -1,0 +1,75 @@
+name: 🐞 Bug report
+description: Report a round-trip failure, a difference from the Python reference, or another defect.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A PROV document that tsprov changes, drops, or reads differently from the Python `prov` library is the most valuable bug report. Attach the document.
+
+        Do not put private data or secrets into this report. For a security vulnerability, **stop** and obey [`SECURITY.md`](https://github.com/inflexa-ai/tsprov/blob/main/SECURITY.md).
+  - type: checkboxes
+    attributes:
+      label: Before you report
+      options:
+        - label: I searched the [issues](../../issues) and the [discussions](../../discussions), and I did not find a duplicate.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of bug
+      options:
+        - Round-trip failure (PROV-JSON or PROV-N)
+        - Difference from the Python reference
+        - Graph or lineage query
+        - Types or API
+        - Other (tell in the description)
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Tell what tsprov did, and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: document
+    attributes:
+      label: PROV document
+      description: The smallest document that shows the bug.
+      render: json
+    validations:
+      required: false
+  - type: textarea
+    id: code
+    attributes:
+      label: Code
+      description: The smallest code that shows the bug.
+      render: typescript
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: tsprov version
+      description: The version of `@inflexa-ai/tsprov`, or the commit SHA if you built from source.
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime
+      description: The runtime and its version, for example Node 24.1, Bun 1.3, or Chrome 140.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: The error or the output. Remove the secrets and the private data.
+      render: shell
+    validations:
+      required: false
