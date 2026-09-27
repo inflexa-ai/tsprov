@@ -1,0 +1,46 @@
+name: ✨ Feature request
+description: Propose a new capability or an improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a large change, open a [discussion](../../discussions) first. [`GOVERNANCE.md`](https://github.com/inflexa-ai/tsprov/blob/main/GOVERNANCE.md) lists the parts of PROV that tsprov does not implement yet.
+  - type: checkboxes
+    attributes:
+      label: Before you propose
+      options:
+        - label: I searched the [issues](../../issues) and the [discussions](../../discussions), and I did not find a duplicate.
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Tell what you want to do, and what stops you today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Serializers (PROV-JSON, PROV-N)
+        - A format that is not implemented (PROV-XML, PROV-RDF, a PROV-N parser)
+        - Model and fluent API
+        - Graph and lineage
+        - Documentation
+        - Other
+    validations:
+      required: true
