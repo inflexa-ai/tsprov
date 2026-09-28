@@ -68,6 +68,6 @@
     "@inflexa-ai/tsprov": "workspace:*",
     "@inflexa-ai/tsprov-render-core": "workspace:*",
     "@types/bun": "latest",
-    "typescript": "^5 || ^6"
+    "typescript": "^7"
   }
 }
