@@ -63,6 +63,6 @@
   "devDependencies": {
     "@inflexa-ai/tsprov": "workspace:*",
     "@types/bun": "latest",
-    "typescript": "^5 || ^6"
+    "typescript": "^7"
   }
 }
