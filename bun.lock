@@ -97,7 +97,7 @@
       "name": "@inflexa-ai/tsprov-render-svg",
       "version": "0.1.0",
       "dependencies": {
-        "@dagrejs/dagre": "^3.0.0",
+        "@dagrejs/dagre": "^3.1.1",
         "@inflexa-ai/tsprov-render-core": "^0.1.0",
       },
       "devDependencies": {
@@ -112,9 +112,9 @@
     },
   },
   "packages": {
-    "@dagrejs/dagre": ["@dagrejs/dagre@3.0.0", "", { "dependencies": { "@dagrejs/graphlib": "4.0.1" } }, "sha512-ZzhnTy1rfuoew9Ez3EIw4L2znPGnYYhfn8vc9c4oB8iw6QAsszbiU0vRhlxWPFnmmNSFAkrYeF1PhM5m4lAN0Q=="],
+    "@dagrejs/dagre": ["@dagrejs/dagre@3.1.1", "", { "dependencies": { "@dagrejs/graphlib": "4.0.5" } }, "sha512-zroZB1dFOFiGgv4Xcrn1DckB1o4aOikPqD2NDQPV0WM//CXGcS6xiD0rNkqHmw6FEg4tabt4nxPLwgCWT+Vb2A=="],
 
-    "@dagrejs/graphlib": ["@dagrejs/graphlib@4.0.1", "", {}, "sha512-IvcV6FduIIAmLwnH+yun+QtV36SC7mERqa86aClNqmMN09WhmPPYU8ckHrZBozErf+UvHPWOTJYaGYiIcs0DgA=="],
+    "@dagrejs/graphlib": ["@dagrejs/graphlib@4.0.5", "", {}, "sha512-7xrBTqIts3o+PMUZX97wSc+7TUbW+/rULzGNCTP6yooNVDXbzw4Wutg/H/xOutTB/c/k0YqOAavgPh4/Zk9PFA=="],
 
     "@inflexa-ai/tsprov": ["@inflexa-ai/tsprov@workspace:packages/tsprov"],
 
